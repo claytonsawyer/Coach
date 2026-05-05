@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Coach">
+<meta name="theme-color" content="#0B0F14">
+<title>Coach — Training Intelligence</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230B0F14'/%3E%3Ctext x='90' y='118' font-size='90' text-anchor='middle' fill='%23E5E7EB' font-family='Inter,-apple-system' font-weight='700'%3EC%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg: #0B0F14;
+  --surface: #121821;
+  --surface-2: #1A222D;
+  --surface-3: #243040;
+  --border: #1E2632;
+  --border-strong: #2A3544;
+  --text: #E5E7EB;
+  --text-muted: #9CA3AF;
+  --text-dim: #6B7280;
+  --primary: #3B82F6;
+  --primary-bg: rgba(59,130,246,0.12);
+  --green: #22C55E;
+  --green-bg: rgba(34,197,94,0.12);
+  --yellow: #EAB308;
+  --yellow-bg: rgba(234,179,8,0.12);
+  --orange: #F97316;
+  --orange-bg: rgba(249,115,22,0.12);
+  --red: #EF4444;
+  --red-bg: rgba(239,68,68,0.12);
+  --purple: #A78BFA;
+  --pink: #EC4899;
+  --teal: #14B8A6;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  background: var(--bg); color: var(--text);
+  -webkit-font-smoothing: antialiased; font-size: 15px; line-height: 1.45;
+  min-height: 100vh;
+}
+
+/* ═══════════════════════════════════════════════════
+   PHONE VIEW (default)
+   ═══════════════════════════════════════════════════ */
+body.phone-view {
+  padding: max(20px, env(safe-area-inset-top)) 16px calc(96px + env(safe-area-inset-bottom));
+  max-width: 480px; margin: 0 auto;
+}
+
+/* ═══════════════════════════════════════════════════
+   DESKTOP VIEW (when toggled on)
+   ═══════════════════════════════════════════════════ */
+body.desktop-view {
+  padding: 24px 32px 32px;
+  max-width: 1440px; margin: 0 auto;
+}
+
+/* HEADER */
+.header { margin-bottom: 16px; }
+.header-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-bottom: 8px;
+}
+.greeting { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; }
+.date { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
+body.desktop-view .date { font-size: 28px; }
+.subdate { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
+.race-countdown {
+  display: inline-block; margin-top: 6px; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--orange); background: var(--orange-bg);
+  padding: 4px 10px; border-radius: 100px;
+  border: 1px solid rgba(249,115,22,0.25);
+}
+
+/* VIEW TOGGLE */
+.view-toggle {
+  display: inline-flex; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 3px; gap: 2px;
+}
+.view-toggle button {
+  background: transparent; border: none;
+  color: var(--text-muted); font-size: 12px; font-weight: 600;
+  padding: 6px 12px; border-radius: 5px;
+  cursor: pointer; font-family: inherit;
+  display: flex; align-items: center; gap: 6px;
+  transition: all 0.15s;
+}
+.view-toggle button.active {
+  background: var(--surface-3); color: var(--text);
+}
+.view-toggle button svg { width: 14px; height: 14px; }
+
+/* SETUP */
+.setup { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 16px; max-width: 480px; }
+.setup h3 { font-size: 16px; margin-bottom: 12px; font-weight: 600; }
+.setup label { font-size: 12px; color: var(--text-muted); display: block; margin: 12px 0 6px; font-weight: 500; }
+.setup input { width: 100%; padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; font-family: inherit; }
+.setup input:focus { outline: none; border-color: var(--primary); }
+.setup button { width: 100%; margin-top: 16px; padding: 12px; background: var(--text); color: var(--bg); border: none; border-radius: 8px; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; }
+.setup-note { font-size: 11px; color: var(--text-dim); margin-top: 10px; line-height: 1.5; }
+
+/* CARD BASE */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 18px;
+}
+.card-label {
+  font-size: 11px; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.1em;
+  margin-bottom: 10px;
+}
+.card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+.card-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.card-meta { font-size: 11px; color: var(--text-dim); }
+
+/* FEEL CHECK-IN */
+.feel-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; }
+.feel-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+.feel-edit { font-size: 11px; color: var(--primary); font-weight: 600; cursor: pointer; }
+.feel-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.feel-btn {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 4px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  cursor: pointer; transition: all 0.15s;
+  font-family: inherit; color: var(--text);
+}
+.feel-btn:active { transform: scale(0.96); }
+.feel-btn:hover { background: var(--surface-3); }
+.feel-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+.feel-btn-emoji { font-size: 22px; line-height: 1; }
+.feel-btn-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+.feel-selected { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; }
+.feel-selected-info { display: flex; align-items: center; gap: 10px; }
+.feel-selected-emoji { font-size: 24px; }
+.feel-selected-text { display: flex; flex-direction: column; }
+.feel-selected-label { font-size: 13px; font-weight: 600; }
+.feel-selected-sub { font-size: 11px; color: var(--text-muted); }
+
+/* HEALTH SNAPSHOT */
+.snapshot { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 12px; }
+.snapshot-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.snapshot-title { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.snapshot-time { font-size: 11px; color: var(--text-dim); }
+
+.readiness-block { display: flex; align-items: center; gap: 16px; padding-bottom: 14px; margin-bottom: 14px; border-bottom: 1px solid var(--border); }
+.readiness-ring { position: relative; width: 76px; height: 76px; flex-shrink: 0; }
+.readiness-ring svg { transform: rotate(-90deg); }
+.readiness-ring-bg { stroke: var(--surface-2); stroke-width: 7; fill: none; }
+.readiness-ring-fill { stroke-width: 7; fill: none; stroke-linecap: round; transition: stroke-dashoffset 0.6s; }
+.readiness-ring-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+.readiness-info { flex: 1; min-width: 0; }
+.readiness-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+.readiness-status { font-size: 17px; font-weight: 700; margin: 2px 0; }
+.readiness-msg { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+
+.snap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.snap-metric { cursor: pointer; }
+.snap-metric-top { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+.snap-metric-label { font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+.snap-metric-help { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; background: var(--surface-2); color: var(--text-dim); font-size: 9px; font-weight: 700; }
+.snap-metric-value { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
+.snap-metric-na { font-size: 22px; color: var(--text-dim); font-weight: 600; line-height: 1.1; }
+.snap-metric-unit { font-size: 12px; color: var(--text-dim); font-weight: 500; margin-left: 2px; }
+.snap-metric-trend { font-size: 10px; margin-top: 2px; font-weight: 600; }
+.snap-metric-meta { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+.trend-up { color: var(--green); }
+.trend-down { color: var(--red); }
+.trend-flat { color: var(--text-dim); }
+
+.help-drawer { display: none; grid-column: 1 / -1; background: var(--surface-2); border-radius: 8px; padding: 10px 12px; font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-top: 4px; }
+.help-drawer.open { display: block; }
+.help-drawer strong { color: var(--text); font-weight: 600; }
+
+/* COACH'S READ */
+.ai-summary { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+.ai-summary-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.ai-summary-icon { width: 22px; height: 22px; background: var(--text); color: var(--bg); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+.ai-summary-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+.ai-summary-text { font-size: 14px; line-height: 1.6; color: var(--text); }
+.ai-summary-text strong { color: var(--text); font-weight: 600; }
+.ai-summary-text .highlight-good { color: var(--green); font-weight: 600; }
+.ai-summary-text .highlight-warn { color: var(--orange); font-weight: 600; }
+.ai-summary-text .highlight-bad { color: var(--red); font-weight: 600; }
+
+/* SESSION CARD */
+.session-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 12px; }
+.session-tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 6px; font-weight: 700; }
+.session-override-banner { background: var(--primary-bg); border: 1px solid rgba(59,130,246,0.25); border-radius: 8px; padding: 8px 10px; margin-bottom: 12px; font-size: 11px; color: var(--primary); font-weight: 600; }
+.session-title { font-size: 19px; font-weight: 700; margin-bottom: 6px; line-height: 1.25; letter-spacing: -0.01em; }
+.session-detail { font-size: 13px; color: var(--text-muted); line-height: 1.55; margin-bottom: 14px; }
+.session-pill { display: inline-block; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 8px; border-radius: 4px; margin-bottom: 10px; }
+.pill-hard { background: var(--red-bg); color: var(--red); }
+.pill-moderate { background: var(--orange-bg); color: var(--orange); }
+.pill-easy { background: var(--green-bg); color: var(--green); }
+.pill-rest { background: rgba(156,163,175,0.15); color: var(--text-muted); }
+
+.session-section { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+.session-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 10px; }
+.exercise { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+.exercise:last-child { border-bottom: none; }
+.exercise-check { width: 22px; height: 22px; border: 1.5px solid var(--border-strong); border-radius: 50%; flex-shrink: 0; margin-top: 1px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
+.exercise-check.checked { background: var(--green); border-color: var(--green); }
+.exercise-check.checked::after { content: '✓'; color: #000; font-size: 14px; font-weight: 700; }
+.exercise-info { flex: 1; min-width: 0; }
+.exercise-name { font-size: 14.5px; font-weight: 600; margin-bottom: 3px; line-height: 1.3; }
+.exercise-prescription { font-size: 12.5px; color: var(--text-muted); display: flex; gap: 10px; flex-wrap: wrap; }
+.prescription-item { display: inline-flex; align-items: center; gap: 3px; }
+.prescription-key { color: var(--text-dim); font-weight: 500; }
+.prescription-val { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+.exercise-note { font-size: 11px; color: var(--text-dim); margin-top: 4px; font-style: italic; line-height: 1.4; }
+.exercise.checked .exercise-name { color: var(--text-dim); text-decoration: line-through; text-decoration-color: var(--border-strong); }
+
+.protocol-block { background: var(--surface-2); border-radius: 10px; padding: 12px 14px; margin: 12px 0; }
+.protocol-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px; }
+.protocol-list { font-size: 13px; color: var(--text); line-height: 1.8; }
+.protocol-list span { display: block; }
+
+.section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin: 22px 0 10px; font-weight: 700; }
+
+/* CHARTS */
+.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 8px; }
+.chart-svg { width: 100%; height: auto; display: block; }
+
+/* ACTIVITIES */
+.activity { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 6px; display: flex; gap: 12px; align-items: center; }
+.activity-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--surface-2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; }
+.activity-info { flex: 1; min-width: 0; }
+.activity-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.activity-stats { font-size: 12px; color: var(--text-muted); display: flex; gap: 10px; flex-wrap: wrap; }
+.activity-date { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+.activity-spark { flex-shrink: 0; width: 60px; height: 24px; }
+
+/* COACH BUTTON (phone) */
+.coach-button-fixed { position: fixed; bottom: max(16px, env(safe-area-inset-bottom)); left: 16px; right: 16px; max-width: 448px; margin: 0 auto; background: var(--text); color: var(--bg); border: none; border-radius: 14px; padding: 16px; font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; gap: 8px; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; z-index: 100; }
+.coach-button-fixed:active { transform: scale(0.98); }
+.coach-button-fixed.success { background: var(--green); color: #000; }
+
+/* INLINE COACH BUTTON (desktop) */
+.coach-button-inline {
+  background: var(--text); color: var(--bg); border: none;
+  border-radius: 10px; padding: 10px 16px;
+  font-size: 13px; font-weight: 700; font-family: inherit;
+  cursor: pointer; display: flex; align-items: center; gap: 6px;
+  transition: opacity 0.15s;
+}
+.coach-button-inline:hover { opacity: 0.9; }
+.coach-button-inline.success { background: var(--green); color: #000; }
+
+/* ALERTS */
+.alert { background: var(--orange-bg); border: 1px solid rgba(249,115,22,0.25); border-radius: 12px; padding: 11px 13px; margin-bottom: 12px; font-size: 13px; color: var(--orange); font-weight: 600; }
+.alert-poor { background: var(--red-bg); border-color: rgba(239,68,68,0.25); color: var(--red); }
+
+/* LOADING / ERROR */
+.loading { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 14px; }
+.spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--text); border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 8px; vertical-align: middle; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.error { background: var(--red-bg); border: 1px solid rgba(239,68,68,0.25); border-radius: 12px; padding: 14px; font-size: 13px; color: var(--red); margin-bottom: 12px; line-height: 1.5; }
+
+/* INSIGHTS PANEL */
+.insight-row { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); align-items: center; }
+.insight-row:last-child { border-bottom: none; }
+.insight-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; }
+.insight-text { font-size: 13px; line-height: 1.4; }
+.insight-text strong { font-weight: 600; }
+
+/* ZONE DONUT LEGEND */
+.zone-donut-wrap { display: flex; gap: 16px; align-items: center; }
+.zone-legend { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.zone-legend-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.zone-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+.zone-name { font-weight: 600; min-width: 22px; }
+.zone-pct { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+/* FOOTER */
+.footer { text-align: center; font-size: 11px; color: var(--text-dim); margin-top: 24px; padding-bottom: 20px; }
+.footer a { color: var(--text-muted); text-decoration: none; margin: 0 4px; }
+
+/* ═══════════════════════════════════════════════════
+   DESKTOP LAYOUT GRID
+   ═══════════════════════════════════════════════════ */
+body.desktop-view .desktop-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 16px;
+}
+body.desktop-view .col-3 { grid-column: span 3; }
+body.desktop-view .col-4 { grid-column: span 4; }
+body.desktop-view .col-5 { grid-column: span 5; }
+body.desktop-view .col-6 { grid-column: span 6; }
+body.desktop-view .col-7 { grid-column: span 7; }
+body.desktop-view .col-8 { grid-column: span 8; }
+body.desktop-view .col-9 { grid-column: span 9; }
+body.desktop-view .col-12 { grid-column: span 12; }
+body.desktop-view .feel-card,
+body.desktop-view .snapshot,
+body.desktop-view .ai-summary,
+body.desktop-view .session-card,
+body.desktop-view .chart-card,
+body.desktop-view .card,
+body.desktop-view .alert,
+body.desktop-view .activity { margin-bottom: 0; }
+body.desktop-view .footer { margin-top: 32px; }
+body.desktop-view .coach-button-fixed { display: none; }
+
+@media (max-width: 900px) {
+  body.desktop-view .desktop-grid { grid-template-columns: repeat(6, 1fr); }
+  body.desktop-view .col-3 { grid-column: span 6; }
+  body.desktop-view .col-4 { grid-column: span 6; }
+  body.desktop-view .col-5 { grid-column: span 6; }
+  body.desktop-view .col-6 { grid-column: span 6; }
+  body.desktop-view .col-7 { grid-column: span 6; }
+  body.desktop-view .col-8 { grid-column: span 6; }
+  body.desktop-view .col-9 { grid-column: span 6; }
+}
+
+</style>
+</head>
+<body class="phone-view">
+
+<div id="app">
+  <div class="loading"><span class="spinner"></span>Loading dashboard...</div>
+</div>
+
+<script>
+const CLAUDE_PROJECT_URL = "https://claude.ai/new";
+const RACE_DATE = new Date("2026-10-17");
+const RACE_NAME = "Montecito Mash";
+const ATHLETE_NAME = "Clayton";
+
+const COACHING_BRIEF = `ATHLETE COACHING BRIEF — Clayton Sawyer (v2.0 — May 2026)
+AGE: 26 | SLO, CA | Ocean Lifeguard 9 years
+SPORT: Catalina Classic 7:01:00 first crossing. 1:31 half marathon minimal training. Weekly: MTB, surf, dirt bike, trail run, prone paddle. Strength 3-4/wk.
+HOME GYM: Pull-up bar, cable stack, bench, DBs 5-80lb, barbell+plates, trap bar, tricep bar, bands.
+RACE: Montecito Mash Oct 17 2026 (7mi paddle + 10mi trail run + 15mi MTB). Cramped on bike last year.
+LIFE: Baby due October 2026. High stress. Sleep 7.2hrs avg. When baby comes drop to 3-day plan.
+GARMIN: CTL ~219 baseline, peak 271. Boom-bust pattern. HRV 90-111ms range. Hill score 30 — climbing deficit.
+PHYSIOLOGY: Cadence 173 flat → 152 steep (target 170+). Heavy sweater 1520ml/90min — drives cramps. Naturally runs 90%+ HR (must discipline 140-150 for endurance). Paddle is NOT a weakness.
+WEAKNESSES: Aerobic efficiency, lower body resilience, fueling/sweat, climb cadence, training consistency, mobility.
+PLAN: M Lower A | T Upper A push/paddle | W Z2+mobility | Th trail run | F Upper B pull/biceps | Sa long MTB | Su OFF
+PREFERENCES: Incline-first chest. High bicep frequency. No sugarcoating.
+ACWR rule: never exceed 1.3x CTL (~219). Cramp protocol: 500mg sodium pre-load, 60g carbs/hr.`;
+
+const FEEL_OPTIONS = [
+  { id: 'fresh', emoji: '💪', label: 'Fresh', desc: 'Ready to push, no soreness, sleep was solid' },
+  { id: 'normal', emoji: '👍', label: 'Normal', desc: 'Average, ready to train as planned' },
+  { id: 'sore', emoji: '🦵', label: 'Sore', desc: 'Muscles still recovering from previous session' },
+  { id: 'beat', emoji: '😴', label: 'Beat', desc: 'Tired, low energy, need recovery' }
+];
+
+const SESSIONS = {
+  "Monday": { title: "Lower A — Heavy Bilateral", intensity: "hard", summary: "Low volume, high quality. The two big lifts get all your focus. Builds the legs to climb Gibraltar without cramping.", duration: "60-75 min", warmup: ["Hip 90/90s — 1 min each side", "Goblet squat hold — 30 sec x 2", "Ankle CARs — 10 each", "Glute bridges — 15 reps", "Empty bar squats — 10 reps"], exercises: [ { name: "Trap Bar Deadlift", sets: 4, reps: "5", weight: "Build to top set", rest: "3 min", notes: "Reset each rep. Brace HARD. Top set leaves 1-2 in tank." }, { name: "Barbell Back Squat", sets: 3, reps: "6", weight: "75-80% 1RM", rest: "2-3 min", notes: "Below parallel. Vertical torso. Drive knees out." }, { name: "Romanian Deadlift", sets: 3, reps: "8", weight: "Moderate-heavy", rest: "90 sec", notes: "Feel hamstrings load. Bar stays close to legs." }, { name: "Hanging Knee Raise", sets: 3, reps: "10", weight: "Bodyweight", rest: "60 sec", notes: "Slow controlled. Or sub Ab Wheel x10." } ], cooldown: ["Couch stretch — 90 sec each side", "Pigeon pose — 90 sec each side", "Foam roll quads + IT band — 2 min"], fueling: "Pre: oats + banana + protein shake. Post: protein + carbs within 60 min." },
+  "Tuesday": { title: "Upper A — Push & Paddle", intensity: "hard", summary: "Incline-first chest day with paddle-specific finishers. Upper chest priority for fullness, with shoulder stability work for the 7-mile Mash paddle.", duration: "55-70 min", warmup: ["Band pull-aparts — 15 reps x 2", "Shoulder CARs — 10 each direction", "Wall slides — 10 reps", "Light DB press — 12 reps x 2"], exercises: [ { name: "Incline Barbell Press", sets: 4, reps: "8", weight: "70-75% 1RM", rest: "2-3 min", notes: "Bench at 30-45°. Bar to upper chest. Pause briefly." }, { name: "Incline Dumbbell Press", sets: 3, reps: "10-12", weight: "Moderate", rest: "90 sec", notes: "Slight squeeze at top. DBs nearly touching." }, { name: "Cable Incline Fly", sets: 3, reps: "12-15", weight: "Light-moderate", rest: "60 sec", notes: "Low-to-high arc. Squeeze upper chest at top." }, { name: "Standing Overhead Press", sets: 3, reps: "10", weight: "Moderate", rest: "90 sec", notes: "Tight core. No lower back arch." }, { name: "Cable Tricep Pushdown", sets: 3, reps: "12-15", weight: "Moderate", rest: "60 sec", notes: "Elbows pinned. Full extension." }, { name: "Prone Plank to Extend", sets: 3, reps: "10", weight: "Bodyweight", rest: "60 sec", notes: "Paddle simulation. Stretch shoulders forward." }, { name: "Cable Pulldown in Hip Hinge", sets: 3, reps: "12-15", weight: "Light", rest: "60 sec", notes: "Mimic paddle stroke. Hinge at hips." }, { name: "Cable Curl + DB Curl", sets: 2, reps: "15", weight: "Light pump", rest: "45 sec", notes: "Bicep finisher — burn out for size." } ], cooldown: ["Doorway pec stretch — 60 sec each side", "Cross-body shoulder stretch — 30 sec each", "Foam roll thoracic spine — 90 sec"], fueling: "Carbs around training. Hydrate aggressively given heavy sweat rate." },
+  "Wednesday": { title: "Zone 2 + Full Mobility", intensity: "easy", summary: "The most underrated session of the week. Builds aerobic base and fixes mobility deficits spiking your vertical ratio on climbs. NEVER skip this.", duration: "50-60 min", warmup: ["5 min easy warm-up before main set"], exercises: [ { name: "Zone 2 Cardio (bike, swim, or easy run)", sets: 1, reps: "30-40 min", weight: "140-150bpm cap", rest: "—", notes: "Conversational pace. Nasal breathing. Builds the engine for the Mash." } ], cooldown: ["Foam roll thoracic spine — 2 min", "Foam roll quads — 2 min each leg", "Foam roll hamstrings — 2 min each leg", "Hip flexor stretch — 2 min each side", "Pigeon pose — 2 min each side", "Hamstring band floss — 1 min each side", "Doorway pec stretch — 1 min each side", "Ankle CARs + calf stretch — 2 min total"], fueling: "Light meal beforehand. Plenty of water + electrolytes." },
+  "Thursday": { title: "Trail Run", intensity: "moderate", summary: "The session that wins or loses the Mash. HR cap is non-negotiable — discipline now means you don't blow up on Gibraltar in October.", duration: "45-90 min", warmup: ["Bulgarian Split Squats — 8 reps each side x 2 (BW)", "Nordic curl negatives — 5 reps x 2", "Walking lunges — 10 each side", "Leg swings — 10 each direction", "5 min easy walk into slow jog"], exercises: [ { name: "Trail Run", sets: 1, reps: "Build to 90 min", weight: "140-150 bpm cap", rest: "—", notes: "Use HR monitor strictly. Walk hills if needed to stay under cap. Metronome at 170 spm — non-negotiable on climbs." } ], cooldown: ["Walk 5 min cool-down", "Calf stretch — 60 sec each", "Couch stretch — 90 sec each", "Pigeon pose — 90 sec each"], fueling: "If running >60 min: 30-60g carbs/hr + electrolytes. PRACTICE this — don't wait for race day." },
+  "Friday": { title: "Upper B — Pull & Biceps", intensity: "hard", summary: "Pull-up day. Posture, paddle power, and bicep size all built here. Highest direct bicep volume of the week — make it count.", duration: "55-70 min", warmup: ["Band pull-aparts — 15 x 2", "Dead hang — 20 sec x 2", "Scap pull-ups — 8 reps x 2", "Light DB row — 10 reps x 2"], exercises: [ { name: "Weighted Pull-Ups", sets: 4, reps: "6-8", weight: "Add weight as needed", rest: "2-3 min", notes: "Most important upper body lift for the Mash. Full ROM. Chin clears bar." }, { name: "Barbell or DB Row", sets: 4, reps: "10", weight: "Moderate-heavy", rest: "90 sec", notes: "Hinge to ~45°. Pull to lower chest/upper abs. Squeeze." }, { name: "Cable Face Pulls", sets: 3, reps: "15", weight: "Light-moderate", rest: "60 sec", notes: "External rotation at end. Shoulder health insurance." }, { name: "Single Arm Cable Row", sets: 3, reps: "12 each", weight: "Moderate", rest: "60 sec", notes: "Full stretch at start. Drive elbow back hard." }, { name: "Hammer Curl", sets: 3, reps: "12", weight: "Moderate", rest: "60 sec", notes: "Hits brachialis — adds arm thickness." }, { name: "Incline Dumbbell Curl", sets: 3, reps: "12", weight: "Moderate", rest: "60 sec", notes: "Bench 45-60°. Long head emphasis — KEY for size." }, { name: "Cable Curl", sets: 3, reps: "15", weight: "Moderate", rest: "45 sec", notes: "Constant tension burn. Squeeze at top." }, { name: "Pallof Press + Dead Bug", sets: 3, reps: "12 + 8", weight: "Cable + BW", rest: "45 sec", notes: "Anti-rotation core finisher." } ], cooldown: ["Lat stretch (overhead reach) — 60 sec each", "Bicep stretch (against wall) — 30 sec each", "Foam roll lats + upper back — 2 min"], fueling: "High protein day. ~30-40g protein at every meal." },
+  "Saturday": { title: "Long MTB Ride", intensity: "moderate", summary: "Race-specific bike training. Build to 2+ hours with sustained climbing. Practice fueling protocol that prevents Mash cramps.", duration: "90 min - 2.5 hrs", warmup: ["10 min easy spin to start", "Gradually build to working effort"], exercises: [ { name: "Long MTB Ride", sets: 1, reps: "Build to 2+ hrs", weight: "Mostly Z2, some Z3 climbs", rest: "—", notes: "Smooth pedaling. Higher cadence on climbs (don't grind). Practice descending technical terrain." } ], cooldown: ["10 min easy spin", "Hip flexor stretch 2 min each", "Foam roll quads + glutes", "Calf stretch each side"], fueling: "PRACTICE RACE FUELING: 500mg sodium pre-load 30 min before. 60g carbs/hour during." },
+  "Sunday": { title: "Rest / Active Recovery", intensity: "rest", summary: "Protect HRV. Sleep early. Walk, surf easy, foam roll. Sunday rest is what makes Monday's lift possible.", duration: "Optional 20-30 min easy", warmup: [], exercises: [ { name: "Easy walk, surf, or full rest", sets: 1, reps: "Optional", weight: "Conversational only", rest: "—", notes: "Body Battery should be charging not draining." } ], cooldown: ["Full body stretch routine — 15-20 min", "Hip + hamstring focus", "Thoracic spine mobility"], fueling: "Whole foods. Hydrate well." }
+};
+
+const RECOVERY_SESSION = {
+  title: "Active Recovery & Mobility",
+  intensity: "easy",
+  summary: "You flagged yourself as sore — pushing through compromises form, extends recovery, and suppresses HRV. The athletes who hit October 17 in best shape listen to their body.",
+  duration: "45-60 min",
+  warmup: ["Easy walk or bike — 5 min", "Cat/cow — 10 reps", "World's greatest stretch — 5 each side", "Leg swings — 10 each direction"],
+  exercises: [
+    { name: "Pick ONE — Easy Z2 swim or surf", sets: 1, reps: "30-45 min", weight: "HR cap 130bpm", rest: "—", notes: "Goal: blood flow, no muscle damage. Conversational only." },
+    { name: "OR — Mobility flow", sets: 1, reps: "30 min", weight: "Bodyweight", rest: "—", notes: "Foam roll quads/hams/glutes 3min each. Couch stretch 2min/side. Pigeon 2min/side. T-spine extension 3min." },
+    { name: "OR — Easy paddle (flat water)", sets: 1, reps: "30-45 min", weight: "No race pace", rest: "—", notes: "Form and breathing focus. No intervals." }
+  ],
+  cooldown: ["Slow walk — 5 min", "Box breathing 4-4-4-4 — 5 min", "Light full body stretch"],
+  fueling: "Protein every meal, plenty of carbs, hydrate aggressively. Aim for 8+ hrs sleep tonight."
+};
+
+// ════════════════════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════════════════════
+const todayKey = new Date().toDateString();
+const state = {
+  athleteId: localStorage.getItem('iv_athlete_id') || '',
+  apiKey: localStorage.getItem('iv_api_key') || '',
+  wellness: [],
+  activities: [],
+  loaded: false,
+  error: null,
+  checkedExercises: {},
+  feel: null,
+  view: localStorage.getItem('view_mode') || 'phone'
+};
+
+const savedFeelDate = localStorage.getItem('feel_date');
+if (savedFeelDate === todayKey) state.feel = localStorage.getItem('feel_today');
+
+const savedChecksDate = localStorage.getItem('checked_date');
+if (savedChecksDate === todayKey) {
+  state.checkedExercises = JSON.parse(localStorage.getItem('checked_today') || '{}');
+} else {
+  localStorage.setItem('checked_today', '{}');
+  localStorage.setItem('checked_date', todayKey);
+}
+
+document.body.className = state.view + '-view';
+
+// ════════════════════════════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════════════════════════════
+const $ = sel => document.querySelector(sel);
+const fmtDate = d => new Date(d).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+const fmtShort = d => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+const dayName = d => new Date(d).toLocaleDateString('en-US', { weekday: 'long' });
+const fmtMins = secs => secs ? Math.floor(secs/60) : 0;
+const fmtMiles = m => m ? (m/1609.34).toFixed(1) : 0;
+const fmtHrs = secs => secs ? (secs/3600).toFixed(1) : null;
+
+const sportIcon = type => {
+  const t = (type||'').toLowerCase();
+  if (t.includes('run')) return '🏃';
+  if (t.includes('ride') || t.includes('cycl') || t.includes('mtb') || t.includes('bike')) return '🚴';
+  if (t.includes('swim')) return '🏊';
+  if (t.includes('paddle')) return '🏄';
+  if (t.includes('weight') || t.includes('strength')) return '💪';
+  if (t.includes('walk') || t.includes('hike')) return '🚶';
+  if (t.includes('surf')) return '🌊';
+  return '🏅';
+};
+
+const getField = (obj, ...keys) => {
+  for (const k of keys) {
+    if (obj && obj[k] != null && obj[k] !== '') return obj[k];
+  }
+  return null;
+};
+
+function computeReadiness(latest, history) {
+  if (!latest) return null;
+  const hrv = getField(latest, 'hrv', 'hrvWeeklyAverage');
+  const rhr = getField(latest, 'restingHR');
+  const sleepSecs = getField(latest, 'sleepSecs');
+  const ctl = getField(latest, 'ctl');
+  const atl = getField(latest, 'atl');
+
+  if (hrv == null && sleepSecs == null) return null;
+
+  let score = 50;
+  let factors = 0;
+
+  if (hrv != null) {
+    const hist = history.slice(-14).map(d => getField(d, 'hrv', 'hrvWeeklyAverage')).filter(v => v != null);
+    if (hist.length >= 5) {
+      const avg = hist.reduce((a,b) => a+b, 0) / hist.length;
+      const pct = ((hrv - avg) / avg) * 100;
+      score += Math.max(-25, Math.min(25, pct * 1.25));
+      factors++;
+    }
+  }
+  if (sleepSecs != null) {
+    const hrs = sleepSecs / 3600;
+    score += Math.max(-15, Math.min(15, (hrs - 7) * 10));
+    factors++;
+  }
+  if (rhr != null) {
+    const hist = history.slice(-14).map(d => getField(d, 'restingHR')).filter(v => v != null);
+    if (hist.length >= 5) {
+      const avg = hist.reduce((a,b) => a+b, 0) / hist.length;
+      const diff = rhr - avg;
+      score += Math.max(-10, Math.min(10, -diff * 2));
+      factors++;
+    }
+  }
+  if (ctl != null && atl != null && ctl > 0) {
+    const acwr = atl / ctl;
+    if (acwr > 1.3) score -= Math.min(15, (acwr - 1.3) * 30);
+    else if (acwr < 0.7) score -= 5;
+    factors++;
+  }
+
+  if (factors === 0) return null;
+  return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+function applyFeelToReadiness(score, feel) {
+  if (score == null && feel == null) return null;
+  let s = score != null ? score : 50;
+  if (feel === 'fresh') s = Math.min(100, s + 8);
+  else if (feel === 'sore') s = Math.max(0, s - 18);
+  else if (feel === 'beat') s = Math.max(0, s - 30);
+  return Math.round(s);
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  FETCH DATA
+// ════════════════════════════════════════════════════════════════════
+async function fetchData() {
+  if (!state.athleteId || !state.apiKey) { state.error = "credentials"; render(); return; }
+  const today = new Date();
+  const monthAgo = new Date(today.getTime() - 90 * 86400000);
+  const fmt = d => d.toISOString().split('T')[0];
+  const auth = 'Basic ' + btoa('API_KEY:' + state.apiKey);
+
+  try {
+    const wRes = await fetch(`https://intervals.icu/api/v1/athlete/${state.athleteId}/wellness?oldest=${fmt(monthAgo)}&newest=${fmt(today)}`, { headers: { Authorization: auth } });
+    if (!wRes.ok) throw new Error(`Intervals API ${wRes.status}`);
+    state.wellness = await wRes.json();
+    const aRes = await fetch(`https://intervals.icu/api/v1/athlete/${state.athleteId}/activities?oldest=${fmt(monthAgo)}&newest=${fmt(today)}`, { headers: { Authorization: auth } });
+    if (aRes.ok) state.activities = await aRes.json();
+    state.loaded = true;
+    state.error = null;
+    render();
+  } catch (e) {
+    state.error = e.message;
+    render();
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  ACTIONS
+// ════════════════════════════════════════════════════════════════════
+function saveCredentials() {
+  const aid = $('#cred-id').value.trim();
+  const key = $('#cred-key').value.trim();
+  if (!aid || !key) { alert('Please fill in both fields'); return; }
+  localStorage.setItem('iv_athlete_id', aid);
+  localStorage.setItem('iv_api_key', key);
+  state.athleteId = aid; state.apiKey = key; state.error = null;
+  $('#app').innerHTML = '<div class="loading"><span class="spinner"></span>Loading dashboard...</div>';
+  fetchData();
+}
+
+function clearCredentials() {
+  if (!confirm('Clear saved credentials?')) return;
+  localStorage.removeItem('iv_athlete_id');
+  localStorage.removeItem('iv_api_key');
+  state.athleteId = ''; state.apiKey = ''; state.loaded = false;
+  state.error = 'credentials';
+  render();
+}
+
+function setFeel(feelId) {
+  state.feel = feelId;
+  localStorage.setItem('feel_today', feelId);
+  localStorage.setItem('feel_date', todayKey);
+  state.checkedExercises = {};
+  localStorage.setItem('checked_today', '{}');
+  render();
+}
+
+function clearFeel() {
+  state.feel = null;
+  localStorage.removeItem('feel_today');
+  localStorage.removeItem('feel_date');
+  state.checkedExercises = {};
+  localStorage.setItem('checked_today', '{}');
+  render();
+}
+
+function toggleExercise(id) {
+  state.checkedExercises[id] = !state.checkedExercises[id];
+  localStorage.setItem('checked_today', JSON.stringify(state.checkedExercises));
+  document.querySelectorAll(`[id="ex-${id}"]`).forEach(el => el.classList.toggle('checked', state.checkedExercises[id]));
+  document.querySelectorAll(`[id="chk-${id}"]`).forEach(el => el.classList.toggle('checked', state.checkedExercises[id]));
+}
+
+function toggleHelp(metric) {
+  document.querySelectorAll(`[id="help-${metric}"]`).forEach(el => el.classList.toggle('open'));
+}
+
+function setView(v) {
+  state.view = v;
+  localStorage.setItem('view_mode', v);
+  document.body.className = v + '-view';
+  render();
+}
+
+function getSessionForToday() {
+  const day = dayName(new Date());
+  const planned = SESSIONS[day];
+  if (state.feel === 'sore' || state.feel === 'beat') {
+    return { session: RECOVERY_SESSION, override: true, plannedTitle: planned.title };
+  }
+  return { session: planned, override: false };
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  RENDER PIECES — shared between phone and desktop
+// ════════════════════════════════════════════════════════════════════
+function renderHeader() {
+  const today = new Date();
+  const daysToRace = Math.ceil((RACE_DATE - today) / 86400000);
+  const phoneIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="2" width="8" height="12" rx="1.5"/><line x1="7" y1="12" x2="9" y2="12"/></svg>';
+  const desktopIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="8" rx="1"/><line x1="6" y1="14" x2="10" y2="14"/><line x1="8" y1="11" x2="8" y2="14"/></svg>';
+  return `
+    <div class="header">
+      <div class="header-row">
+        <div>
+          <div class="greeting">Good morning, ${ATHLETE_NAME}</div>
+          <div class="date">${fmtDate(today)}</div>
+        </div>
+        <div class="view-toggle">
+          <button class="${state.view === 'phone' ? 'active' : ''}" onclick="setView('phone')">${phoneIcon}<span>Phone</span></button>
+          <button class="${state.view === 'desktop' ? 'active' : ''}" onclick="setView('desktop')">${desktopIcon}<span>Desktop</span></button>
+        </div>
+      </div>
+      <div class="subdate"><span class="race-countdown">${daysToRace} days to ${RACE_NAME}</span></div>
+    </div>
+  `;
+}
+
+function renderSetup() {
+  return `
+    ${renderHeader()}
+    <div class="setup">
+      <h3>Connect Intervals.icu</h3>
+      <label>Athlete ID</label>
+      <input type="text" id="cred-id" placeholder="i+xxxxxxxx" autocomplete="off">
+      <label>API Key</label>
+      <input type="password" id="cred-key" placeholder="API key from settings" autocomplete="off">
+      <button onclick="saveCredentials()">Save & Continue</button>
+      <div class="setup-note">Find both at intervals.icu → Settings → API. Stored only on your device.</div>
+    </div>
+  `;
+}
+
+function renderFeelCheckIn() {
+  if (!state.feel) {
+    return `
+      <div class="feel-card">
+        <div class="feel-title">How do you feel today?</div>
+        <div class="feel-options">
+          ${FEEL_OPTIONS.map(opt => `
+            <button class="feel-btn" onclick="setFeel('${opt.id}')">
+              <div class="feel-btn-emoji">${opt.emoji}</div>
+              <div class="feel-btn-label">${opt.label}</div>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+  const opt = FEEL_OPTIONS.find(o => o.id === state.feel);
+  return `
+    <div class="feel-card">
+      <div class="feel-title">
+        How you're feeling
+        <span class="feel-edit" onclick="clearFeel()">Change</span>
+      </div>
+      <div class="feel-selected">
+        <div class="feel-selected-info">
+          <div class="feel-selected-emoji">${opt.emoji}</div>
+          <div class="feel-selected-text">
+            <div class="feel-selected-label">${opt.label}</div>
+            <div class="feel-selected-sub">${opt.desc}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function getReadinessStatus(score) {
+  if (score == null) return { color: 'var(--text-muted)', label: 'No data', dot: 'var(--text-muted)', msg: 'Tap how you feel or wait for Garmin sync' };
+  if (score >= 80) return { color: 'var(--green)', label: 'Full send', dot: 'var(--green)', msg: "You're fresh — push it today" };
+  if (score >= 60) return { color: 'var(--yellow)', label: 'Moderate', dot: 'var(--yellow)', msg: 'Execute session, back off top-end 10-15%' };
+  if (score >= 40) return { color: 'var(--orange)', label: 'Low', dot: 'var(--orange)', msg: 'Swap hard session for Zone 2 or mobility' };
+  return { color: 'var(--red)', label: 'Poor', dot: 'var(--red)', msg: 'Recovery day — non-negotiable' };
+}
+
+const HELP = {
+  hrv: '<strong>Heart Rate Variability</strong> — variation between heartbeats. Higher = better recovery, lower stress. Your range is 90-111ms; below 85ms is the warning zone.',
+  rhr: '<strong>Resting Heart Rate</strong> — beats per minute when at full rest. Lower trending down = improving fitness. Spikes up = stress, illness, or fatigue.',
+  sleep: '<strong>Total sleep</strong> measured by Garmin. 7-9hrs is ideal. Quality matters too — checking REM and deep sleep on your watch gives the full picture.',
+  ctl: '<strong>Chronic Training Load</strong> — your fitness, calculated as a 42-day weighted average of training stress. Your baseline is ~219, peak hit 271 in July 2024.',
+  atl: '<strong>Acute Training Load</strong> — recent fatigue from the last 7 days of training. High ATL relative to CTL means you\'re piling up fresh fatigue.',
+  tsb: '<strong>Training Stress Balance</strong> — Form = Fitness (CTL) − Fatigue (ATL). Positive = fresh and ready to perform. Negative = fatigued. 0 means perfectly balanced.',
+  acwr: '<strong>Acute:Chronic Workload Ratio</strong> — ratio of recent load to chronic baseline. 0.8-1.2 is the productive zone. Above 1.3 = injury risk territory.'
+};
+
+function renderHealthSnapshot(latest, history, idSuffix='') {
+  const hrv = getField(latest, 'hrv', 'hrvWeeklyAverage');
+  const sleep = fmtHrs(getField(latest, 'sleepSecs'));
+  const rhr = getField(latest, 'restingHR');
+  const ctl = getField(latest, 'ctl');
+  const atl = getField(latest, 'atl');
+  const tsb = (ctl != null && atl != null) ? (ctl - atl) : null;
+  const acwr = (ctl && atl) ? (atl/ctl) : null;
+  const sleepScore = getField(latest, 'sleepScore');
+  const baseReadiness = computeReadiness(latest, history);
+  const adjustedReadiness = applyFeelToReadiness(baseReadiness, state.feel);
+  const status = getReadinessStatus(adjustedReadiness);
+  const ringRadius = 32;
+  const ringCircumference = 2 * Math.PI * ringRadius;
+  const ringOffset = adjustedReadiness != null ? ringCircumference * (1 - adjustedReadiness/100) : ringCircumference;
+
+  const trend = (key, latestVal) => {
+    if (latestVal == null) return null;
+    const recent = history.slice(-8, -1).map(d => getField(d, key)).filter(v => v != null);
+    if (recent.length < 3) return null;
+    const avg = recent.reduce((a,b) => a+b, 0) / recent.length;
+    const pct = ((latestVal - avg) / avg) * 100;
+    return { pct, dir: pct > 2 ? 'up' : pct < -2 ? 'down' : 'flat' };
+  };
+  const hrvTrend = trend('hrv', hrv) || trend('hrvWeeklyAverage', hrv);
+  const rhrTrend = trend('restingHR', rhr);
+  const trendArrow = (t, inverse=false) => {
+    if (!t) return '';
+    const arrow = t.dir === 'up' ? '↑' : t.dir === 'down' ? '↓' : '→';
+    let cls;
+    if (t.dir === 'flat') cls = 'trend-flat';
+    else if (inverse) cls = t.dir === 'up' ? 'trend-down' : 'trend-up';
+    else cls = t.dir === 'up' ? 'trend-up' : 'trend-down';
+    return `<div class="snap-metric-trend ${cls}">${arrow} ${Math.abs(Math.round(t.pct))}% vs avg</div>`;
+  };
+
+  let formStatus = '';
+  if (tsb != null) {
+    if (tsb > 5) formStatus = 'Fresh';
+    else if (tsb > -10) formStatus = 'Neutral';
+    else if (tsb > -20) formStatus = 'Productive';
+    else formStatus = 'Fatigued';
+  }
+
+  const nowStr = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  const feelNote = state.feel ? `Adjusted for "${FEEL_OPTIONS.find(o=>o.id===state.feel).label}" check-in` : '';
+
+  const m = (key, label, value, unit, trendStr, meta) => `
+    <div class="snap-metric" onclick="toggleHelp('${key}${idSuffix}')">
+      <div class="snap-metric-top">
+        <span class="snap-metric-label">${label}</span>
+        <span class="snap-metric-help">?</span>
+      </div>
+      ${value == null ? `<div class="snap-metric-na">—</div>` : `<div class="snap-metric-value">${value}<span class="snap-metric-unit">${unit}</span></div>`}
+      ${trendStr || (meta ? `<div class="snap-metric-meta">${meta}</div>` : '')}
+      <div class="help-drawer" id="help-${key}${idSuffix}">${HELP[key]}</div>
+    </div>
+  `;
+
+  return `
+    <div class="snapshot">
+      <div class="snapshot-header">
+        <div class="snapshot-title">Health Snapshot</div>
+        <div class="snapshot-time">${nowStr}</div>
+      </div>
+      <div class="readiness-block">
+        <div class="readiness-ring">
+          <svg width="76" height="76">
+            <circle class="readiness-ring-bg" cx="38" cy="38" r="${ringRadius}"></circle>
+            <circle class="readiness-ring-fill" cx="38" cy="38" r="${ringRadius}" stroke="${status.color}" stroke-dasharray="${ringCircumference}" stroke-dashoffset="${ringOffset}"></circle>
+          </svg>
+          <div class="readiness-ring-text">${adjustedReadiness != null ? adjustedReadiness : '—'}</div>
+        </div>
+        <div class="readiness-info">
+          <div class="readiness-label">Readiness</div>
+          <div class="readiness-status" style="color: ${status.color}">${status.label}</div>
+          <div class="readiness-msg">${status.msg}</div>
+          ${feelNote ? `<div class="readiness-msg" style="margin-top: 4px; font-size: 11px; color: var(--primary);">${feelNote}</div>` : ''}
+        </div>
+      </div>
+      <div class="snap-grid">
+        ${m('hrv', 'HRV', hrv ? Math.round(hrv) : null, 'ms', trendArrow(hrvTrend))}
+        ${m('rhr', 'Resting HR', rhr, 'bpm', trendArrow(rhrTrend, true))}
+        ${m('sleep', 'Sleep', sleep, 'hrs', null, sleepScore ? `Score: ${sleepScore}` : '')}
+        ${m('ctl', 'Fitness', ctl != null ? Math.round(ctl) : null, '', null, 'Baseline: 219')}
+        ${m('atl', 'Fatigue', atl != null ? Math.round(atl) : null, '', null, '7-day load')}
+        ${m('tsb', 'Form', tsb != null ? (tsb > 0 ? '+' : '') + Math.round(tsb) : null, '', null, formStatus)}
+        ${m('acwr', 'Load Ratio', acwr ? acwr.toFixed(2) : null, 'x', null, 'Cap: 1.3')}
+      </div>
+    </div>
+  `;
+}
+
+function renderAlerts(latest) {
+  let alerts = '';
+  const hrv = getField(latest, 'hrv', 'hrvWeeklyAverage');
+  if (hrv != null && hrv < 85) alerts += `<div class="alert">⚠️ HRV at ${Math.round(hrv)}ms — below 85ms threshold. Auto-reduce intensity today.</div>`;
+  if (state.feel === 'beat') alerts += `<div class="alert alert-poor">🛑 You marked yourself as beat — strong recommendation to take a true rest day.</div>`;
+  else if (state.feel === 'sore') alerts += `<div class="alert">🦵 Sore today — session swapped to active recovery to protect your training week.</div>`;
+  return alerts;
+}
+
+function buildSummary(latest, history, activities) {
+  const today = new Date();
+  const day = dayName(today);
+  const { session, override } = getSessionForToday();
+  const baseReadiness = computeReadiness(latest, history);
+  const adjustedReadiness = applyFeelToReadiness(baseReadiness, state.feel);
+  const hrv = getField(latest, 'hrv', 'hrvWeeklyAverage');
+  const sleep = getField(latest, 'sleepSecs');
+  const ctl = getField(latest, 'ctl');
+  const atl = getField(latest, 'atl');
+  const tsb = (ctl != null && atl != null) ? ctl - atl : null;
+
+  const recentHrv = history.slice(-7).map(d => getField(d, 'hrv', 'hrvWeeklyAverage')).filter(v => v != null);
+  const olderHrv = history.slice(-14, -7).map(d => getField(d, 'hrv', 'hrvWeeklyAverage')).filter(v => v != null);
+  const hrvTrend = (recentHrv.length && olderHrv.length) ? ((recentHrv.reduce((a,b)=>a+b,0)/recentHrv.length) - (olderHrv.reduce((a,b)=>a+b,0)/olderHrv.length)) : null;
+
+  let parts = [];
+  parts.push(`<strong>${day}</strong> — ${session.title}.`);
+  if (override) parts.push(`<span class="highlight-warn">Original plan was ${SESSIONS[day].title} but swapped based on your check-in.</span>`);
+
+  if (ctl != null && atl != null) {
+    if (tsb > 5) parts.push(`Form is <span class="highlight-good">+${Math.round(tsb)} (fresh — fitness exceeds fatigue)</span>, fitness ${Math.round(ctl)}.`);
+    else if (tsb > -10) parts.push(`Form is <strong>${Math.round(tsb)} (neutral — fitness and fatigue balanced)</strong>, fitness ${Math.round(ctl)}.`);
+    else if (tsb > -20) parts.push(`Form is <span class="highlight-warn">${Math.round(tsb)} (productive — building fitness)</span>, fitness ${Math.round(ctl)}.`);
+    else parts.push(`Form is <span class="highlight-bad">${Math.round(tsb)} (very fatigued)</span> — body asking for recovery.`);
+  }
+
+  if (hrv != null) {
+    if (hrv < 85) parts.push(`HRV at <span class="highlight-bad">${Math.round(hrv)}ms</span> is below 85ms threshold — auto intensity reduction.`);
+    else if (hrvTrend != null && hrvTrend < -3) parts.push(`HRV trending down (${Math.round(hrv)}ms) — stress accumulating.`);
+    else if (hrvTrend != null && hrvTrend > 3) parts.push(`HRV trending <span class="highlight-good">up</span> at ${Math.round(hrv)}ms — recovery working.`);
+  }
+
+  if (adjustedReadiness != null) {
+    if (state.feel === 'sore' || state.feel === 'beat') parts.push(`Computed readiness adjusted to <span class="highlight-warn">${adjustedReadiness}/100</span> based on your check-in.`);
+    else if (adjustedReadiness >= 80) parts.push(`Readiness <span class="highlight-good">${adjustedReadiness}/100</span> — green light.`);
+    else if (adjustedReadiness >= 60) parts.push(`Readiness ${adjustedReadiness}/100 — execute but cap top sets 10-15% lighter.`);
+    else if (adjustedReadiness >= 40) parts.push(`Readiness <span class="highlight-warn">${adjustedReadiness}/100</span> — strongly consider Zone 2 or mobility.`);
+    else parts.push(`Readiness <span class="highlight-bad">${adjustedReadiness}/100</span> — rest day, non-negotiable.`);
+  }
+
+  if (sleep != null) {
+    const hrs = sleep / 3600;
+    if (hrs < 6) parts.push(`Only <span class="highlight-bad">${hrs.toFixed(1)}hrs</span> sleep — drop intensity 15-20%.`);
+    else if (hrs >= 7.5) parts.push(`Solid <span class="highlight-good">${hrs.toFixed(1)}hrs</span> sleep gives clean foundation today.`);
+  }
+
+  if (adjustedReadiness == null && hrv == null && sleep == null) parts.push(`<em style="color: var(--text-dim);">Wellness data not syncing from Garmin — check Intervals settings.</em>`);
+
+  const days = Math.ceil((RACE_DATE - today) / 86400000);
+  if (days <= 14) parts.push(`<span class="highlight-warn">${days} days to the Mash — race week mode.</span>`);
+  else if (days <= 60) parts.push(`${days} days to the Mash — entering peaking phase soon.`);
+
+  return parts.join(' ');
+}
+
+function renderSession() {
+  const { session, override, plannedTitle } = getSessionForToday();
+  const pillClass = `pill-${session.intensity}`;
+  const pillLabel = { hard: 'High Intensity', moderate: 'Moderate', easy: 'Easy / Recovery', rest: 'Rest Day' }[session.intensity];
+  const day = dayName(new Date());
+
+  const exerciseRows = session.exercises.map((ex, i) => {
+    const id = `${day}-${override ? 'rec' : 'plan'}-${i}`;
+    const checked = state.checkedExercises[id];
+    const items = [];
+    if (ex.sets) items.push(`<span class="prescription-item"><span class="prescription-key">Sets</span> <span class="prescription-val">${ex.sets}</span></span>`);
+    if (ex.reps) items.push(`<span class="prescription-item"><span class="prescription-key">Reps</span> <span class="prescription-val">${ex.reps}</span></span>`);
+    if (ex.weight) items.push(`<span class="prescription-item"><span class="prescription-key">Load</span> <span class="prescription-val">${ex.weight}</span></span>`);
+    if (ex.rest && ex.rest !== '—') items.push(`<span class="prescription-item"><span class="prescription-key">Rest</span> <span class="prescription-val">${ex.rest}</span></span>`);
+    return `
+      <div class="exercise ${checked ? 'checked' : ''}" id="ex-${id}">
+        <div class="exercise-check ${checked ? 'checked' : ''}" id="chk-${id}" onclick="toggleExercise('${id}')"></div>
+        <div class="exercise-info">
+          <div class="exercise-name">${ex.name}</div>
+          <div class="exercise-prescription">${items.join('')}</div>
+          ${ex.notes ? `<div class="exercise-note">${ex.notes}</div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const warmupBlock = session.warmup.length ? `<div class="protocol-block"><div class="protocol-title">Warm-up</div><div class="protocol-list">${session.warmup.map(w => `<span>• ${w}</span>`).join('')}</div></div>` : '';
+  const cooldownBlock = session.cooldown.length ? `<div class="protocol-block"><div class="protocol-title">Cool-down & Mobility</div><div class="protocol-list">${session.cooldown.map(c => `<span>• ${c}</span>`).join('')}</div></div>` : '';
+  const fuelingBlock = session.fueling ? `<div class="protocol-block"><div class="protocol-title">Fueling</div><div class="protocol-list" style="font-size: 13px;">${session.fueling}</div></div>` : '';
+  const overrideBanner = override ? `<div class="session-override-banner">↻ Original plan was ${plannedTitle} — adjusted for your check-in</div>` : '';
+
+  return `
+    <div class="session-card">
+      <div class="session-tag">Today's Session · ${session.duration}</div>
+      ${overrideBanner}
+      <span class="session-pill ${pillClass}">${pillLabel}</span>
+      <div class="session-title">${session.title}</div>
+      <div class="session-detail">${session.summary}</div>
+      ${warmupBlock}
+      <div class="session-section">
+        <div class="session-section-title">Main Work · ${session.exercises.length} ${session.exercises.length === 1 ? 'movement' : 'movements'}</div>
+        ${exerciseRows}
+      </div>
+      ${cooldownBlock}
+      ${fuelingBlock}
+    </div>
+  `;
+}
+
+// Generic line chart
+function renderChart(history, key, title, color, days=14, height=80) {
+  const data = history.slice(-days).map(d => ({ date: d.id, value: getField(d, key) })).filter(d => d.value != null);
+  if (data.length < 2) return '';
+  const w = 380, h = height, pad = 12;
+  const values = data.map(d => d.value);
+  const min = Math.min(...values), max = Math.max(...values);
+  const range = max - min || 1;
+  const stepX = (w - pad*2) / (data.length - 1);
+  const points = data.map((d, i) => [pad + i * stepX, pad + (h - pad*2) * (1 - (d.value - min) / range)]);
+  const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+  const area = `${path} L ${points[points.length-1][0].toFixed(1)},${h-pad} L ${pad},${h-pad} Z`;
+  const change = ((data[data.length-1].value - data[0].value) / data[0].value * 100).toFixed(0);
+
+  return `
+    <div class="chart-card">
+      <div class="card-header"><div class="card-title">${title}</div><div class="card-meta">${days}d · ${change > 0 ? '+' : ''}${change}%</div></div>
+      <svg class="chart-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+        <path d="${area}" fill="${color}" opacity="0.15"/>
+        <path d="${path}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        ${points.map(p => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2" fill="${color}"/>`).join('')}
+      </svg>
+    </div>
+  `;
+}
+
+// Multi-line CTL/ATL/TSB chart for desktop
+function renderLoadFullChart(history, days=60) {
+  const data = history.slice(-days).map(d => ({ date: d.id, ctl: getField(d, 'ctl'), atl: getField(d, 'atl') })).filter(d => d.ctl != null && d.atl != null);
+  if (data.length < 2) return '<div class="chart-card"><div class="card-label">Training Load</div><div style="color:var(--text-dim);font-size:13px;text-align:center;padding:30px 0;">Not enough load data yet</div></div>';
+  const w = 800, h = 220, pad = 30;
+  const allVals = data.flatMap(d => [d.ctl, d.atl]);
+  const min = Math.min(...allVals);
+  const max = Math.max(...allVals);
+  const range = max - min || 1;
+  const stepX = (w - pad*2) / (data.length - 1);
+  const yFor = v => pad + (h - pad*2) * (1 - (v - min) / range);
+
+  const ctlPoints = data.map((d, i) => [pad + i * stepX, yFor(d.ctl)]);
+  const atlPoints = data.map((d, i) => [pad + i * stepX, yFor(d.atl)]);
+  const ctlPath = ctlPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+  const atlPath = atlPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+
+  const tsbAreaPoints = data.map((d, i) => [pad + i * stepX, yFor(Math.max(d.ctl, d.atl))]);
+  const ctlClose = [...ctlPoints].reverse();
+  const tsbArea = atlPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ') +
+                  ' ' + ctlClose.map(p => `L ${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ') + ' Z';
+
+  const ctlEnd = data[data.length-1].ctl;
+  const atlEnd = data[data.length-1].atl;
+  const tsbEnd = ctlEnd - atlEnd;
+
+  return `
+    <div class="chart-card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Training Load — ${days}d</div>
+          <div style="display:flex;gap:14px;margin-top:4px;font-size:12px;color:var(--text-muted);">
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--primary);margin-right:5px;"></span>CTL ${Math.round(ctlEnd)}</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-right:5px;"></span>ATL ${Math.round(atlEnd)}</span>
+            <span style="color:${tsbEnd > 0 ? 'var(--green)' : 'var(--orange)'};">TSB ${tsbEnd > 0 ? '+' : ''}${Math.round(tsbEnd)}</span>
+          </div>
+        </div>
+      </div>
+      <svg class="chart-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+        <path d="${tsbArea}" fill="var(--orange)" opacity="0.08"/>
+        <path d="${ctlPath}" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="${atlPath}" fill="none" stroke="var(--red)" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  `;
+}
+
+// Insights panel
+function renderInsights(history, activities) {
+  const insights = [];
+
+  // Load change last 7 days vs previous 7
+  const recentLoad = history.slice(-7).map(d => getField(d, 'atl')).filter(v => v != null);
+  const prevLoad = history.slice(-14, -7).map(d => getField(d, 'atl')).filter(v => v != null);
+  if (recentLoad.length && prevLoad.length) {
+    const r = recentLoad.reduce((a,b)=>a+b,0)/recentLoad.length;
+    const p = prevLoad.reduce((a,b)=>a+b,0)/prevLoad.length;
+    const pct = Math.round(((r - p) / p) * 100);
+    if (Math.abs(pct) >= 5) {
+      const up = pct > 0;
+      insights.push({
+        icon: up ? '⚠️' : '✅',
+        bg: up ? 'var(--orange-bg)' : 'var(--green-bg)',
+        text: `Load <strong>${up ? 'increased' : 'decreased'} ${Math.abs(pct)}%</strong> this week`
+      });
+    }
+  }
+
+  // Sleep consistency
+  const recentSleep = history.slice(-7).map(d => getField(d, 'sleepSecs')).filter(v => v != null);
+  if (recentSleep.length >= 5) {
+    const avg = recentSleep.reduce((a,b)=>a+b,0)/recentSleep.length / 3600;
+    if (avg < 6.5) insights.push({ icon: '😴', bg: 'var(--red-bg)', text: `<strong>Sleep averaging ${avg.toFixed(1)}hrs</strong> — recovery suppressed` });
+    else if (avg >= 7.5) insights.push({ icon: '🌙', bg: 'var(--green-bg)', text: `<strong>Strong sleep week</strong> — averaging ${avg.toFixed(1)}hrs` });
+  }
+
+  // Activity volume
+  const lastWeek = activities.slice(-7);
+  if (lastWeek.length) {
+    const totalMins = lastWeek.reduce((s, a) => s + (a.moving_time || 0), 0) / 60;
+    const totalHrs = (totalMins / 60).toFixed(1);
+    insights.push({ icon: '⏱️', bg: 'var(--primary-bg)', text: `<strong>${totalHrs}hrs</strong> training in last 7 days · ${lastWeek.length} sessions` });
+  }
+
+  // ACWR check
+  const latest = history[history.length - 1];
+  if (latest) {
+    const ctl = getField(latest, 'ctl');
+    const atl = getField(latest, 'atl');
+    if (ctl && atl && ctl > 0) {
+      const acwr = atl / ctl;
+      if (acwr > 1.3) insights.push({ icon: '🚨', bg: 'var(--red-bg)', text: `<strong>ACWR at ${acwr.toFixed(2)}</strong> — over your 1.3 cap, injury risk zone` });
+      else if (acwr >= 0.8 && acwr <= 1.2) insights.push({ icon: '🎯', bg: 'var(--green-bg)', text: `<strong>ACWR optimal at ${acwr.toFixed(2)}</strong> — productive training zone` });
+    }
+  }
+
+  if (!insights.length) insights.push({ icon: '📊', bg: 'var(--surface-2)', text: 'Build more training data for personalized insights' });
+
+  return `
+    <div class="card">
+      <div class="card-label">Insights</div>
+      ${insights.slice(0, 5).map(i => `
+        <div class="insight-row">
+          <div class="insight-icon" style="background: ${i.bg};">${i.icon}</div>
+          <div class="insight-text">${i.text}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// Zone distribution from recent activities
+function renderZoneDonut(activities) {
+  const zoneSecs = [0, 0, 0, 0, 0];
+  activities.slice(-30).forEach(a => {
+    if (a.icu_zone_times) {
+      a.icu_zone_times.forEach((t, i) => { if (i < 5) zoneSecs[i] += t || 0; });
+    } else if (a.icu_hr_zone_times) {
+      a.icu_hr_zone_times.forEach((t, i) => { if (i < 5) zoneSecs[i] += t || 0; });
+    } else if (a.moving_time) {
+      // Rough estimate based on activity type when zone data missing
+      const mins = a.moving_time / 60;
+      const t = (a.type || '').toLowerCase();
+      if (t.includes('run')) { zoneSecs[1] += mins * 30; zoneSecs[2] += mins * 20; zoneSecs[3] += mins * 10; }
+      else { zoneSecs[1] += mins * 40; zoneSecs[2] += mins * 15; }
+    }
+  });
+  const total = zoneSecs.reduce((a, b) => a + b, 0);
+  if (total === 0) return '<div class="card"><div class="card-label">Zone Distribution</div><div style="color:var(--text-dim);font-size:13px;text-align:center;padding:30px 0;">Not enough zone data yet</div></div>';
+
+  const colors = ['#9CA3AF', 'var(--green)', 'var(--primary)', 'var(--orange)', 'var(--red)'];
+  const labels = ['Z1 Recovery', 'Z2 Endurance', 'Z3 Tempo', 'Z4 Threshold', 'Z5 VO2'];
+  let cumAngle = -90;
+  const arcs = zoneSecs.map((secs, i) => {
+    const pct = secs / total;
+    const angle = pct * 360;
+    if (angle < 0.5) { return ''; }
+    const start = cumAngle;
+    const end = cumAngle + angle;
+    cumAngle = end;
+    const cx = 70, cy = 70, r = 55, ir = 35;
+    const sx1 = cx + r * Math.cos(start * Math.PI / 180);
+    const sy1 = cy + r * Math.sin(start * Math.PI / 180);
+    const sx2 = cx + r * Math.cos(end * Math.PI / 180);
+    const sy2 = cy + r * Math.sin(end * Math.PI / 180);
+    const ix1 = cx + ir * Math.cos(end * Math.PI / 180);
+    const iy1 = cy + ir * Math.sin(end * Math.PI / 180);
+    const ix2 = cx + ir * Math.cos(start * Math.PI / 180);
+    const iy2 = cy + ir * Math.sin(start * Math.PI / 180);
+    const large = angle > 180 ? 1 : 0;
+    return `<path d="M ${sx1.toFixed(2)} ${sy1.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${sx2.toFixed(2)} ${sy2.toFixed(2)} L ${ix1.toFixed(2)} ${iy1.toFixed(2)} A ${ir} ${ir} 0 ${large} 0 ${ix2.toFixed(2)} ${iy2.toFixed(2)} Z" fill="${colors[i]}"/>`;
+  }).join('');
+
+  const legendRows = zoneSecs.map((s, i) => `
+    <div class="zone-legend-row">
+      <span class="zone-dot" style="background:${colors[i]};"></span>
+      <span class="zone-name">${labels[i].split(' ')[0]}</span>
+      <span class="zone-pct">${Math.round((s / total) * 100)}%</span>
+    </div>
+  `).join('');
+
+  return `
+    <div class="card">
+      <div class="card-label">Zone Distribution · 30d</div>
+      <div class="zone-donut-wrap">
+        <svg width="140" height="140" viewBox="0 0 140 140">${arcs}</svg>
+        <div class="zone-legend">${legendRows}</div>
+      </div>
+    </div>
+  `;
+}
+
+// Weekly volume bar chart
+function renderWeeklyVolume(activities) {
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const today = new Date();
+  const weekStart = new Date(today);
+  const dow = today.getDay();
+  const offset = dow === 0 ? 6 : dow - 1;
+  weekStart.setDate(today.getDate() - offset);
+  weekStart.setHours(0,0,0,0);
+
+  const dayMins = [0,0,0,0,0,0,0];
+  activities.forEach(a => {
+    const d = new Date(a.start_date_local);
+    if (d >= weekStart) {
+      const idx = (d.getDay() + 6) % 7;
+      dayMins[idx] += (a.moving_time || 0) / 60;
+    }
+  });
+
+  const max = Math.max(...dayMins, 60);
+  const w = 380, h = 140, pad = 24, barW = (w - pad*2) / 7 - 8;
+  const todayIdx = (dow + 6) % 7;
+
+  const bars = dayMins.map((mins, i) => {
+    const x = pad + i * ((w - pad*2) / 7) + 4;
+    const barH = (mins / max) * (h - pad*2);
+    const y = h - pad - barH;
+    const isToday = i === todayIdx;
+    const color = isToday ? 'var(--primary)' : 'var(--surface-3)';
+    return `
+      <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(barH, 2).toFixed(1)}" fill="${color}" rx="3"/>
+      <text x="${(x + barW/2).toFixed(1)}" y="${h - 6}" text-anchor="middle" fill="var(--text-dim)" font-size="10" font-family="Inter" font-weight="600">${days[i]}</text>
+      ${mins > 0 ? `<text x="${(x + barW/2).toFixed(1)}" y="${(y - 4).toFixed(1)}" text-anchor="middle" fill="var(--text-muted)" font-size="9" font-family="Inter" font-weight="600">${Math.round(mins)}</text>` : ''}
+    `;
+  }).join('');
+
+  const totalHrs = (dayMins.reduce((a,b) => a+b, 0) / 60).toFixed(1);
+
+  return `
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">This Week's Volume</div>
+        <div class="card-meta">${totalHrs} hrs total</div>
+      </div>
+      <svg class="chart-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">${bars}</svg>
+    </div>
+  `;
+}
+
+// Mini sparkline for activity feed
+function renderSparkline(activity) {
+  // Use HR as the metric if available, else flat line
+  const hr = activity.average_heartrate;
+  if (!hr) return '<svg class="activity-spark" viewBox="0 0 60 24"><line x1="0" y1="12" x2="60" y2="12" stroke="var(--border-strong)" stroke-width="1"/></svg>';
+  // Generate a representative sparkline based on activity profile
+  const points = [];
+  const w = 60, h = 24;
+  for (let i = 0; i < 12; i++) {
+    const noise = Math.sin(i * 0.8 + activity.id * 0.3) * 0.3 + Math.random() * 0.2;
+    const y = 4 + (h - 8) * (0.4 + noise);
+    points.push([i * (w/11), Math.max(2, Math.min(h-2, y))]);
+  }
+  const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+  return `<svg class="activity-spark" viewBox="0 0 ${w} ${h}"><path d="${path}" fill="none" stroke="var(--primary)" stroke-width="1.5"/></svg>`;
+}
+
+function renderActivities(activities, limit=7) {
+  if (!activities.length) return '<div class="card"><div class="card-label">Recent Activities</div><div style="color:var(--text-dim);font-size:13px;padding:10px 0;">No activities yet</div></div>';
+  const recent = activities.slice(-limit).reverse();
+  const inner = recent.map(a => {
+    const icon = sportIcon(a.type);
+    const dist = a.distance ? `${fmtMiles(a.distance)} mi` : '';
+    const dur = a.moving_time ? `${fmtMins(a.moving_time)} min` : '';
+    const hr = a.average_heartrate ? `${Math.round(a.average_heartrate)} bpm` : '';
+    const date = a.start_date_local ? fmtShort(a.start_date_local.split('T')[0]) : '';
+    const stats = [dist, dur, hr].filter(Boolean).join(' · ');
+    return `
+      <div class="activity">
+        <div class="activity-icon">${icon}</div>
+        <div class="activity-info">
+          <div class="activity-name">${a.name || a.type || 'Activity'}</div>
+          <div class="activity-stats">${stats}</div>
+          <div class="activity-date">${date}</div>
+        </div>
+        ${renderSparkline(a)}
+      </div>
+    `;
+  }).join('');
+  return inner;
+}
+
+function buildClaudePrompt(latest, history, activities) {
+  const today = new Date();
+  const day = dayName(today);
+  const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  const baseReadiness = computeReadiness(latest, history);
+  const adjustedReadiness = applyFeelToReadiness(baseReadiness, state.feel);
+  const feelLine = state.feel ? `Self-reported state: ${FEEL_OPTIONS.find(o => o.id === state.feel).label} (${FEEL_OPTIONS.find(o => o.id === state.feel).desc})` : 'Self-reported state: not provided';
+
+  const data = [
+    `Computed Readiness: ${adjustedReadiness ?? 'unable to compute'}/100${state.feel ? ' (adjusted for self-report)' : ''}`,
+    feelLine,
+    `HRV: ${getField(latest, 'hrv', 'hrvWeeklyAverage') ?? 'not synced'} ms`,
+    `Resting HR: ${getField(latest, 'restingHR') ?? 'not synced'} bpm`,
+    `Sleep: ${fmtHrs(getField(latest, 'sleepSecs')) ?? 'not synced'} hrs`,
+    `Sleep Score: ${getField(latest, 'sleepScore') ?? 'not synced'}`,
+    `CTL (fitness): ${getField(latest, 'ctl') ?? 'not synced'}`,
+    `ATL (fatigue): ${getField(latest, 'atl') ?? 'not synced'}`,
+    `Stress: ${getField(latest, 'avgStressLevel') ?? 'not synced'}`
+  ].join('\n');
+
+  const recent = activities.slice(-7).reverse().map(a => {
+    const dist = a.distance ? `${fmtMiles(a.distance)} mi` : '';
+    const dur = a.moving_time ? `${fmtMins(a.moving_time)} min` : '';
+    const hr = a.average_heartrate ? `${Math.round(a.average_heartrate)} bpm` : '';
+    const date = (a.start_date_local || '').split('T')[0];
+    return `${date}: ${a.type} — ${a.name || ''} (${[dist,dur,hr].filter(Boolean).join(', ')})`;
+  }).join('\n') || 'No recent activities';
+
+  return `You are the personal coach for Clayton Sawyer. Here is his full coaching brief:
+
+${COACHING_BRIEF}
+
+Today is ${day}, ${dateStr}.
+
+LIVE INTERVALS.ICU DATA + SELF-REPORT:
+${data}
+
+RECENT ACTIVITIES (last 7 days):
+${recent}
+
+Important: factor his self-reported state heavily into your recommendation. If he says "sore" or "beat", recommend recovery work, NOT pushing through.
+
+Format exactly like this:
+
+READINESS ASSESSMENT
+One straight-talking sentence on his recovery state.
+
+TODAY'S SESSION
+Specific session with sets/reps/duration/intensity.
+
+KEY FOCUS
+One specific actionable cue for today.
+
+FUELING NOTE
+One sentence on nutrition/hydration given his heavy sweat rate.
+
+Tight and direct. No fluff.`;
+}
+
+async function generateSession(btnId='coach-btn') {
+  const sorted = [...state.wellness].sort((a,b) => (a.id || '').localeCompare(b.id || ''));
+  const latest = sorted[sorted.length - 1] || {};
+  const prompt = buildClaudePrompt(latest, sorted, state.activities);
+  try {
+    await navigator.clipboard.writeText(prompt);
+    document.querySelectorAll(`[id="${btnId}"]`).forEach(btn => {
+      btn.innerHTML = '✓ Copied — opening Claude...';
+      btn.classList.add('success');
+    });
+    setTimeout(() => {
+      window.open(CLAUDE_PROJECT_URL, '_blank');
+      setTimeout(() => {
+        document.querySelectorAll(`[id="${btnId}"]`).forEach(btn => {
+          btn.innerHTML = '⚡ Get AI Coach Response';
+          btn.classList.remove('success');
+        });
+      }, 2000);
+    }, 600);
+  } catch (e) { alert('Could not copy. Check browser permissions.'); }
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  TOP-LEVEL RENDER
+// ════════════════════════════════════════════════════════════════════
+function render() {
+  const app = $('#app');
+
+  if (state.error === 'credentials') { app.innerHTML = renderSetup(); return; }
+  if (state.error && state.error !== 'credentials') {
+    app.innerHTML = `${renderHeader()}<div class="error">Could not reach Intervals.icu: ${state.error}<br><button onclick="clearCredentials()" style="margin-top: 12px; background: transparent; border: 1px solid var(--red); color: var(--red); padding: 8px 12px; border-radius: 6px; font-size: 13px; font-family: inherit;">Reset credentials</button></div>`;
+    return;
+  }
+  if (!state.loaded) { app.innerHTML = '<div class="loading"><span class="spinner"></span>Loading dashboard...</div>'; return; }
+
+  const sorted = [...state.wellness].sort((a,b) => (a.id || '').localeCompare(b.id || ''));
+  const latest = sorted[sorted.length - 1] || {};
+
+  if (state.view === 'desktop') {
+    renderDesktop(latest, sorted);
+  } else {
+    renderPhone(latest, sorted);
+  }
+}
+
+function renderPhone(latest, sorted) {
+  const summary = buildSummary(latest, sorted, state.activities);
+  $('#app').innerHTML = `
+    ${renderHeader()}
+    ${renderFeelCheckIn()}
+    ${renderHealthSnapshot(latest, sorted)}
+    ${renderAlerts(latest)}
+    <div class="ai-summary">
+      <div class="ai-summary-header"><div class="ai-summary-icon">C</div><div class="ai-summary-title">Coach's Read</div></div>
+      <div class="ai-summary-text">${summary}</div>
+    </div>
+    ${renderSession()}
+    ${sorted.some(d => getField(d, 'hrv', 'hrvWeeklyAverage') != null) ? `
+      <div class="section-label">Trends</div>
+      ${renderChart(sorted, 'hrv', 'HRV', '#A78BFA', 14)}
+      ${renderChart(sorted, 'restingHR', 'Resting HR', '#EC4899', 14)}
+    ` : ''}
+    ${sorted.some(d => getField(d, 'ctl') != null) ? renderChart(sorted, 'ctl', 'Fitness (CTL)', '#3B82F6', 30) : ''}
+    <div class="section-label">Last 7 Days</div>
+    ${renderActivities(state.activities, 7)}
+    <div class="footer">
+      <a href="#" onclick="clearCredentials();return false;">Reset</a> ·
+      <a href="https://intervals.icu" target="_blank">Intervals.icu</a> ·
+      Updated ${new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+    </div>
+    <button class="coach-button-fixed" id="coach-btn" onclick="generateSession()">⚡ Get AI Coach Response</button>
+  `;
+}
+
+function renderDesktop(latest, sorted) {
+  const summary = buildSummary(latest, sorted, state.activities);
+  $('#app').innerHTML = `
+    ${renderHeader()}
+    <div class="desktop-grid" style="margin-bottom: 16px;">
+
+      <div class="col-4" style="display: flex; flex-direction: column; gap: 16px;">
+        ${renderFeelCheckIn()}
+        ${renderAlerts(latest) || ''}
+        <div class="ai-summary">
+          <div class="ai-summary-header" style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="ai-summary-icon">C</div>
+              <div class="ai-summary-title">Coach's Read</div>
+            </div>
+            <button class="coach-button-inline" id="coach-btn" onclick="generateSession()">⚡ Get AI Response</button>
+          </div>
+          <div class="ai-summary-text">${summary}</div>
+        </div>
+      </div>
+
+      <div class="col-4">${renderHealthSnapshot(latest, sorted, '-d')}</div>
+
+      <div class="col-4">${renderSession()}</div>
+
+      <div class="col-8">${renderLoadFullChart(sorted, 60)}</div>
+      <div class="col-4">${renderInsights(sorted, state.activities)}</div>
+
+      <div class="col-4">${renderZoneDonut(state.activities)}</div>
+      <div class="col-4">${renderWeeklyVolume(state.activities)}</div>
+      <div class="col-4">${sorted.some(d => getField(d, 'hrv', 'hrvWeeklyAverage') != null) ? renderChart(sorted, 'hrv', 'HRV — 30d', '#A78BFA', 30, 100) : '<div class="card"><div class="card-label">HRV</div><div style="color:var(--text-dim);font-size:13px;text-align:center;padding:30px 0;">No HRV data yet</div></div>'}</div>
+
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Recent Activities</div>
+            <div class="card-meta">Last 14 days</div>
+          </div>
+          ${renderActivities(state.activities, 14)}
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <a href="#" onclick="clearCredentials();return false;">Reset</a> ·
+      <a href="https://intervals.icu" target="_blank">Intervals.icu</a> ·
+      Updated ${new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+    </div>
+  `;
+}
+
+fetchData();
+</script>
+</body>
+</html>
