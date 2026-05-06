@@ -72,7 +72,7 @@ body.desktop-view {
 .greeting { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; }
 .date { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
 body.desktop-view .date { font-size: 28px; }
-.subdate { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
+.subdate { font-size: 12px; color: var(--text-muted); margin-top: 6px; font-weight: 500; }
 .race-countdown {
   display: inline-block; margin-top: 6px; font-size: 11px; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.08em;
@@ -611,9 +611,32 @@ function renderHeader() {
           <button class="${state.view === 'desktop' ? 'active' : ''}" onclick="setView('desktop')">${desktopIcon}<span>Desktop</span></button>
         </div>
       </div>
-      <div class="subdate"><span class="race-countdown">${daysToRace} days to ${RACE_NAME}</span></div>
+      <div class="subdate" id="perf-subdate">Loading...</div>
     </div>
   `;
+}
+
+function renderPerfSubdate(latest, sorted) {
+  const ctl = getField(latest, 'ctl');
+  const atl = getField(latest, 'atl');
+  const hrv = getField(latest, 'hrv', 'hrvWeeklyAverage');
+  const tsb = (ctl != null && atl != null) ? ctl - atl : null;
+
+  const parts = [];
+  if (ctl != null) {
+    const delta = Math.round(ctl - 219);
+    const sign = delta >= 0 ? '+' : '';
+    parts.push(`Fitness ${Math.round(ctl)} (${sign}${delta} vs baseline)`);
+  }
+  if (tsb != null) {
+    const form = tsb > 5 ? 'Fresh' : tsb > -10 ? 'Neutral' : tsb > -20 ? 'Building' : 'Fatigued';
+    parts.push(`Form: ${form} (TSB ${tsb > 0 ? '+' : ''}${Math.round(tsb)})`);
+  }
+  if (hrv != null) {
+    parts.push(`HRV ${Math.round(hrv)}ms`);
+  }
+  const el = document.getElementById('perf-subdate');
+  if (el) el.textContent = parts.length ? parts.join(' · ') : 'Loading metrics...';
 }
 
 function renderSetup() {
@@ -969,6 +992,46 @@ function renderLoadFullChart(history, days=60) {
 function renderInsights(history, activities) {
   const insights = [];
 
+  // Fitness trend — CTL vs baseline
+  const latest = history[history.length - 1];
+  if (latest) {
+    const ctl = getField(latest, 'ctl');
+    const atl = getField(latest, 'atl');
+    if (ctl != null) {
+      const delta = Math.round(ctl - 219);
+      const sign = delta >= 0 ? '+' : '';
+      const color = delta >= 5 ? 'var(--green-bg)' : delta <= -10 ? 'var(--red-bg)' : 'var(--surface-2)';
+      const icon = delta >= 0
+        ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>'
+        : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>';
+      insights.push({ icon, bg: color, text: `Fitness (CTL) at <strong>${Math.round(ctl)}</strong> — <strong>${sign}${delta} vs 219 baseline</strong>. Peak: 271.` });
+    }
+    if (ctl && atl && ctl > 0) {
+      const acwr = atl / ctl;
+      if (acwr > 1.3) insights.push({ icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', bg: 'var(--red-bg)', text: `<strong>ACWR ${acwr.toFixed(2)}</strong> — above 1.3 cap. Back off today.` });
+      else if (acwr >= 0.8 && acwr <= 1.2) insights.push({ icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>', bg: 'var(--green-bg)', text: `<strong>ACWR ${acwr.toFixed(2)}</strong> — optimal training zone. Build.` });
+    }
+  }
+
+  // HRV trend — 7d vs previous 7d
+  const recentHrv = history.slice(-7).map(d => getField(d, 'hrv', 'hrvWeeklyAverage')).filter(v => v != null);
+  const prevHrv = history.slice(-14, -7).map(d => getField(d, 'hrv', 'hrvWeeklyAverage')).filter(v => v != null);
+  if (recentHrv.length && prevHrv.length) {
+    const r = recentHrv.reduce((a,b)=>a+b,0)/recentHrv.length;
+    const p = prevHrv.reduce((a,b)=>a+b,0)/prevHrv.length;
+    const diff = Math.round(r - p);
+    if (Math.abs(diff) >= 3) {
+      const up = diff > 0;
+      insights.push({
+        icon: up
+          ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>'
+          : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',
+        bg: up ? 'var(--green-bg)' : 'var(--orange-bg)',
+        text: `HRV <strong>${up ? 'up' : 'down'} ${Math.abs(diff)}ms</strong> vs last week — recovery ${up ? 'improving' : 'under stress'}.`
+      });
+    }
+  }
+
   // Load change last 7 days vs previous 7
   const recentLoad = history.slice(-7).map(d => getField(d, 'atl')).filter(v => v != null);
   const prevLoad = history.slice(-14, -7).map(d => getField(d, 'atl')).filter(v => v != null);
@@ -981,44 +1044,24 @@ function renderInsights(history, activities) {
       insights.push({
         icon: up ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>',
         bg: up ? 'var(--orange-bg)' : 'var(--green-bg)',
-        text: `Load <strong>${up ? 'increased' : 'decreased'} ${Math.abs(pct)}%</strong> this week`
+        text: `Weekly load <strong>${up ? 'up' : 'down'} ${Math.abs(pct)}%</strong> vs prior week — ${up ? 'watch your ACWR' : 'maintain consistency'}.`
       });
     }
   }
 
-  // Sleep consistency
+  // Sleep this week
   const recentSleep = history.slice(-7).map(d => getField(d, 'sleepSecs')).filter(v => v != null);
-  if (recentSleep.length >= 5) {
+  if (recentSleep.length >= 4) {
     const avg = recentSleep.reduce((a,b)=>a+b,0)/recentSleep.length / 3600;
-    if (avg < 6.5) insights.push({ icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>', bg: 'var(--red-bg)', text: `<strong>Sleep averaging ${avg.toFixed(1)}hrs</strong> — recovery suppressed` });
-    else if (avg >= 7.5) insights.push({ icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>', bg: 'var(--green-bg)', text: `<strong>Strong sleep week</strong> — averaging ${avg.toFixed(1)}hrs` });
-  }
-
-  // Activity volume
-  const lastWeek = activities.slice(-7);
-  if (lastWeek.length) {
-    const totalMins = lastWeek.reduce((s, a) => s + (a.moving_time || 0), 0) / 60;
-    const totalHrs = (totalMins / 60).toFixed(1);
-    insights.push({ icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>', bg: 'var(--primary-bg)', text: `<strong>${totalHrs}hrs</strong> training in last 7 days · ${lastWeek.length} sessions` });
-  }
-
-  // ACWR check
-  const latest = history[history.length - 1];
-  if (latest) {
-    const ctl = getField(latest, 'ctl');
-    const atl = getField(latest, 'atl');
-    if (ctl && atl && ctl > 0) {
-      const acwr = atl / ctl;
-      if (acwr > 1.3) insights.push({ icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', bg: 'var(--red-bg)', text: `<strong>ACWR at ${acwr.toFixed(2)}</strong> — over your 1.3 cap, injury risk zone` });
-      else if (acwr >= 0.8 && acwr <= 1.2) insights.push({ icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>', bg: 'var(--green-bg)', text: `<strong>ACWR optimal at ${acwr.toFixed(2)}</strong> — productive training zone` });
-    }
+    if (avg < 6.5) insights.push({ icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>', bg: 'var(--red-bg)', text: `Sleep averaging <strong>${avg.toFixed(1)}hrs</strong> — recovery suppressed. Gains happen in sleep.` });
+    else if (avg >= 7.5) insights.push({ icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>', bg: 'var(--green-bg)', text: `Solid sleep week — <strong>${avg.toFixed(1)}hrs avg</strong>. Recovery and adaptation optimized.` });
   }
 
   if (!insights.length) insights.push({ icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>', bg: 'var(--surface-2)', text: 'Build more training data for personalized insights' });
 
   return `
     <div class="card">
-      <div class="card-label">Insights</div>
+      <div class="card-label">Performance Insights</div>
       ${insights.slice(0, 5).map(i => `
         <div class="insight-row">
           <div class="insight-icon" style="background: ${i.bg};">${i.icon}</div>
@@ -1142,7 +1185,7 @@ function renderWeeklyVolume(activities) {
 // Mini sparkline for activity feed
 function renderSparkline(activity) {
   // Use HR as the metric if available, else flat line
-  const hr = activity.average_heartrate;
+  const hr = activity.icu_average_hr ?? activity.average_heartrate;
   if (!hr) return '<svg class="activity-spark" viewBox="0 0 60 24"><line x1="0" y1="12" x2="60" y2="12" stroke="var(--border-strong)" stroke-width="1"/></svg>';
   // Generate a representative sparkline based on activity profile
   const points = [];
@@ -1163,7 +1206,8 @@ function renderActivities(activities, limit=7) {
     const icon = sportIcon(a.type);
     const dist = a.distance ? `${fmtMiles(a.distance)} mi` : '';
     const dur = a.moving_time ? `${fmtMins(a.moving_time)} min` : '';
-    const hr = a.average_heartrate ? `${Math.round(a.average_heartrate)} bpm` : '';
+    const hrVal = a.icu_average_hr ?? a.average_heartrate ?? null;
+    const hr = hrVal ? `${Math.round(hrVal)} bpm` : '';
     const date = a.start_date_local ? fmtShort(a.start_date_local.split('T')[0]) : '';
     const stats = [dist, dur, hr].filter(Boolean).join(' · ');
     return `
@@ -1204,7 +1248,7 @@ function buildClaudePrompt(latest, history, activities) {
   const recent = activities.slice(-7).reverse().map(a => {
     const dist = a.distance ? `${fmtMiles(a.distance)} mi` : '';
     const dur = a.moving_time ? `${fmtMins(a.moving_time)} min` : '';
-    const hr = a.average_heartrate ? `${Math.round(a.average_heartrate)} bpm` : '';
+    const hr = (a.icu_average_hr ?? a.average_heartrate) ? `${Math.round(a.icu_average_hr ?? a.average_heartrate)} bpm` : '';
     const date = (a.start_date_local || '').split('T')[0];
     return `${date}: ${a.type} — ${a.name || ''} (${[dist,dur,hr].filter(Boolean).join(', ')})`;
   }).join('\n') || 'No recent activities';
@@ -1283,6 +1327,8 @@ function render() {
   } else {
     renderPhone(latest, sorted);
   }
+  // Update performance subheader after render
+  if (state.loaded) renderPerfSubdate(latest, sorted);
 }
 
 function renderPhone(latest, sorted) {
