@@ -706,6 +706,141 @@ body.desktop-view .coach-button-fixed { display: none; }
     border: 1px solid #1E293B;
     border-radius: 14px;
   }
+
+  /* === WEEKLY SCHEDULE CARD === */
+  .week-card {
+    background: #111827;
+    border: 1px solid #1E293B;
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 12px;
+  }
+  .week-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .week-card-title {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #475569;
+  }
+  .week-card-sub {
+    font-size: 11px;
+    color: #374151;
+    font-weight: 500;
+  }
+  .week-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+  }
+  .week-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 4px;
+    border-radius: 12px;
+    background: #0F1924;
+    border: 1px solid #1E293B;
+    transition: all 0.2s;
+    cursor: default;
+    position: relative;
+  }
+  .week-day.is-today {
+    background: rgba(79, 142, 247, 0.1);
+    border-color: rgba(79, 142, 247, 0.35);
+    box-shadow: 0 0 0 1px rgba(79, 142, 247, 0.2);
+  }
+  .week-day-name {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #475569;
+  }
+  .week-day.is-today .week-day-name {
+    color: #4F8EF7;
+  }
+  .week-day-icon {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #475569;
+  }
+  .week-day.is-today .week-day-icon {
+    color: #4F8EF7;
+  }
+  .week-today-detail-icon {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4F8EF7;
+    flex-shrink: 0;
+  }
+  .week-day-type {
+    font-size: 8.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-align: center;
+    line-height: 1.3;
+    color: #64748B;
+  }
+  .week-day.is-today .week-day-type {
+    color: #93C5FD;
+  }
+  .week-day-badge {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-top: 2px;
+  }
+  /* intensity color dots */
+  .badge-hard    { background: #F87171; }
+  .badge-moderate { background: #FB923C; }
+  .badge-easy    { background: #34D399; }
+  .badge-rest    { background: #374151; }
+
+  /* expanded detail strip shown on today */
+  .week-today-detail {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: rgba(79, 142, 247, 0.07);
+    border: 1px solid rgba(79, 142, 247, 0.2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .week-today-detail-text {}
+  .week-today-detail-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #4F8EF7;
+    margin-bottom: 2px;
+  }
+  .week-today-detail-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #E2E8F0;
+    line-height: 1.3;
+  }
+  .week-today-detail-meta {
+    font-size: 11px;
+    color: #64748B;
+    margin-top: 2px;
+  }
 </style>
 </head>
 <body class="phone-view">
@@ -730,6 +865,7 @@ GARMIN: CTL ~219 baseline, peak 271. Boom-bust pattern. HRV 90-111ms range. Hill
 PHYSIOLOGY: Cadence 173 flat → 152 steep (target 170+). Heavy sweater 1520ml/90min — drives cramps. Naturally runs 90%+ HR (must discipline 140-150 for endurance). Paddle is NOT a weakness.
 WEAKNESSES: Aerobic efficiency, lower body resilience, fueling/sweat, climb cadence, training consistency, mobility.
 PLAN: M Lower A | T Upper A push/paddle | W Z2+mobility | Th trail run | F Upper B pull/biceps | Sa long MTB | Su OFF
+TIME CONSTRAINTS: Runs max 60 min. Lifting sessions max 75 min. MTB rides max 2 hrs. Full-time job — sessions must fit real schedule.
 PREFERENCES: Incline-first chest. High bicep frequency. No sugarcoating.
 ACWR rule: never exceed 1.3x CTL (~219). Cramp protocol: 500mg sodium pre-load, 60g carbs/hr.`;
 
@@ -742,11 +878,11 @@ const FEEL_OPTIONS = [
 
 const SESSIONS = {
   "Monday": { title: "Lower A — Heavy Bilateral", intensity: "hard", summary: "Low volume, high quality. The two big lifts get all your focus. Builds the legs to climb Gibraltar without cramping.", duration: "60-75 min", warmup: ["Hip 90/90s — 1 min each side", "Goblet squat hold — 30 sec x 2", "Ankle CARs — 10 each", "Glute bridges — 15 reps", "Empty bar squats — 10 reps"], exercises: [ { name: "Trap Bar Deadlift", sets: 4, reps: "5", weight: "Build to top set", rest: "3 min", notes: "Reset each rep. Brace HARD. Top set leaves 1-2 in tank." }, { name: "Barbell Back Squat", sets: 3, reps: "6", weight: "75-80% 1RM", rest: "2-3 min", notes: "Below parallel. Vertical torso. Drive knees out." }, { name: "Romanian Deadlift", sets: 3, reps: "8", weight: "Moderate-heavy", rest: "90 sec", notes: "Feel hamstrings load. Bar stays close to legs." }, { name: "Hanging Knee Raise", sets: 3, reps: "10", weight: "Bodyweight", rest: "60 sec", notes: "Slow controlled. Or sub Ab Wheel x10." } ], cooldown: ["Couch stretch — 90 sec each side", "Pigeon pose — 90 sec each side", "Foam roll quads + IT band — 2 min"], fueling: "Pre: oats + banana + protein shake. Post: protein + carbs within 60 min." },
-  "Tuesday": { title: "Upper A — Push & Paddle", intensity: "hard", summary: "Incline-first chest day with paddle-specific finishers. Upper chest priority for fullness, with shoulder stability work for the 7-mile Mash paddle.", duration: "55-70 min", warmup: ["Band pull-aparts — 15 reps x 2", "Shoulder CARs — 10 each direction", "Wall slides — 10 reps", "Light DB press — 12 reps x 2"], exercises: [ { name: "Incline Barbell Press", sets: 4, reps: "8", weight: "70-75% 1RM", rest: "2-3 min", notes: "Bench at 30-45°. Bar to upper chest. Pause briefly." }, { name: "Incline Dumbbell Press", sets: 3, reps: "10-12", weight: "Moderate", rest: "90 sec", notes: "Slight squeeze at top. DBs nearly touching." }, { name: "Cable Incline Fly", sets: 3, reps: "12-15", weight: "Light-moderate", rest: "60 sec", notes: "Low-to-high arc. Squeeze upper chest at top." }, { name: "Standing Overhead Press", sets: 3, reps: "10", weight: "Moderate", rest: "90 sec", notes: "Tight core. No lower back arch." }, { name: "Cable Tricep Pushdown", sets: 3, reps: "12-15", weight: "Moderate", rest: "60 sec", notes: "Elbows pinned. Full extension." }, { name: "Prone Plank to Extend", sets: 3, reps: "10", weight: "Bodyweight", rest: "60 sec", notes: "Paddle simulation. Stretch shoulders forward." }, { name: "Cable Pulldown in Hip Hinge", sets: 3, reps: "12-15", weight: "Light", rest: "60 sec", notes: "Mimic paddle stroke. Hinge at hips." }, { name: "Cable Curl + DB Curl", sets: 2, reps: "15", weight: "Light pump", rest: "45 sec", notes: "Bicep finisher — burn out for size." } ], cooldown: ["Doorway pec stretch — 60 sec each side", "Cross-body shoulder stretch — 30 sec each", "Foam roll thoracic spine — 90 sec"], fueling: "Carbs around training. Hydrate aggressively given heavy sweat rate." },
+  "Tuesday": { title: "Upper A — Push & Paddle", intensity: "hard", summary: "Incline-first chest day with paddle-specific finishers. Upper chest priority for fullness, with shoulder stability work for the 7-mile Mash paddle.", duration: "60-75 min", warmup: ["Band pull-aparts — 15 reps x 2", "Shoulder CARs — 10 each direction", "Wall slides — 10 reps", "Light DB press — 12 reps x 2"], exercises: [ { name: "Incline Barbell Press", sets: 4, reps: "8", weight: "70-75% 1RM", rest: "2-3 min", notes: "Bench at 30-45°. Bar to upper chest. Pause briefly." }, { name: "Incline Dumbbell Press", sets: 3, reps: "10-12", weight: "Moderate", rest: "90 sec", notes: "Slight squeeze at top. DBs nearly touching." }, { name: "Cable Incline Fly", sets: 3, reps: "12-15", weight: "Light-moderate", rest: "60 sec", notes: "Low-to-high arc. Squeeze upper chest at top." }, { name: "Standing Overhead Press", sets: 3, reps: "10", weight: "Moderate", rest: "90 sec", notes: "Tight core. No lower back arch." }, { name: "Cable Tricep Pushdown", sets: 3, reps: "12-15", weight: "Moderate", rest: "60 sec", notes: "Elbows pinned. Full extension." }, { name: "Prone Plank to Extend", sets: 3, reps: "10", weight: "Bodyweight", rest: "60 sec", notes: "Paddle simulation. Stretch shoulders forward." }, { name: "Cable Pulldown in Hip Hinge", sets: 3, reps: "12-15", weight: "Light", rest: "60 sec", notes: "Mimic paddle stroke. Hinge at hips." }, { name: "Cable Curl + DB Curl", sets: 2, reps: "15", weight: "Light pump", rest: "45 sec", notes: "Bicep finisher — burn out for size." } ], cooldown: ["Doorway pec stretch — 60 sec each side", "Cross-body shoulder stretch — 30 sec each", "Foam roll thoracic spine — 90 sec"], fueling: "Carbs around training. Hydrate aggressively given heavy sweat rate." },
   "Wednesday": { title: "Zone 2 + Full Mobility", intensity: "easy", summary: "The most underrated session of the week. Builds aerobic base and fixes mobility deficits spiking your vertical ratio on climbs. NEVER skip this.", duration: "50-60 min", warmup: ["5 min easy warm-up before main set"], exercises: [ { name: "Zone 2 Cardio (bike, swim, or easy run)", sets: 1, reps: "30-40 min", weight: "140-150bpm cap", rest: "—", notes: "Conversational pace. Nasal breathing. Builds the engine for the Mash." } ], cooldown: ["Foam roll thoracic spine — 2 min", "Foam roll quads — 2 min each leg", "Foam roll hamstrings — 2 min each leg", "Hip flexor stretch — 2 min each side", "Pigeon pose — 2 min each side", "Hamstring band floss — 1 min each side", "Doorway pec stretch — 1 min each side", "Ankle CARs + calf stretch — 2 min total"], fueling: "Light meal beforehand. Plenty of water + electrolytes." },
-  "Thursday": { title: "Trail Run", intensity: "moderate", summary: "The session that wins or loses the Mash. HR cap is non-negotiable — discipline now means you don't blow up on Gibraltar in October.", duration: "45-90 min", warmup: ["Bulgarian Split Squats — 8 reps each side x 2 (BW)", "Nordic curl negatives — 5 reps x 2", "Walking lunges — 10 each side", "Leg swings — 10 each direction", "5 min easy walk into slow jog"], exercises: [ { name: "Trail Run", sets: 1, reps: "Build to 90 min", weight: "140-150 bpm cap", rest: "—", notes: "Use HR monitor strictly. Walk hills if needed to stay under cap. Metronome at 170 spm — non-negotiable on climbs." } ], cooldown: ["Walk 5 min cool-down", "Calf stretch — 60 sec each", "Couch stretch — 90 sec each", "Pigeon pose — 90 sec each"], fueling: "If running >60 min: 30-60g carbs/hr + electrolytes. PRACTICE this — don't wait for race day." },
-  "Friday": { title: "Upper B — Pull & Biceps", intensity: "hard", summary: "Pull-up day. Posture, paddle power, and bicep size all built here. Highest direct bicep volume of the week — make it count.", duration: "55-70 min", warmup: ["Band pull-aparts — 15 x 2", "Dead hang — 20 sec x 2", "Scap pull-ups — 8 reps x 2", "Light DB row — 10 reps x 2"], exercises: [ { name: "Weighted Pull-Ups", sets: 4, reps: "6-8", weight: "Add weight as needed", rest: "2-3 min", notes: "Most important upper body lift for the Mash. Full ROM. Chin clears bar." }, { name: "Barbell or DB Row", sets: 4, reps: "10", weight: "Moderate-heavy", rest: "90 sec", notes: "Hinge to ~45°. Pull to lower chest/upper abs. Squeeze." }, { name: "Cable Face Pulls", sets: 3, reps: "15", weight: "Light-moderate", rest: "60 sec", notes: "External rotation at end. Shoulder health insurance." }, { name: "Single Arm Cable Row", sets: 3, reps: "12 each", weight: "Moderate", rest: "60 sec", notes: "Full stretch at start. Drive elbow back hard." }, { name: "Hammer Curl", sets: 3, reps: "12", weight: "Moderate", rest: "60 sec", notes: "Hits brachialis — adds arm thickness." }, { name: "Incline Dumbbell Curl", sets: 3, reps: "12", weight: "Moderate", rest: "60 sec", notes: "Bench 45-60°. Long head emphasis — KEY for size." }, { name: "Cable Curl", sets: 3, reps: "15", weight: "Moderate", rest: "45 sec", notes: "Constant tension burn. Squeeze at top." }, { name: "Pallof Press + Dead Bug", sets: 3, reps: "12 + 8", weight: "Cable + BW", rest: "45 sec", notes: "Anti-rotation core finisher." } ], cooldown: ["Lat stretch (overhead reach) — 60 sec each", "Bicep stretch (against wall) — 30 sec each", "Foam roll lats + upper back — 2 min"], fueling: "High protein day. ~30-40g protein at every meal." },
-  "Saturday": { title: "Long MTB Ride", intensity: "moderate", summary: "Race-specific bike training. Build to 2+ hours with sustained climbing. Practice fueling protocol that prevents Mash cramps.", duration: "90 min - 2.5 hrs", warmup: ["10 min easy spin to start", "Gradually build to working effort"], exercises: [ { name: "Long MTB Ride", sets: 1, reps: "Build to 2+ hrs", weight: "Mostly Z2, some Z3 climbs", rest: "—", notes: "Smooth pedaling. Higher cadence on climbs (don't grind). Practice descending technical terrain." } ], cooldown: ["10 min easy spin", "Hip flexor stretch 2 min each", "Foam roll quads + glutes", "Calf stretch each side"], fueling: "PRACTICE RACE FUELING: 500mg sodium pre-load 30 min before. 60g carbs/hour during." },
+  "Thursday": { title: "Trail Run", intensity: "moderate", summary: "The session that wins or loses the Mash. HR cap is non-negotiable — discipline now means you don't blow up on Gibraltar in October.", duration: "45-60 min", warmup: ["Bulgarian Split Squats — 8 reps each side x 2 (BW)", "Nordic curl negatives — 5 reps x 2", "Walking lunges — 10 each side", "Leg swings — 10 each direction", "5 min easy walk into slow jog"], exercises: [ { name: "Trail Run", sets: 1, reps: "Build to 60 min", weight: "140-150 bpm cap", rest: "—", notes: "Use HR monitor strictly. Walk hills if needed to stay under cap. Metronome at 170 spm — non-negotiable on climbs." } ], cooldown: ["Walk 5 min cool-down", "Calf stretch — 60 sec each", "Couch stretch — 90 sec each", "Pigeon pose — 90 sec each"], fueling: "If running >45 min: 30-60g carbs + electrolytes. PRACTICE this — don't wait for race day." },
+  "Friday": { title: "Upper B — Pull & Biceps", intensity: "hard", summary: "Pull-up day. Posture, paddle power, and bicep size all built here. Highest direct bicep volume of the week — make it count.", duration: "60-75 min", warmup: ["Band pull-aparts — 15 x 2", "Dead hang — 20 sec x 2", "Scap pull-ups — 8 reps x 2", "Light DB row — 10 reps x 2"], exercises: [ { name: "Weighted Pull-Ups", sets: 4, reps: "6-8", weight: "Add weight as needed", rest: "2-3 min", notes: "Most important upper body lift for the Mash. Full ROM. Chin clears bar." }, { name: "Barbell or DB Row", sets: 4, reps: "10", weight: "Moderate-heavy", rest: "90 sec", notes: "Hinge to ~45°. Pull to lower chest/upper abs. Squeeze." }, { name: "Cable Face Pulls", sets: 3, reps: "15", weight: "Light-moderate", rest: "60 sec", notes: "External rotation at end. Shoulder health insurance." }, { name: "Single Arm Cable Row", sets: 3, reps: "12 each", weight: "Moderate", rest: "60 sec", notes: "Full stretch at start. Drive elbow back hard." }, { name: "Hammer Curl", sets: 3, reps: "12", weight: "Moderate", rest: "60 sec", notes: "Hits brachialis — adds arm thickness." }, { name: "Incline Dumbbell Curl", sets: 3, reps: "12", weight: "Moderate", rest: "60 sec", notes: "Bench 45-60°. Long head emphasis — KEY for size." }, { name: "Cable Curl", sets: 3, reps: "15", weight: "Moderate", rest: "45 sec", notes: "Constant tension burn. Squeeze at top." }, { name: "Pallof Press + Dead Bug", sets: 3, reps: "12 + 8", weight: "Cable + BW", rest: "45 sec", notes: "Anti-rotation core finisher." } ], cooldown: ["Lat stretch (overhead reach) — 60 sec each", "Bicep stretch (against wall) — 30 sec each", "Foam roll lats + upper back — 2 min"], fueling: "High protein day. ~30-40g protein at every meal." },
+  "Saturday": { title: "Long MTB Ride", intensity: "moderate", summary: "Race-specific bike training. Build to 2 hours with sustained climbing. Practice fueling protocol that prevents Mash cramps.", duration: "90 min - 2 hrs", warmup: ["10 min easy spin to start", "Gradually build to working effort"], exercises: [ { name: "Long MTB Ride", sets: 1, reps: "Build to 2 hrs", weight: "Mostly Z2, some Z3 climbs", rest: "—", notes: "Smooth pedaling. Higher cadence on climbs (don't grind). Practice descending technical terrain." } ], cooldown: ["10 min easy spin", "Hip flexor stretch 2 min each", "Foam roll quads + glutes", "Calf stretch each side"], fueling: "PRACTICE RACE FUELING: 500mg sodium pre-load 30 min before. 60g carbs/hour during." },
   "Sunday": { title: "Rest / Active Recovery", intensity: "rest", summary: "Protect HRV. Sleep early. Walk, surf easy, foam roll. Sunday rest is what makes Monday's lift possible.", duration: "Optional 20-30 min easy", warmup: [], exercises: [ { name: "Easy walk, surf, or full rest", sets: 1, reps: "Optional", weight: "Conversational only", rest: "—", notes: "Body Battery should be charging not draining." } ], cooldown: ["Full body stretch routine — 15-20 min", "Hip + hamstring focus", "Thoracic spine mobility"], fueling: "Whole foods. Hydrate well." }
 };
 
@@ -1689,6 +1825,82 @@ async function generateSession(btnId='coach-btn') {
 }
 
 // ════════════════════════════════════════════════════════════════════
+//  WEEKLY SCHEDULE CARD
+// ════════════════════════════════════════════════════════════════════
+function renderWeeklySchedule() {
+  const ORDER = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const SHORT  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+  const svgIcon = (paths, vb='0 0 24 24') =>
+    `<svg width="18" height="18" viewBox="${vb}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+
+  // Barbell / lift
+  const iLift   = svgIcon('<line x1="6" y1="5" x2="6" y2="19"/><line x1="18" y1="5" x2="18" y2="19"/><line x1="6" y1="12" x2="18" y2="12"/><rect x="2" y="9" width="4" height="6" rx="1"/><rect x="18" y="9" width="4" height="6" rx="1"/>');
+  // Pull-up bar / upper pull
+  const iPull   = svgIcon('<rect x="2" y="3" width="20" height="3" rx="1"/><line x1="12" y1="6" x2="12" y2="11"/><circle cx="12" cy="14" r="3"/><path d="M9 21v-2a3 3 0 0 1 6 0v2"/>');
+  // Heart + wave (zone 2 / easy cardio)
+  const iZ2     = svgIcon('<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>');
+  // Running figure
+  const iRun    = svgIcon('<circle cx="12" cy="4" r="2"/><path d="m9 20 2-7-2-3 4-2 2 4h3"/><path d="m6 10 2-1"/>');
+  // Push / chest press (person pushing)
+  const iPush   = svgIcon('<circle cx="12" cy="5" r="2"/><path d="M10 22V14l-2-3 4-4 4 4-2 3v8"/><path d="M6 9h3M15 9h3"/>');
+  // Bike
+  const iBike   = svgIcon('<circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2"/>');
+  // Moon / rest
+  const iRest   = svgIcon('<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>');
+
+  const META = {
+    Monday:    { icon: iLift,  type: 'Lower A\nHeavy Lift',    intensity: 'hard',     detail: 'Trap bar deadlift · Squat · RDL', duration: '60-75 min' },
+    Tuesday:   { icon: iPush,  type: 'Upper A\nPush + Paddle', intensity: 'hard',     detail: 'Incline press · Paddle sim · Triceps', duration: '60-75 min' },
+    Wednesday: { icon: iZ2,    type: 'Zone 2\n+ Mobility',     intensity: 'easy',     detail: '140-150 bpm · Full mobility flow', duration: '50-60 min' },
+    Thursday:  { icon: iRun,   type: 'Trail Run\n170 spm cap', intensity: 'moderate', detail: '140-150 bpm HR cap · Metronome on', duration: '45-60 min' },
+    Friday:    { icon: iPull,  type: 'Upper B\nPull + Biceps', intensity: 'hard',     detail: 'Weighted pull-ups · Rows · Bicep volume', duration: '60-75 min' },
+    Saturday:  { icon: iBike,  type: 'Long MTB\nRide',         intensity: 'moderate', detail: 'Build to 2 hrs · Practice race fueling', duration: '90 min-2 hrs' },
+    Sunday:    { icon: iRest,  type: 'Full Rest\nRecover',     intensity: 'rest',     detail: 'Walk / stretch / surf easy', duration: 'Optional 20-30 min' },
+  };
+
+  const todayName = dayName(new Date());
+  const todayMeta = META[todayName];
+
+  const days = ORDER.map((day, i) => {
+    const m = META[day];
+    const isToday = day === todayName;
+    const badgeClass = `badge-${m.intensity}`;
+    const typeLines = m.type.split('\n');
+    return `
+      <div class="week-day ${isToday ? 'is-today' : ''}">
+        <div class="week-day-name">${SHORT[i]}</div>
+        <div class="week-day-icon">${m.icon}</div>
+        <div class="week-day-type">${typeLines[0]}<br><span style="opacity:0.7">${typeLines[1]}</span></div>
+        <div class="week-day-badge ${badgeClass}"></div>
+      </div>
+    `;
+  }).join('');
+
+  const todayStrip = todayMeta ? `
+    <div class="week-today-detail">
+      <div class="week-today-detail-icon">${todayMeta.icon.replace('width="18" height="18"', 'width="22" height="22"')}</div>
+      <div class="week-today-detail-text">
+        <div class="week-today-detail-label">Today · ${todayMeta.duration}</div>
+        <div class="week-today-detail-title">${todayMeta.type.replace('\n', ' — ')}</div>
+        <div class="week-today-detail-meta">${todayMeta.detail}</div>
+      </div>
+    </div>
+  ` : '';
+
+  return `
+    <div class="week-card">
+      <div class="week-card-header">
+        <div class="week-card-title">Weekly Training Plan</div>
+        <div class="week-card-sub">Phase 1 · Weeks 1-8</div>
+      </div>
+      <div class="week-days">${days}</div>
+      ${todayStrip}
+    </div>
+  `;
+}
+
+// ════════════════════════════════════════════════════════════════════
 //  TOP-LEVEL RENDER
 // ════════════════════════════════════════════════════════════════════
 function render() {
@@ -1718,6 +1930,7 @@ function renderPhone(latest, sorted) {
   $('#app').innerHTML = `
     ${renderHeader()}
     ${renderFeelCheckIn()}
+    ${renderWeeklySchedule()}
     ${renderHealthSnapshot(latest, sorted)}
     ${renderAlerts(latest)}
     <div class="ai-summary">
@@ -1769,6 +1982,8 @@ function renderDesktop(latest, sorted) {
 
       <div class="col-8">${renderLoadFullChart(sorted, 60)}</div>
       <div class="col-4">${renderInsights(sorted, state.activities)}</div>
+
+      <div class="col-12">${renderWeeklySchedule()}</div>
 
       <div class="col-4">${renderZoneDonut(state.activities)}</div>
       <div class="col-4">${renderWeeklyVolume(state.activities)}</div>
