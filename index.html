@@ -324,6 +324,388 @@ body.desktop-view .coach-button-fixed { display: none; }
   body.desktop-view .col-9 { grid-column: span 6; }
 }
 
+
+  /* ══════════════════════════════════════════
+     ENHANCED VISUAL DESIGN — Claude improvements
+     ══════════════════════════════════════════ */
+
+  /* === GLOBAL === */
+  body { background: #080C12; }
+  html { background: #080C12; }
+
+  /* === HEADER === */
+  .greeting {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #4F8EF7;
+    margin-bottom: 1px;
+  }
+  .date {
+    font-size: 27px;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1.1;
+    color: #F1F5F9;
+  }
+  .subdate {
+    font-size: 11px;
+    color: #475569;
+    margin-top: 5px;
+  }
+
+  /* === VIEW TOGGLE === */
+  .view-toggle button.active {
+    background: rgba(79, 142, 247, 0.15);
+    color: #4F8EF7;
+    border: 1px solid rgba(79, 142, 247, 0.3);
+  }
+
+  /* === FEEL CARD === */
+  .feel-card {
+    background: #111827;
+    border: 1px solid #1E293B;
+    border-radius: 16px;
+  }
+  .feel-title {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: #475569;
+    text-transform: uppercase;
+  }
+  .feel-btn {
+    background: #1E293B;
+    border: 1px solid #263548;
+    border-radius: 12px;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .feel-btn:hover {
+    background: #243245;
+    border-color: #334155;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  }
+  .feel-btn.active {
+    background: #F1F5F9;
+    border-color: #F1F5F9;
+    color: #080C12;
+    transform: none;
+  }
+  .feel-btn-emoji { font-size: 24px; }
+  .feel-btn-label {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-top: 5px;
+    color: #94A3B8;
+  }
+
+  /* === HEALTH SNAPSHOT === */
+  .snapshot {
+    background: #111827;
+    border: 1px solid #1E293B;
+    border-radius: 18px;
+  }
+  .snapshot-title {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #475569;
+  }
+  .snapshot-time {
+    font-size: 11px;
+    color: #374151;
+  }
+  .readiness-block {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.07), rgba(34, 197, 94, 0.02));
+    border: 1px solid rgba(34, 197, 94, 0.15);
+    border-radius: 14px;
+  }
+  .readiness-ring {
+    filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.4));
+  }
+  .readiness-label {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: #4B5563;
+    text-transform: uppercase;
+  }
+  .readiness-status {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #34D399;
+  }
+  .readiness-msg {
+    font-size: 12px;
+    color: #6B7280;
+    margin-top: 2px;
+  }
+  .snap-metric-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: #475569;
+    margin-bottom: 3px;
+  }
+  .snap-metric-value {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    color: #F1F5F9;
+  }
+  .snap-metric-unit {
+    font-size: 12px;
+    font-weight: 500;
+    color: #6B7280;
+  }
+  .snap-metric-meta {
+    font-size: 11px;
+    color: #6B7280;
+    margin-top: 2px;
+  }
+  .snap-metric-trend {
+    font-size: 10.5px;
+    font-weight: 600;
+    margin-top: 3px;
+  }
+  .trend-up { color: #34D399; }
+  .trend-down { color: #F87171; }
+
+  /* === COACH'S READ === */
+  .ai-summary {
+    background: linear-gradient(135deg, rgba(79, 142, 247, 0.08) 0%, rgba(124, 92, 246, 0.05) 100%);
+    border: 1px solid rgba(79, 142, 247, 0.2);
+    border-radius: 18px;
+  }
+  .ai-summary-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .ai-summary-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba(79, 142, 247, 0.15);
+    border: 1px solid rgba(79, 142, 247, 0.25);
+    font-size: 12px;
+    font-weight: 800;
+    color: #4F8EF7;
+  }
+  .ai-summary-title {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #4F8EF7;
+  }
+  .ai-summary-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #CBD5E1;
+  }
+  .highlight-good {
+    color: #34D399;
+    font-weight: 700;
+  }
+
+  /* === SESSION CARD === */
+  .session-card {
+    background: #111827;
+    border: 1px solid #1E293B;
+    border-radius: 18px;
+  }
+  .session-tag {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #475569;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .session-pill {
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+  .pill-moderate {
+    background: rgba(249, 115, 22, 0.12);
+    color: #FB923C;
+  }
+  .pill-hard {
+    background: rgba(239, 68, 68, 0.12);
+    color: #F87171;
+  }
+  .pill-easy {
+    background: rgba(34, 197, 94, 0.12);
+    color: #34D399;
+  }
+  .session-title {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #F1F5F9;
+    margin-bottom: 8px;
+  }
+  .session-detail {
+    font-size: 13px;
+    line-height: 1.65;
+    color: #94A3B8;
+  }
+  .session-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(30, 41, 59, 0.8);
+  }
+  .session-section-title {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #475569;
+    margin-bottom: 12px;
+  }
+  .exercise-check {
+    border: 1.5px solid #263548;
+    transition: border-color 0.2s;
+  }
+  .exercise:hover .exercise-check {
+    border-color: #4F8EF7;
+  }
+  .exercise-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #E2E8F0;
+  }
+  .prescription-key {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #475569;
+  }
+  .prescription-val {
+    font-size: 13px;
+    font-weight: 600;
+    color: #CBD5E1;
+  }
+  .exercise-note {
+    font-size: 12px;
+    color: #4B5563;
+    font-style: italic;
+    line-height: 1.55;
+  }
+  .protocol-block {
+    background: #0F1924;
+    border-radius: 10px;
+  }
+  .protocol-list {
+    font-size: 13px;
+    color: #94A3B8;
+    line-height: 2;
+  }
+  .protocol-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: #475569;
+    text-transform: uppercase;
+  }
+
+  /* === TRENDS & CHARTS === */
+  .section-label {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #475569;
+  }
+  .chart-card {
+    background: #111827;
+    border: 1px solid #1E293B;
+    border-radius: 14px;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #E2E8F0;
+  }
+  .card-meta {
+    font-size: 10.5px;
+    color: #475569;
+    font-weight: 600;
+  }
+
+  /* === ACTIVITY LIST === */
+  .activity-icon {
+    background: #1E293B;
+    border: 1px solid #263548;
+    border-radius: 10px;
+  }
+  .activity-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #E2E8F0;
+  }
+  .activity-stats {
+    font-size: 11.5px;
+    color: #64748B;
+  }
+  .activity-date {
+    font-size: 10px;
+    color: #374151;
+  }
+
+  /* === AI COACH BUTTON === */
+  .coach-button-fixed button {
+    background: linear-gradient(135deg, #4F8EF7 0%, #7C5CF6 100%);
+    border: none;
+    border-radius: 14px;
+    padding: 15px 24px;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    box-shadow: 0 4px 20px rgba(79, 142, 247, 0.35), 0 1px 0 rgba(255,255,255,0.1) inset;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    letter-spacing: 0.01em;
+  }
+  .coach-button-fixed button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(79, 142, 247, 0.5);
+  }
+  .coach-button-fixed button:active {
+    transform: scale(0.97);
+  }
+
+  /* === FOOTER === */
+  .footer {
+    font-size: 11px;
+    color: #374151;
+  }
+  .footer a {
+    color: #4F8EF7;
+    opacity: 0.7;
+    text-decoration: none;
+  }
+
+  /* === TOOLTIP === */
+  .help-drawer {
+    background: #111827;
+    border: 1px solid #1E293B;
+    border-radius: 14px;
+  }
 </style>
 </head>
 <body class="phone-view">
