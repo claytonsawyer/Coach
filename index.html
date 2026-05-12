@@ -282,6 +282,80 @@ body.desktop-view .date { font-size: 28px; }
 .zone-name { font-weight: 600; min-width: 22px; }
 .zone-pct { color: var(--text-muted); font-variant-numeric: tabular-nums; }
 
+/* WEEK PLANNER */
+.week-planner { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+.week-planner-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.week-planner-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
+.week-planner-reset { font-size: 11px; color: var(--primary); font-weight: 600; cursor: pointer; background: none; border: none; font-family: inherit; padding: 0; }
+.week-days { display: flex; flex-direction: column; gap: 6px; }
+.week-day-row { display: flex; flex-direction: column; padding: 10px 12px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border); transition: all 0.15s; position: relative; }
+.week-day-row:hover { border-color: var(--border-strong); background: var(--surface-3); }
+.week-day-row.today { border-color: rgba(59,130,246,0.4); background: rgba(59,130,246,0.06); }
+.week-day-row.modified { border-color: rgba(249,115,22,0.35); }
+.week-day-row.rest-day { opacity: 0.6; }
+.week-day-label { font-size: 11px; font-weight: 700; color: var(--text-muted); min-width: 28px; text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0; }
+.week-day-row.today .week-day-label { color: var(--primary); }
+.week-day-session { flex: 1; min-width: 0; }
+.week-day-session-name { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.week-day-session-meta { font-size: 11px; color: var(--text-dim); margin-top: 1px; }
+.week-day-badge { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; padding: 3px 7px; border-radius: 4px; flex-shrink: 0; }
+.badge-hard { background: var(--red-bg); color: var(--red); }
+.badge-moderate { background: var(--orange-bg); color: var(--orange); }
+.badge-easy { background: var(--green-bg); color: var(--green); }
+.badge-rest { background: rgba(156,163,175,0.12); color: var(--text-dim); }
+.badge-custom { background: rgba(249,115,22,0.15); color: var(--orange); }
+.week-day-edit { font-size: 18px; color: var(--text-dim); flex-shrink: 0; line-height: 1; }
+.week-day-row.today .week-day-edit { color: var(--primary); }
+.today-pill { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--primary); background: var(--primary-bg); padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
+.modified-tag { font-size: 9px; font-weight: 700; color: var(--orange); opacity: 0.8; }
+.week-day-main { display: flex; align-items: center; gap: 10px; width: 100%; cursor: pointer; }
+.week-day-row.has-log { border-color: rgba(34,197,94,0.3); }
+.week-day-row.missed { opacity: 0.5; }
+.day-log-entries { margin-top: 7px; padding-top: 7px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 3px; pointer-events: none; }
+.day-log-entry { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+.day-log-icon { display: flex; align-items: center; color: var(--green); flex-shrink: 0; margin-top: 1px; }
+.day-log-icon svg { width: 12px; height: 12px; }
+.day-log-name { font-size: 11px; font-weight: 600; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 1; min-width: 0; max-width: 160px; }
+.day-log-stats { font-size: 10.5px; color: var(--text-dim); white-space: nowrap; flex-shrink: 0; }
+.day-log-check { margin-left: auto; color: var(--green); font-size: 11px; font-weight: 700; flex-shrink: 0; padding-left: 4px; }
+
+/* SWAP MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; display: flex; align-items: flex-end; justify-content: center; animation: fadeIn 0.15s; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal { background: var(--surface); border-radius: 20px 20px 0 0; padding: 20px; width: 100%; max-width: 480px; max-height: 85vh; overflow-y: auto; animation: slideUp 0.2s cubic-bezier(0.34, 1.3, 0.64, 1); }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-handle { width: 36px; height: 4px; background: var(--border-strong); border-radius: 2px; margin: 0 auto 18px; }
+.modal-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.modal-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 18px; }
+.modal-section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin: 14px 0 8px; }
+.swap-option { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-2); margin-bottom: 6px; cursor: pointer; transition: all 0.15s; }
+.swap-option:hover { border-color: var(--border-strong); background: var(--surface-3); }
+.swap-option.selected { border-color: var(--primary); background: var(--primary-bg); }
+.swap-option-icon { font-size: 22px; width: 36px; text-align: center; flex-shrink: 0; }
+.swap-option-info { flex: 1; min-width: 0; }
+.swap-option-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.swap-option-meta { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+.custom-input-wrap { display: flex; gap: 8px; margin-top: 8px; }
+.custom-input { flex: 1; padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 13px; font-family: inherit; }
+.custom-input:focus { outline: none; border-color: var(--primary); }
+.modal-actions { display: flex; gap: 8px; margin-top: 18px; }
+.modal-btn { flex: 1; padding: 13px; border-radius: 10px; font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; border: none; }
+.modal-btn-cancel { background: var(--surface-2); color: var(--text-muted); border: 1px solid var(--border); }
+.modal-btn-confirm { background: var(--text); color: var(--bg); }
+.modal-btn-confirm:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* PHONE MINI DATA CARDS */
+.phone-data-grid .card,
+.phone-data-grid .chart-card {
+  margin-bottom: 0;
+  padding: 12px;
+}
+.phone-data-grid .card-label,
+.phone-data-grid .card-title { font-size: 10px; }
+.phone-data-grid .zone-legend-row { font-size: 10px; }
+.phone-data-grid .zone-dot { width: 8px; height: 8px; }
+.phone-data-grid .card-meta { font-size: 9px; }
+
 /* FOOTER */
 .footer { text-align: center; font-size: 11px; color: var(--text-dim); margin-top: 24px; padding-bottom: 20px; }
 .footer a { color: var(--text-muted); text-decoration: none; margin: 0 4px; }
@@ -700,147 +774,73 @@ body.desktop-view .coach-button-fixed { display: none; }
     text-decoration: none;
   }
 
-  /* === TOOLTIP === */
-  .help-drawer {
-    background: #111827;
-    border: 1px solid #1E293B;
-    border-radius: 14px;
-  }
-
-  /* === WEEKLY SCHEDULE CARD === */
-  .week-card {
+  /* === WEEK PLANNER ENHANCED === */
+  .week-planner {
     background: #111827;
     border: 1px solid #1E293B;
     border-radius: 18px;
-    padding: 18px;
-    margin-bottom: 12px;
   }
-  .week-card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 14px;
-  }
-  .week-card-title {
-    font-size: 9.5px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: #475569;
-  }
-  .week-card-sub {
-    font-size: 11px;
-    color: #374151;
-    font-weight: 500;
-  }
-  .week-days {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
-  }
-  .week-day {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 4px;
-    border-radius: 12px;
+  .week-day-row {
     background: #0F1924;
     border: 1px solid #1E293B;
+    border-radius: 12px;
     transition: all 0.2s;
-    cursor: default;
-    position: relative;
   }
-  .week-day.is-today {
-    background: rgba(79, 142, 247, 0.1);
+  .week-day-row:hover {
+    background: #1a2535;
+    border-color: #263548;
+  }
+  .week-day-row.today {
+    background: rgba(79, 142, 247, 0.08);
     border-color: rgba(79, 142, 247, 0.35);
-    box-shadow: 0 0 0 1px rgba(79, 142, 247, 0.2);
   }
-  .week-day-name {
-    font-size: 9px;
+  .week-day-row.modified {
+    border-color: rgba(249, 115, 22, 0.4);
+    background: rgba(249, 115, 22, 0.05);
+  }
+  .week-day-label {
+    font-size: 10px;
     font-weight: 800;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    letter-spacing: 0.1em;
     color: #475569;
+    min-width: 30px;
   }
-  .week-day.is-today .week-day-name {
-    color: #4F8EF7;
-  }
-  .week-day-icon {
-    width: 18px;
-    height: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #475569;
-  }
-  .week-day.is-today .week-day-icon {
-    color: #4F8EF7;
-  }
-  .week-today-detail-icon {
-    width: 22px;
-    height: 22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #4F8EF7;
-    flex-shrink: 0;
-  }
-  .week-day-type {
-    font-size: 8.5px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    text-align: center;
-    line-height: 1.3;
-    color: #64748B;
-  }
-  .week-day.is-today .week-day-type {
-    color: #93C5FD;
-  }
-  .week-day-badge {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    margin-top: 2px;
-  }
-  /* intensity color dots */
-  .badge-hard    { background: #F87171; }
-  .badge-moderate { background: #FB923C; }
-  .badge-easy    { background: #34D399; }
-  .badge-rest    { background: #374151; }
-
-  /* expanded detail strip shown on today */
-  .week-today-detail {
-    margin-top: 12px;
-    padding: 10px 14px;
-    background: rgba(79, 142, 247, 0.07);
-    border: 1px solid rgba(79, 142, 247, 0.2);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .week-today-detail-text {}
-  .week-today-detail-label {
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: #4F8EF7;
-    margin-bottom: 2px;
-  }
-  .week-today-detail-title {
-    font-size: 14px;
+  .week-day-row.today .week-day-label { color: #4F8EF7; }
+  .week-day-session-name {
+    font-size: 13px;
     font-weight: 700;
     color: #E2E8F0;
-    line-height: 1.3;
   }
-  .week-today-detail-meta {
-    font-size: 11px;
-    color: #64748B;
-    margin-top: 2px;
+  .week-day-session-meta {
+    font-size: 10.5px;
+    color: #475569;
   }
+  /* === MODAL ENHANCED === */
+  .modal {
+    background: #111827;
+    border-top: 1px solid #1E293B;
+  }
+  .modal-title { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; color: #F1F5F9; }
+  .modal-sub { color: #475569; }
+  .swap-option {
+    background: #0F1924;
+    border: 1px solid #1E293B;
+    border-radius: 12px;
+  }
+  .swap-option:hover { background: #1a2535; border-color: #263548; }
+  .swap-option.selected { border-color: #4F8EF7; background: rgba(79, 142, 247, 0.1); }
+  .swap-option-name { font-size: 13.5px; font-weight: 700; color: #E2E8F0; }
+  .swap-option-meta { color: #475569; }
+  .custom-input {
+    background: #0F1924;
+    border: 1px solid #1E293B;
+    color: #E2E8F0;
+    border-radius: 10px;
+  }
+  .custom-input:focus { border-color: #4F8EF7; }
+  .modal-btn-cancel { background: #1E293B; border: 1px solid #263548; color: #94A3B8; }
+  .modal-btn-confirm { background: #F1F5F9; color: #080C12; }
+
 </style>
 </head>
 <body class="phone-view">
@@ -865,7 +865,6 @@ GARMIN: CTL ~219 baseline, peak 271. Boom-bust pattern. HRV 90-111ms range. Hill
 PHYSIOLOGY: Cadence 173 flat → 152 steep (target 170+). Heavy sweater 1520ml/90min — drives cramps. Naturally runs 90%+ HR (must discipline 140-150 for endurance). Paddle is NOT a weakness.
 WEAKNESSES: Aerobic efficiency, lower body resilience, fueling/sweat, climb cadence, training consistency, mobility.
 PLAN: M Lower A | T Upper A push/paddle | W Z2+mobility | Th trail run | F Upper B pull/biceps | Sa long MTB | Su OFF
-TIME CONSTRAINTS: Runs max 60 min. Lifting sessions max 75 min. MTB rides max 2 hrs. Full-time job — sessions must fit real schedule.
 PREFERENCES: Incline-first chest. High bicep frequency. No sugarcoating.
 ACWR rule: never exceed 1.3x CTL (~219). Cramp protocol: 500mg sodium pre-load, 60g carbs/hr.`;
 
@@ -878,11 +877,11 @@ const FEEL_OPTIONS = [
 
 const SESSIONS = {
   "Monday": { title: "Lower A — Heavy Bilateral", intensity: "hard", summary: "Low volume, high quality. The two big lifts get all your focus. Builds the legs to climb Gibraltar without cramping.", duration: "60-75 min", warmup: ["Hip 90/90s — 1 min each side", "Goblet squat hold — 30 sec x 2", "Ankle CARs — 10 each", "Glute bridges — 15 reps", "Empty bar squats — 10 reps"], exercises: [ { name: "Trap Bar Deadlift", sets: 4, reps: "5", weight: "Build to top set", rest: "3 min", notes: "Reset each rep. Brace HARD. Top set leaves 1-2 in tank." }, { name: "Barbell Back Squat", sets: 3, reps: "6", weight: "75-80% 1RM", rest: "2-3 min", notes: "Below parallel. Vertical torso. Drive knees out." }, { name: "Romanian Deadlift", sets: 3, reps: "8", weight: "Moderate-heavy", rest: "90 sec", notes: "Feel hamstrings load. Bar stays close to legs." }, { name: "Hanging Knee Raise", sets: 3, reps: "10", weight: "Bodyweight", rest: "60 sec", notes: "Slow controlled. Or sub Ab Wheel x10." } ], cooldown: ["Couch stretch — 90 sec each side", "Pigeon pose — 90 sec each side", "Foam roll quads + IT band — 2 min"], fueling: "Pre: oats + banana + protein shake. Post: protein + carbs within 60 min." },
-  "Tuesday": { title: "Upper A — Push & Paddle", intensity: "hard", summary: "Incline-first chest day with paddle-specific finishers. Upper chest priority for fullness, with shoulder stability work for the 7-mile Mash paddle.", duration: "60-75 min", warmup: ["Band pull-aparts — 15 reps x 2", "Shoulder CARs — 10 each direction", "Wall slides — 10 reps", "Light DB press — 12 reps x 2"], exercises: [ { name: "Incline Barbell Press", sets: 4, reps: "8", weight: "70-75% 1RM", rest: "2-3 min", notes: "Bench at 30-45°. Bar to upper chest. Pause briefly." }, { name: "Incline Dumbbell Press", sets: 3, reps: "10-12", weight: "Moderate", rest: "90 sec", notes: "Slight squeeze at top. DBs nearly touching." }, { name: "Cable Incline Fly", sets: 3, reps: "12-15", weight: "Light-moderate", rest: "60 sec", notes: "Low-to-high arc. Squeeze upper chest at top." }, { name: "Standing Overhead Press", sets: 3, reps: "10", weight: "Moderate", rest: "90 sec", notes: "Tight core. No lower back arch." }, { name: "Cable Tricep Pushdown", sets: 3, reps: "12-15", weight: "Moderate", rest: "60 sec", notes: "Elbows pinned. Full extension." }, { name: "Prone Plank to Extend", sets: 3, reps: "10", weight: "Bodyweight", rest: "60 sec", notes: "Paddle simulation. Stretch shoulders forward." }, { name: "Cable Pulldown in Hip Hinge", sets: 3, reps: "12-15", weight: "Light", rest: "60 sec", notes: "Mimic paddle stroke. Hinge at hips." }, { name: "Cable Curl + DB Curl", sets: 2, reps: "15", weight: "Light pump", rest: "45 sec", notes: "Bicep finisher — burn out for size." } ], cooldown: ["Doorway pec stretch — 60 sec each side", "Cross-body shoulder stretch — 30 sec each", "Foam roll thoracic spine — 90 sec"], fueling: "Carbs around training. Hydrate aggressively given heavy sweat rate." },
+  "Tuesday": { title: "Upper A — Push & Paddle", intensity: "hard", summary: "Incline-first chest day with paddle-specific finishers. Upper chest priority for fullness, with shoulder stability work for the 7-mile Mash paddle.", duration: "55-70 min", warmup: ["Band pull-aparts — 15 reps x 2", "Shoulder CARs — 10 each direction", "Wall slides — 10 reps", "Light DB press — 12 reps x 2"], exercises: [ { name: "Incline Barbell Press", sets: 4, reps: "8", weight: "70-75% 1RM", rest: "2-3 min", notes: "Bench at 30-45°. Bar to upper chest. Pause briefly." }, { name: "Incline Dumbbell Press", sets: 3, reps: "10-12", weight: "Moderate", rest: "90 sec", notes: "Slight squeeze at top. DBs nearly touching." }, { name: "Cable Incline Fly", sets: 3, reps: "12-15", weight: "Light-moderate", rest: "60 sec", notes: "Low-to-high arc. Squeeze upper chest at top." }, { name: "Standing Overhead Press", sets: 3, reps: "10", weight: "Moderate", rest: "90 sec", notes: "Tight core. No lower back arch." }, { name: "Cable Tricep Pushdown", sets: 3, reps: "12-15", weight: "Moderate", rest: "60 sec", notes: "Elbows pinned. Full extension." }, { name: "Prone Plank to Extend", sets: 3, reps: "10", weight: "Bodyweight", rest: "60 sec", notes: "Paddle simulation. Stretch shoulders forward." }, { name: "Cable Pulldown in Hip Hinge", sets: 3, reps: "12-15", weight: "Light", rest: "60 sec", notes: "Mimic paddle stroke. Hinge at hips." }, { name: "Cable Curl + DB Curl", sets: 2, reps: "15", weight: "Light pump", rest: "45 sec", notes: "Bicep finisher — burn out for size." } ], cooldown: ["Doorway pec stretch — 60 sec each side", "Cross-body shoulder stretch — 30 sec each", "Foam roll thoracic spine — 90 sec"], fueling: "Carbs around training. Hydrate aggressively given heavy sweat rate." },
   "Wednesday": { title: "Zone 2 + Full Mobility", intensity: "easy", summary: "The most underrated session of the week. Builds aerobic base and fixes mobility deficits spiking your vertical ratio on climbs. NEVER skip this.", duration: "50-60 min", warmup: ["5 min easy warm-up before main set"], exercises: [ { name: "Zone 2 Cardio (bike, swim, or easy run)", sets: 1, reps: "30-40 min", weight: "140-150bpm cap", rest: "—", notes: "Conversational pace. Nasal breathing. Builds the engine for the Mash." } ], cooldown: ["Foam roll thoracic spine — 2 min", "Foam roll quads — 2 min each leg", "Foam roll hamstrings — 2 min each leg", "Hip flexor stretch — 2 min each side", "Pigeon pose — 2 min each side", "Hamstring band floss — 1 min each side", "Doorway pec stretch — 1 min each side", "Ankle CARs + calf stretch — 2 min total"], fueling: "Light meal beforehand. Plenty of water + electrolytes." },
-  "Thursday": { title: "Trail Run", intensity: "moderate", summary: "The session that wins or loses the Mash. HR cap is non-negotiable — discipline now means you don't blow up on Gibraltar in October.", duration: "45-60 min", warmup: ["Bulgarian Split Squats — 8 reps each side x 2 (BW)", "Nordic curl negatives — 5 reps x 2", "Walking lunges — 10 each side", "Leg swings — 10 each direction", "5 min easy walk into slow jog"], exercises: [ { name: "Trail Run", sets: 1, reps: "Build to 60 min", weight: "140-150 bpm cap", rest: "—", notes: "Use HR monitor strictly. Walk hills if needed to stay under cap. Metronome at 170 spm — non-negotiable on climbs." } ], cooldown: ["Walk 5 min cool-down", "Calf stretch — 60 sec each", "Couch stretch — 90 sec each", "Pigeon pose — 90 sec each"], fueling: "If running >45 min: 30-60g carbs + electrolytes. PRACTICE this — don't wait for race day." },
-  "Friday": { title: "Upper B — Pull & Biceps", intensity: "hard", summary: "Pull-up day. Posture, paddle power, and bicep size all built here. Highest direct bicep volume of the week — make it count.", duration: "60-75 min", warmup: ["Band pull-aparts — 15 x 2", "Dead hang — 20 sec x 2", "Scap pull-ups — 8 reps x 2", "Light DB row — 10 reps x 2"], exercises: [ { name: "Weighted Pull-Ups", sets: 4, reps: "6-8", weight: "Add weight as needed", rest: "2-3 min", notes: "Most important upper body lift for the Mash. Full ROM. Chin clears bar." }, { name: "Barbell or DB Row", sets: 4, reps: "10", weight: "Moderate-heavy", rest: "90 sec", notes: "Hinge to ~45°. Pull to lower chest/upper abs. Squeeze." }, { name: "Cable Face Pulls", sets: 3, reps: "15", weight: "Light-moderate", rest: "60 sec", notes: "External rotation at end. Shoulder health insurance." }, { name: "Single Arm Cable Row", sets: 3, reps: "12 each", weight: "Moderate", rest: "60 sec", notes: "Full stretch at start. Drive elbow back hard." }, { name: "Hammer Curl", sets: 3, reps: "12", weight: "Moderate", rest: "60 sec", notes: "Hits brachialis — adds arm thickness." }, { name: "Incline Dumbbell Curl", sets: 3, reps: "12", weight: "Moderate", rest: "60 sec", notes: "Bench 45-60°. Long head emphasis — KEY for size." }, { name: "Cable Curl", sets: 3, reps: "15", weight: "Moderate", rest: "45 sec", notes: "Constant tension burn. Squeeze at top." }, { name: "Pallof Press + Dead Bug", sets: 3, reps: "12 + 8", weight: "Cable + BW", rest: "45 sec", notes: "Anti-rotation core finisher." } ], cooldown: ["Lat stretch (overhead reach) — 60 sec each", "Bicep stretch (against wall) — 30 sec each", "Foam roll lats + upper back — 2 min"], fueling: "High protein day. ~30-40g protein at every meal." },
-  "Saturday": { title: "Long MTB Ride", intensity: "moderate", summary: "Race-specific bike training. Build to 2 hours with sustained climbing. Practice fueling protocol that prevents Mash cramps.", duration: "90 min - 2 hrs", warmup: ["10 min easy spin to start", "Gradually build to working effort"], exercises: [ { name: "Long MTB Ride", sets: 1, reps: "Build to 2 hrs", weight: "Mostly Z2, some Z3 climbs", rest: "—", notes: "Smooth pedaling. Higher cadence on climbs (don't grind). Practice descending technical terrain." } ], cooldown: ["10 min easy spin", "Hip flexor stretch 2 min each", "Foam roll quads + glutes", "Calf stretch each side"], fueling: "PRACTICE RACE FUELING: 500mg sodium pre-load 30 min before. 60g carbs/hour during." },
+  "Thursday": { title: "Trail Run", intensity: "moderate", summary: "The session that wins or loses the Mash. HR cap is non-negotiable — discipline now means you don't blow up on Gibraltar in October.", duration: "45-90 min", warmup: ["Bulgarian Split Squats — 8 reps each side x 2 (BW)", "Nordic curl negatives — 5 reps x 2", "Walking lunges — 10 each side", "Leg swings — 10 each direction", "5 min easy walk into slow jog"], exercises: [ { name: "Trail Run", sets: 1, reps: "Build to 90 min", weight: "140-150 bpm cap", rest: "—", notes: "Use HR monitor strictly. Walk hills if needed to stay under cap. Metronome at 170 spm — non-negotiable on climbs." } ], cooldown: ["Walk 5 min cool-down", "Calf stretch — 60 sec each", "Couch stretch — 90 sec each", "Pigeon pose — 90 sec each"], fueling: "If running >60 min: 30-60g carbs/hr + electrolytes. PRACTICE this — don't wait for race day." },
+  "Friday": { title: "Upper B — Pull & Biceps", intensity: "hard", summary: "Pull-up day. Posture, paddle power, and bicep size all built here. Highest direct bicep volume of the week — make it count.", duration: "55-70 min", warmup: ["Band pull-aparts — 15 x 2", "Dead hang — 20 sec x 2", "Scap pull-ups — 8 reps x 2", "Light DB row — 10 reps x 2"], exercises: [ { name: "Weighted Pull-Ups", sets: 4, reps: "6-8", weight: "Add weight as needed", rest: "2-3 min", notes: "Most important upper body lift for the Mash. Full ROM. Chin clears bar." }, { name: "Barbell or DB Row", sets: 4, reps: "10", weight: "Moderate-heavy", rest: "90 sec", notes: "Hinge to ~45°. Pull to lower chest/upper abs. Squeeze." }, { name: "Cable Face Pulls", sets: 3, reps: "15", weight: "Light-moderate", rest: "60 sec", notes: "External rotation at end. Shoulder health insurance." }, { name: "Single Arm Cable Row", sets: 3, reps: "12 each", weight: "Moderate", rest: "60 sec", notes: "Full stretch at start. Drive elbow back hard." }, { name: "Hammer Curl", sets: 3, reps: "12", weight: "Moderate", rest: "60 sec", notes: "Hits brachialis — adds arm thickness." }, { name: "Incline Dumbbell Curl", sets: 3, reps: "12", weight: "Moderate", rest: "60 sec", notes: "Bench 45-60°. Long head emphasis — KEY for size." }, { name: "Cable Curl", sets: 3, reps: "15", weight: "Moderate", rest: "45 sec", notes: "Constant tension burn. Squeeze at top." }, { name: "Pallof Press + Dead Bug", sets: 3, reps: "12 + 8", weight: "Cable + BW", rest: "45 sec", notes: "Anti-rotation core finisher." } ], cooldown: ["Lat stretch (overhead reach) — 60 sec each", "Bicep stretch (against wall) — 30 sec each", "Foam roll lats + upper back — 2 min"], fueling: "High protein day. ~30-40g protein at every meal." },
+  "Saturday": { title: "Long MTB Ride", intensity: "moderate", summary: "Race-specific bike training. Build to 2+ hours with sustained climbing. Practice fueling protocol that prevents Mash cramps.", duration: "90 min - 2.5 hrs", warmup: ["10 min easy spin to start", "Gradually build to working effort"], exercises: [ { name: "Long MTB Ride", sets: 1, reps: "Build to 2+ hrs", weight: "Mostly Z2, some Z3 climbs", rest: "—", notes: "Smooth pedaling. Higher cadence on climbs (don't grind). Practice descending technical terrain." } ], cooldown: ["10 min easy spin", "Hip flexor stretch 2 min each", "Foam roll quads + glutes", "Calf stretch each side"], fueling: "PRACTICE RACE FUELING: 500mg sodium pre-load 30 min before. 60g carbs/hour during." },
   "Sunday": { title: "Rest / Active Recovery", intensity: "rest", summary: "Protect HRV. Sleep early. Walk, surf easy, foam roll. Sunday rest is what makes Monday's lift possible.", duration: "Optional 20-30 min easy", warmup: [], exercises: [ { name: "Easy walk, surf, or full rest", sets: 1, reps: "Optional", weight: "Conversational only", rest: "—", notes: "Body Battery should be charging not draining." } ], cooldown: ["Full body stretch routine — 15-20 min", "Hip + hamstring focus", "Thoracic spine mobility"], fueling: "Whole foods. Hydrate well." }
 };
 
@@ -905,6 +904,26 @@ const RECOVERY_SESSION = {
 //  STATE
 // ════════════════════════════════════════════════════════════════════
 const todayKey = new Date().toDateString();
+
+// Week swap state — keyed by "YYYY-WW-DayName"
+function getWeekKey() {
+  const d = new Date();
+  const jan1 = new Date(d.getFullYear(), 0, 1);
+  const week = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+  return `${d.getFullYear()}-W${week}`;
+}
+const WEEK_KEY = getWeekKey();
+function swapStoreKey(day) { return `swap-${WEEK_KEY}-${day}`; }
+
+function loadWeekSwaps() {
+  const swaps = {};
+  ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].forEach(day => {
+    const saved = localStorage.getItem(swapStoreKey(day));
+    if (saved) swaps[day] = JSON.parse(saved);
+  });
+  return swaps;
+}
+
 const state = {
   athleteId: localStorage.getItem('iv_athlete_id') || '',
   apiKey: localStorage.getItem('iv_api_key') || '',
@@ -914,7 +933,9 @@ const state = {
   error: null,
   checkedExercises: {},
   feel: null,
-  view: localStorage.getItem('view_mode') || 'phone'
+  view: localStorage.getItem('view_mode') || 'phone',
+  weekSwaps: loadWeekSwaps(),
+  swapModalDay: null
 };
 
 const savedFeelDate = localStorage.getItem('feel_date');
@@ -1100,18 +1121,248 @@ function setView(v) {
   render();
 }
 
+// ════════════════════════════════════════════════════════════════════
+//  SWAP OPTIONS — activities you can sub in for any day
+// ════════════════════════════════════════════════════════════════════
+const SWAP_OPTIONS = [
+  { id: 'surf', icon: '🏄', name: 'Surf', meta: 'Z2 ocean effort — great aerobic + balance work', intensity: 'easy', duration: '60-90 min', notes: 'Keep it conversational. Paddle-out reps count as Zone 2.' },
+  { id: 'paddle', icon: '🚣', name: 'Prone Paddle', meta: 'Flat or downwind — race-specific cardio', intensity: 'moderate', duration: '45-90 min', notes: 'Stay at 140-150bpm. Excellent Mash paddle prep.' },
+  { id: 'swim', icon: '🏊', name: 'Swim', meta: 'Pool or ocean — aerobic + shoulder recovery', intensity: 'easy', duration: '30-60 min', notes: 'Zone 2 effort. Shoulder health benefit on recovery days.' },
+  { id: 'mtb', icon: '🚵', name: 'MTB Ride', meta: 'Trail or road — race-specific bike work', intensity: 'moderate', duration: '60-150 min', notes: 'Practice fueling. Cadence on climbs. Mash-specific.' },
+  { id: 'trail_run', icon: '🏃', name: 'Trail Run', meta: '140-150bpm cap, 170spm metronome', intensity: 'moderate', duration: '45-90 min', notes: 'Non-negotiable: HR cap and metronome. Walk hills if needed.' },
+  { id: 'dirt_bike', icon: '🏍️', name: 'Dirt Bike', meta: 'Active — not counted as structured training', intensity: 'easy', duration: 'Variable', notes: 'Fun counts. Not replacing a key session — log as extra.' },
+  { id: 'zone2', icon: '🚴', name: 'Zone 2 Cardio', meta: 'Easy bike, jog, or elliptical at 140-150bpm', intensity: 'easy', duration: '30-45 min', notes: 'Conversational pace only. Builds aerobic base every time.' },
+  { id: 'mobility', icon: '🧘', name: 'Mobility Only', meta: 'Full body stretch + foam roll protocol', intensity: 'easy', duration: '30-45 min', notes: 'Hips, ankles, hamstrings, thoracic. Fixes vertical ratio.' },
+  { id: 'rest', icon: '💤', name: 'Rest Day', meta: 'Full recovery — protect HRV', intensity: 'rest', duration: '—', notes: 'Walk, eat well, sleep early. Makes next session better.' },
+  { id: 'custom', icon: '✏️', name: 'Custom', meta: 'Type your own activity', intensity: 'moderate', duration: 'Variable', notes: '' }
+];
+
+function openSwapModal(day) {
+  state.swapModalDay = day;
+  state.swapModalSelected = null;
+  state.swapModalCustom = '';
+  renderSwapModal();
+}
+
+function closeSwapModal() {
+  state.swapModalDay = null;
+  const existing = document.getElementById('swap-modal-overlay');
+  if (existing) existing.remove();
+}
+
+function selectSwapOption(id) {
+  state.swapModalSelected = id;
+  document.querySelectorAll('.swap-option').forEach(el => el.classList.toggle('selected', el.dataset.id === id));
+  const customWrap = document.getElementById('custom-input-wrap');
+  if (customWrap) customWrap.style.display = id === 'custom' ? 'flex' : 'none';
+  const confirmBtn = document.getElementById('swap-confirm-btn');
+  if (confirmBtn) confirmBtn.disabled = false;
+}
+
+function confirmSwap() {
+  const day = state.swapModalDay;
+  const optId = state.swapModalSelected;
+  if (!day || !optId) return;
+  let opt = SWAP_OPTIONS.find(o => o.id === optId);
+  if (optId === 'custom') {
+    const val = document.getElementById('custom-activity-input')?.value.trim();
+    if (!val) return;
+    opt = { ...opt, name: val, meta: 'Custom activity', id: 'custom' };
+  }
+  const swap = { ...opt };
+  state.weekSwaps[day] = swap;
+  localStorage.setItem(swapStoreKey(day), JSON.stringify(swap));
+  closeSwapModal();
+  render();
+}
+
+function clearSwap(day) {
+  delete state.weekSwaps[day];
+  localStorage.removeItem(swapStoreKey(day));
+  render();
+}
+
+function resetAllSwaps() {
+  ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].forEach(day => {
+    delete state.weekSwaps[day];
+    localStorage.removeItem(swapStoreKey(day));
+  });
+  render();
+}
+
+function renderSwapModal() {
+  const existing = document.getElementById('swap-modal-overlay');
+  if (existing) existing.remove();
+  const day = state.swapModalDay;
+  if (!day) return;
+  const planned = SESSIONS[day];
+  const currentSwap = state.weekSwaps[day];
+
+  const options = SWAP_OPTIONS.map(opt => `
+    <div class="swap-option" data-id="${opt.id}" onclick="selectSwapOption('${opt.id}')">
+      <div class="swap-option-icon">${opt.icon}</div>
+      <div class="swap-option-info">
+        <div class="swap-option-name">${opt.name}</div>
+        <div class="swap-option-meta">${opt.meta}</div>
+      </div>
+    </div>
+  `).join('');
+
+  const overlay = document.createElement('div');
+  overlay.id = 'swap-modal-overlay';
+  overlay.className = 'modal-overlay';
+  overlay.onclick = (e) => { if (e.target === overlay) closeSwapModal(); };
+  overlay.innerHTML = `
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Swap ${day}'s Session</div>
+      <div class="modal-sub">Planned: ${planned.title} · ${planned.duration}</div>
+      ${currentSwap ? `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:8px 12px;background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.25);border-radius:8px;font-size:12px;color:#FB923C;font-weight:600;">
+        <span>Currently swapped to: ${currentSwap.icon} ${currentSwap.name}</span>
+        <span style="margin-left:auto;cursor:pointer;text-decoration:underline;" onclick="clearSwap('${day}');closeSwapModal();">Remove swap</span>
+      </div>` : ''}
+      <div class="modal-section-label">Choose replacement activity</div>
+      ${options}
+      <div id="custom-input-wrap" class="custom-input-wrap" style="display:none;">
+        <input type="text" id="custom-activity-input" class="custom-input" placeholder="e.g. Beach volleyball, Yoga, Ocean swim..." autocomplete="off">
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-cancel" onclick="closeSwapModal()">Cancel</button>
+        <button class="modal-btn modal-btn-confirm" id="swap-confirm-btn" onclick="confirmSwap()" disabled>Confirm Swap</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
 function getSessionForToday() {
   const day = dayName(new Date());
   const planned = SESSIONS[day];
-  if (state.feel === 'sore' || state.feel === 'beat') {
-    return { session: RECOVERY_SESSION, override: true, plannedTitle: planned.title };
+  // Week swap takes priority over feel-based override
+  if (state.weekSwaps[day]) {
+    const swap = state.weekSwaps[day];
+    return {
+      session: {
+        title: `${swap.icon} ${swap.name}`,
+        intensity: swap.intensity,
+        summary: swap.notes || swap.meta,
+        duration: swap.duration,
+        warmup: [],
+        exercises: [{ name: swap.name, sets: 1, reps: swap.duration, weight: swap.intensity === 'easy' ? 'Easy effort' : 'Moderate effort', rest: '—', notes: swap.notes }],
+        cooldown: ['Stretch as needed', 'Hydrate well'],
+        fueling: swap.intensity !== 'rest' ? 'Electrolytes if over 60 min. Protein post-session.' : 'Whole foods. Rest and recover.'
+      },
+      override: true,
+      plannedTitle: planned.title,
+      isSwap: true,
+      swapName: swap.name
+    };
   }
-  return { session: planned, override: false };
+  if (state.feel === 'sore' || state.feel === 'beat') {
+    return { session: RECOVERY_SESSION, override: true, plannedTitle: planned.title, isSwap: false };
+  }
+  return { session: planned, override: false, isSwap: false };
 }
 
 // ════════════════════════════════════════════════════════════════════
 //  RENDER PIECES — shared between phone and desktop
 // ════════════════════════════════════════════════════════════════════
+
+function getWeekStartMonday() {
+  const today = new Date();
+  const dow = today.getDay(); // 0=Sun
+  const diff = dow === 0 ? -6 : 1 - dow; // shift to Monday
+  const mon = new Date(today);
+  mon.setDate(today.getDate() + diff);
+  mon.setHours(0, 0, 0, 0);
+  return mon;
+}
+
+function activitiesForDay(activities, targetDate) {
+  const dateStr = targetDate.toISOString().split('T')[0];
+  return activities.filter(a => {
+    const aDate = (a.start_date_local || '').split('T')[0];
+    return aDate === dateStr;
+  });
+}
+
+function renderWeekPlanner(activities = []) {
+  const today = new Date();
+  const todayName = dayName(today);
+  const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const hasAnySwap = Object.keys(state.weekSwaps).length > 0;
+  const weekStart = getWeekStartMonday();
+
+  const badgeClass = { hard: 'badge-hard', moderate: 'badge-moderate', easy: 'badge-easy', rest: 'badge-rest' };
+  const badgeLabel = { hard: 'Hard', moderate: 'Mod', easy: 'Easy', rest: 'Off' };
+  const dayAbbr = { Monday: 'MON', Tuesday: 'TUE', Wednesday: 'WED', Thursday: 'THU', Friday: 'FRI', Saturday: 'SAT', Sunday: 'SUN' };
+
+  const rows = DAYS.map((day, idx) => {
+    const isToday = day === todayName;
+    const swap = state.weekSwaps[day];
+    const planned = SESSIONS[day];
+    const intensity = swap ? swap.intensity : planned.intensity;
+    const title = swap ? `${swap.icon} ${swap.name}` : planned.title;
+    const meta = swap ? `Swapped · was: ${planned.title}` : planned.duration;
+    const isRest = intensity === 'rest' && !swap;
+
+    // Find Garmin activities logged on this day
+    const dayDate = new Date(weekStart);
+    dayDate.setDate(weekStart.getDate() + idx);
+    const logged = activitiesForDay(activities, dayDate);
+    const isPast = dayDate < today && !isToday;
+
+    const loggedHtml = logged.map(a => {
+      const dist = a.distance ? `${fmtMiles(a.distance)}mi` : '';
+      const dur = a.moving_time ? `${fmtMins(a.moving_time)}min` : '';
+      const hrVal = a.icu_average_hr ?? a.average_heartrate ?? null;
+      const hr = hrVal ? `${Math.round(hrVal)}bpm` : '';
+      const stats = [dist, dur, hr].filter(Boolean).join(' · ');
+      const icon = sportIcon(a.type);
+      // Shorten Garmin auto-names like "San Luis Obispo County..." 
+      const rawName = a.name || a.type || 'Activity';
+      const shortName = rawName.length > 28 ? rawName.slice(0, 26) + '…' : rawName;
+      return `
+        <div class="day-log-entry">
+          <span class="day-log-icon">${icon}</span>
+          <span class="day-log-name">${shortName}</span>
+          ${stats ? `<span class="day-log-stats">${stats}</span>` : ''}
+          <span class="day-log-check">✓</span>
+        </div>
+      `;
+    }).join('');
+
+    const hasLog = logged.length > 0;
+    const doneClass = hasLog ? 'has-log' : (isPast && !isToday && intensity !== 'rest' ? 'missed' : '');
+
+    return `
+      <div class="week-day-row ${isToday ? 'today' : ''} ${swap ? 'modified' : ''} ${isRest ? 'rest-day' : ''} ${doneClass}">
+        <div class="week-day-main" onclick="openSwapModal('${day}')">
+          <div class="week-day-label">${dayAbbr[day]}</div>
+          <div class="week-day-session">
+            <div class="week-day-session-name">${title}</div>
+            <div class="week-day-session-meta">${meta}</div>
+          </div>
+          ${isToday ? '<span class="today-pill">Today</span>' : ''}
+          ${swap ? `<span class="week-day-badge badge-custom">Custom</span>` : `<span class="week-day-badge ${badgeClass[intensity] || 'badge-rest'}">${badgeLabel[intensity] || 'Off'}</span>`}
+          <div class="week-day-edit">›</div>
+        </div>
+        ${hasLog ? `<div class="day-log-entries">${loggedHtml}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="week-planner">
+      <div class="week-planner-header">
+        <div class="week-planner-title">This Week</div>
+        ${hasAnySwap ? `<button class="week-planner-reset" onclick="resetAllSwaps()">Reset all</button>` : ''}
+      </div>
+      <div class="week-days">${rows}</div>
+    </div>
+  `;
+}
+
 function renderHeader() {
   const today = new Date();
   const daysToRace = Math.ceil((RACE_DATE - today) / 86400000);
@@ -1315,6 +1566,83 @@ function renderHealthSnapshot(latest, history, idSuffix='') {
         ${m('tsb', 'Form', tsb != null ? (tsb > 0 ? '+' : '') + Math.round(tsb) : null, '', null, formStatus)}
         ${m('acwr', 'Load Ratio', acwr ? acwr.toFixed(2) : null, 'x', null, 'Cap: 1.3')}
       </div>
+    </div>
+  `;
+}
+
+function renderCoachCard(latest, history, activities) {
+  const summary = buildSummary(latest, history, activities);
+  const insights = [];
+
+  const ctl = getField(latest, 'ctl');
+  const atl = getField(latest, 'atl');
+  const hrv = getField(latest, 'hrv', 'hrvWeeklyAverage');
+
+  if (ctl != null) {
+    const delta = Math.round(ctl - 219);
+    const sign = delta >= 0 ? '+' : '';
+    const color = delta >= 5 ? 'var(--green-bg)' : delta <= -10 ? 'var(--red-bg)' : 'var(--surface-3)';
+    const icon = delta >= 0
+      ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>'
+      : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>';
+    insights.push({ icon, bg: color, text: `Fitness (CTL) <strong>${Math.round(ctl)}</strong> — <strong>${sign}${delta} vs baseline</strong>. Peak was 271.` });
+  }
+  if (ctl && atl && ctl > 0) {
+    const acwr = atl / ctl;
+    if (acwr > 1.3) insights.push({ icon: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', bg: 'var(--red-bg)', text: `<strong>ACWR ${acwr.toFixed(2)}</strong> — above 1.3 cap. Back off today.` });
+    else if (acwr >= 0.8 && acwr <= 1.2) insights.push({ icon: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>', bg: 'var(--green-bg)', text: `<strong>ACWR ${acwr.toFixed(2)}</strong> — optimal zone. Build.` });
+  }
+  const recentHrv = history.slice(-7).map(d => getField(d, 'hrv', 'hrvWeeklyAverage')).filter(v => v != null);
+  const prevHrv = history.slice(-14, -7).map(d => getField(d, 'hrv', 'hrvWeeklyAverage')).filter(v => v != null);
+  if (recentHrv.length && prevHrv.length) {
+    const r = recentHrv.reduce((a,b)=>a+b,0)/recentHrv.length;
+    const p = prevHrv.reduce((a,b)=>a+b,0)/prevHrv.length;
+    const diff = Math.round(r - p);
+    if (Math.abs(diff) >= 3) {
+      const up = diff > 0;
+      insights.push({ icon: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>', bg: up ? 'var(--green-bg)' : 'var(--orange-bg)', text: `HRV <strong>${up ? 'up' : 'down'} ${Math.abs(diff)}ms</strong> vs last week — recovery ${up ? 'improving' : 'under stress'}.` });
+    }
+  }
+  const recentLoad = history.slice(-7).map(d => getField(d, 'atl')).filter(v => v != null);
+  const prevLoad = history.slice(-14, -7).map(d => getField(d, 'atl')).filter(v => v != null);
+  if (recentLoad.length && prevLoad.length) {
+    const r = recentLoad.reduce((a,b)=>a+b,0)/recentLoad.length;
+    const p = prevLoad.reduce((a,b)=>a+b,0)/prevLoad.length;
+    const pct = Math.round(((r - p) / p) * 100);
+    if (Math.abs(pct) >= 5) {
+      const up = pct > 0;
+      insights.push({ icon: up ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>', bg: up ? 'var(--orange-bg)' : 'var(--green-bg)', text: `Weekly load <strong>${up ? 'up' : 'down'} ${Math.abs(pct)}%</strong> vs prior week — ${up ? 'watch ACWR' : 'maintain consistency'}.` });
+    }
+  }
+  const recentSleep = history.slice(-7).map(d => getField(d, 'sleepSecs')).filter(v => v != null);
+  if (recentSleep.length >= 4) {
+    const avg = recentSleep.reduce((a,b)=>a+b,0)/recentSleep.length / 3600;
+    if (avg < 6.5) insights.push({ icon: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>', bg: 'var(--red-bg)', text: `Sleep avg <strong>${avg.toFixed(1)}hrs</strong> — recovery suppressed.` });
+    else if (avg >= 7.5) insights.push({ icon: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>', bg: 'var(--green-bg)', text: `Sleep avg <strong>${avg.toFixed(1)}hrs</strong> — solid recovery week.` });
+  }
+
+  const insightRows = insights.length
+    ? insights.slice(0, 5).map(i => `
+        <div class="insight-row" style="padding: 7px 0;">
+          <div class="insight-icon" style="background: ${i.bg}; width: 26px; height: 26px; border-radius: 6px;">${i.icon}</div>
+          <div class="insight-text" style="font-size: 12px;">${i.text}</div>
+        </div>`).join('')
+    : '';
+
+  const divider = insights.length ? `<div style="height: 1px; background: var(--border); margin: 12px 0;"></div>` : '';
+
+  return `
+    <div class="ai-summary" style="margin-bottom: 12px;">
+      <div class="ai-summary-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="ai-summary-icon">C</div>
+          <div class="ai-summary-title">Coach's Read</div>
+        </div>
+        <button class="coach-button-inline" id="coach-btn" onclick="generateSession()">⚡ Ask Claude</button>
+      </div>
+      <div class="ai-summary-text">${summary}</div>
+      ${divider}
+      ${insightRows}
     </div>
   `;
 }
@@ -1825,82 +2153,6 @@ async function generateSession(btnId='coach-btn') {
 }
 
 // ════════════════════════════════════════════════════════════════════
-//  WEEKLY SCHEDULE CARD
-// ════════════════════════════════════════════════════════════════════
-function renderWeeklySchedule() {
-  const ORDER = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-  const SHORT  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-
-  const svgIcon = (paths, vb='0 0 24 24') =>
-    `<svg width="18" height="18" viewBox="${vb}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
-
-  // Barbell / lift
-  const iLift   = svgIcon('<line x1="6" y1="5" x2="6" y2="19"/><line x1="18" y1="5" x2="18" y2="19"/><line x1="6" y1="12" x2="18" y2="12"/><rect x="2" y="9" width="4" height="6" rx="1"/><rect x="18" y="9" width="4" height="6" rx="1"/>');
-  // Pull-up bar / upper pull
-  const iPull   = svgIcon('<rect x="2" y="3" width="20" height="3" rx="1"/><line x1="12" y1="6" x2="12" y2="11"/><circle cx="12" cy="14" r="3"/><path d="M9 21v-2a3 3 0 0 1 6 0v2"/>');
-  // Heart + wave (zone 2 / easy cardio)
-  const iZ2     = svgIcon('<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>');
-  // Running figure
-  const iRun    = svgIcon('<circle cx="12" cy="4" r="2"/><path d="m9 20 2-7-2-3 4-2 2 4h3"/><path d="m6 10 2-1"/>');
-  // Push / chest press (person pushing)
-  const iPush   = svgIcon('<circle cx="12" cy="5" r="2"/><path d="M10 22V14l-2-3 4-4 4 4-2 3v8"/><path d="M6 9h3M15 9h3"/>');
-  // Bike
-  const iBike   = svgIcon('<circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2"/>');
-  // Moon / rest
-  const iRest   = svgIcon('<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>');
-
-  const META = {
-    Monday:    { icon: iLift,  type: 'Lower A\nHeavy Lift',    intensity: 'hard',     detail: 'Trap bar deadlift · Squat · RDL', duration: '60-75 min' },
-    Tuesday:   { icon: iPush,  type: 'Upper A\nPush + Paddle', intensity: 'hard',     detail: 'Incline press · Paddle sim · Triceps', duration: '60-75 min' },
-    Wednesday: { icon: iZ2,    type: 'Zone 2\n+ Mobility',     intensity: 'easy',     detail: '140-150 bpm · Full mobility flow', duration: '50-60 min' },
-    Thursday:  { icon: iRun,   type: 'Trail Run\n170 spm cap', intensity: 'moderate', detail: '140-150 bpm HR cap · Metronome on', duration: '45-60 min' },
-    Friday:    { icon: iPull,  type: 'Upper B\nPull + Biceps', intensity: 'hard',     detail: 'Weighted pull-ups · Rows · Bicep volume', duration: '60-75 min' },
-    Saturday:  { icon: iBike,  type: 'Long MTB\nRide',         intensity: 'moderate', detail: 'Build to 2 hrs · Practice race fueling', duration: '90 min-2 hrs' },
-    Sunday:    { icon: iRest,  type: 'Full Rest\nRecover',     intensity: 'rest',     detail: 'Walk / stretch / surf easy', duration: 'Optional 20-30 min' },
-  };
-
-  const todayName = dayName(new Date());
-  const todayMeta = META[todayName];
-
-  const days = ORDER.map((day, i) => {
-    const m = META[day];
-    const isToday = day === todayName;
-    const badgeClass = `badge-${m.intensity}`;
-    const typeLines = m.type.split('\n');
-    return `
-      <div class="week-day ${isToday ? 'is-today' : ''}">
-        <div class="week-day-name">${SHORT[i]}</div>
-        <div class="week-day-icon">${m.icon}</div>
-        <div class="week-day-type">${typeLines[0]}<br><span style="opacity:0.7">${typeLines[1]}</span></div>
-        <div class="week-day-badge ${badgeClass}"></div>
-      </div>
-    `;
-  }).join('');
-
-  const todayStrip = todayMeta ? `
-    <div class="week-today-detail">
-      <div class="week-today-detail-icon">${todayMeta.icon.replace('width="18" height="18"', 'width="22" height="22"')}</div>
-      <div class="week-today-detail-text">
-        <div class="week-today-detail-label">Today · ${todayMeta.duration}</div>
-        <div class="week-today-detail-title">${todayMeta.type.replace('\n', ' — ')}</div>
-        <div class="week-today-detail-meta">${todayMeta.detail}</div>
-      </div>
-    </div>
-  ` : '';
-
-  return `
-    <div class="week-card">
-      <div class="week-card-header">
-        <div class="week-card-title">Weekly Training Plan</div>
-        <div class="week-card-sub">Phase 1 · Weeks 1-8</div>
-      </div>
-      <div class="week-days">${days}</div>
-      ${todayStrip}
-    </div>
-  `;
-}
-
-// ════════════════════════════════════════════════════════════════════
 //  TOP-LEVEL RENDER
 // ════════════════════════════════════════════════════════════════════
 function render() {
@@ -1926,69 +2178,57 @@ function render() {
 }
 
 function renderPhone(latest, sorted) {
-  const summary = buildSummary(latest, sorted, state.activities);
   $('#app').innerHTML = `
     ${renderHeader()}
     ${renderFeelCheckIn()}
-    ${renderWeeklySchedule()}
-    ${renderHealthSnapshot(latest, sorted)}
+    ${renderCoachCard(latest, sorted, state.activities)}
     ${renderAlerts(latest)}
-    <div class="ai-summary">
-      <div class="ai-summary-header"><div class="ai-summary-icon">C</div><div class="ai-summary-title">Coach's Read</div></div>
-      <div class="ai-summary-text">${summary}</div>
+    ${renderHealthSnapshot(latest, sorted)}
+    <div class="phone-data-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+      ${renderZoneDonut(state.activities)}
+      ${renderWeeklyVolume(state.activities)}
     </div>
+    ${renderWeekPlanner(state.activities)}
     ${renderSession()}
-    ${sorted.some(d => getField(d, 'hrv', 'hrvWeeklyAverage') != null) ? `
-      <div class="section-label">Trends</div>
-      ${renderChart(sorted, 'hrv', 'HRV', '#A78BFA', 14)}
-      ${renderChart(sorted, 'restingHR', 'Resting HR', '#EC4899', 14)}
-    ` : ''}
-    ${sorted.some(d => getField(d, 'ctl') != null) ? renderChart(sorted, 'ctl', 'Fitness (CTL)', '#3B82F6', 30) : ''}
-    <div class="section-label">Last 7 Days</div>
-    ${renderActivities(state.activities, 7)}
     <div class="footer">
       <a href="#" onclick="clearCredentials();return false;">Reset</a> ·
       <a href="https://intervals.icu" target="_blank">Intervals.icu</a> ·
       Updated ${new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
     </div>
-    <button class="coach-button-fixed" id="coach-btn" onclick="generateSession()">⚡ Get AI Coach Response</button>
+    <button class="coach-button-fixed" id="coach-btn-fixed" onclick="generateSession('coach-btn-fixed')">⚡ Get AI Coach Response</button>
   `;
 }
 
 function renderDesktop(latest, sorted) {
-  const summary = buildSummary(latest, sorted, state.activities);
   $('#app').innerHTML = `
     ${renderHeader()}
     <div class="desktop-grid" style="margin-bottom: 16px;">
 
+      <!-- LEFT COLUMN: Feel + Coach + Week Planner -->
       <div class="col-4" style="display: flex; flex-direction: column; gap: 16px;">
         ${renderFeelCheckIn()}
         ${renderAlerts(latest) || ''}
-        <div class="ai-summary">
-          <div class="ai-summary-header" style="display: flex; align-items: center; justify-content: space-between;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <div class="ai-summary-icon">C</div>
-              <div class="ai-summary-title">Coach's Read</div>
-            </div>
-            <button class="coach-button-inline" id="coach-btn" onclick="generateSession()">⚡ Get AI Response</button>
-          </div>
-          <div class="ai-summary-text">${summary}</div>
+        ${renderCoachCard(latest, sorted, state.activities)}
+        ${renderWeekPlanner(state.activities)}
+      </div>
+
+      <!-- MIDDLE COLUMN: Health Snapshot + Insights + Zone + Volume -->
+      <div class="col-4" style="display: flex; flex-direction: column; gap: 16px;">
+        ${renderHealthSnapshot(latest, sorted, '-d')}
+        ${renderInsights(sorted, state.activities)}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          ${renderZoneDonut(state.activities)}
+          ${renderWeeklyVolume(state.activities)}
         </div>
       </div>
 
-      <div class="col-4">${renderHealthSnapshot(latest, sorted, '-d')}</div>
-
+      <!-- RIGHT COLUMN: Session -->
       <div class="col-4">${renderSession()}</div>
 
-      <div class="col-8">${renderLoadFullChart(sorted, 60)}</div>
-      <div class="col-4">${renderInsights(sorted, state.activities)}</div>
+      <!-- FULL WIDTH: Training Load -->
+      <div class="col-12">${renderLoadFullChart(sorted, 60)}</div>
 
-      <div class="col-12">${renderWeeklySchedule()}</div>
-
-      <div class="col-4">${renderZoneDonut(state.activities)}</div>
-      <div class="col-4">${renderWeeklyVolume(state.activities)}</div>
-      <div class="col-4">${sorted.some(d => getField(d, 'hrv', 'hrvWeeklyAverage') != null) ? renderChart(sorted, 'hrv', 'HRV — 30d', '#A78BFA', 30, 100) : '<div class="card"><div class="card-label">HRV</div><div style="color:var(--text-dim);font-size:13px;text-align:center;padding:30px 0;">No HRV data yet</div></div>'}</div>
-
+      <!-- FULL WIDTH: Recent Activities -->
       <div class="col-12">
         <div class="card">
           <div class="card-header">
