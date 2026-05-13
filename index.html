@@ -287,6 +287,15 @@ body.desktop-view .date { font-size: 28px; }
 .week-planner-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
 .week-planner-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
 .week-planner-reset { font-size: 11px; color: var(--primary); font-weight: 600; cursor: pointer; background: none; border: none; font-family: inherit; padding: 0; }
+.week-adherence { display: flex; gap: 12px; margin-bottom: 12px; padding: 10px 12px; background: var(--surface-2); border-radius: 10px; align-items: center; }
+.adherence-ring { position: relative; width: 44px; height: 44px; flex-shrink: 0; }
+.adherence-ring svg { transform: rotate(-90deg); }
+.adherence-ring-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 13px; font-weight: 700; }
+.adherence-info { flex: 1; min-width: 0; }
+.adherence-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
+.adherence-detail { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+.streak-badge { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: var(--orange); background: var(--orange-bg); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(249,115,22,0.2); flex-shrink: 0; }
+.fuel-reminder { margin-top: 10px; padding: 8px 12px; background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); border-radius: 8px; font-size: 11px; color: var(--primary); font-weight: 500; }
 .week-days { display: flex; flex-direction: column; gap: 6px; }
 .week-day-row { display: flex; flex-direction: column; padding: 10px 12px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border); transition: all 0.15s; position: relative; }
 .week-day-row:hover { border-color: var(--border-strong); background: var(--surface-3); }
@@ -310,6 +319,7 @@ body.desktop-view .date { font-size: 28px; }
 .modified-tag { font-size: 9px; font-weight: 700; color: var(--orange); opacity: 0.8; }
 .week-day-main { display: flex; align-items: center; gap: 10px; width: 100%; cursor: pointer; }
 .week-day-row.has-log { border-color: rgba(34,197,94,0.3); }
+.week-day-row.has-log-swap { border-color: rgba(249,115,22,0.3); }
 .week-day-row.missed { opacity: 0.5; }
 .day-log-entries { margin-top: 7px; padding-top: 7px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 3px; pointer-events: none; }
 .day-log-entry { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
@@ -317,7 +327,9 @@ body.desktop-view .date { font-size: 28px; }
 .day-log-icon svg { width: 12px; height: 12px; }
 .day-log-name { font-size: 11px; font-weight: 600; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 1; min-width: 0; max-width: 160px; }
 .day-log-stats { font-size: 10.5px; color: var(--text-dim); white-space: nowrap; flex-shrink: 0; }
-.day-log-check { margin-left: auto; color: var(--green); font-size: 11px; font-weight: 700; flex-shrink: 0; padding-left: 4px; }
+.day-log-check { margin-left: auto; font-size: 11px; font-weight: 700; flex-shrink: 0; padding-left: 4px; }
+.day-log-check.match { color: var(--green); }
+.day-log-check.swap { color: var(--orange); }
 
 /* SWAP MODAL */
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; display: flex; align-items: flex-end; justify-content: center; animation: fadeIn 0.15s; }
@@ -876,12 +888,12 @@ const FEEL_OPTIONS = [
 ];
 
 const SESSIONS = {
-  "Monday": { title: "Lower A — Heavy Bilateral", intensity: "hard", summary: "Low volume, high quality. The two big lifts get all your focus. Builds the legs to climb Gibraltar without cramping.", duration: "60-75 min", warmup: ["Hip 90/90s — 1 min each side", "Goblet squat hold — 30 sec x 2", "Ankle CARs — 10 each", "Glute bridges — 15 reps", "Empty bar squats — 10 reps"], exercises: [ { name: "Trap Bar Deadlift", sets: 4, reps: "5", weight: "Build to top set", rest: "3 min", notes: "Reset each rep. Brace HARD. Top set leaves 1-2 in tank." }, { name: "Barbell Back Squat", sets: 3, reps: "6", weight: "75-80% 1RM", rest: "2-3 min", notes: "Below parallel. Vertical torso. Drive knees out." }, { name: "Romanian Deadlift", sets: 3, reps: "8", weight: "Moderate-heavy", rest: "90 sec", notes: "Feel hamstrings load. Bar stays close to legs." }, { name: "Hanging Knee Raise", sets: 3, reps: "10", weight: "Bodyweight", rest: "60 sec", notes: "Slow controlled. Or sub Ab Wheel x10." } ], cooldown: ["Couch stretch — 90 sec each side", "Pigeon pose — 90 sec each side", "Foam roll quads + IT band — 2 min"], fueling: "Pre: oats + banana + protein shake. Post: protein + carbs within 60 min." },
+  "Monday": { title: "Lower A — Heavy Bilateral", intensity: "hard", summary: "Low volume, high quality. The two big lifts get all your focus. Bulgarian split squats and calf raises directly fix your Hill Score of 30 and prevent Gibraltar cramps.", duration: "60-75 min", warmup: ["Hip 90/90s — 1 min each side", "Goblet squat hold — 30 sec x 2", "Ankle CARs — 10 each", "Glute bridges — 15 reps", "Empty bar squats — 10 reps"], exercises: [ { name: "Trap Bar Deadlift", sets: 4, reps: "5", weight: "Build to top set", rest: "3 min", notes: "Reset each rep. Brace HARD. Top set leaves 1-2 in tank." }, { name: "Barbell Back Squat", sets: 3, reps: "6", weight: "75-80% 1RM", rest: "2-3 min", notes: "Below parallel. Vertical torso. Drive knees out." }, { name: "Bulgarian Split Squat", sets: 3, reps: "8 each", weight: "DBs or barbell", rest: "90 sec", notes: "THE climb exercise. Rear foot elevated. Deep stretch at bottom. Directly builds Gibraltar legs." }, { name: "Romanian Deadlift", sets: 3, reps: "8", weight: "Moderate-heavy", rest: "90 sec", notes: "Feel hamstrings load. Bar stays close to legs." }, { name: "Standing Calf Raise", sets: 3, reps: "15", weight: "Heavy DB or barbell", rest: "60 sec", notes: "Full ROM — 3 sec negative. Calves cramp first on climbs. Build them." }, { name: "Hanging Knee Raise", sets: 3, reps: "10", weight: "Bodyweight", rest: "60 sec", notes: "Slow controlled. Or sub Ab Wheel x10." } ], cooldown: ["Couch stretch — 90 sec each side", "Pigeon pose — 90 sec each side", "Foam roll quads + IT band — 2 min"], fueling: "Pre: oats + banana + protein shake. Post: protein + carbs within 60 min." },
   "Tuesday": { title: "Upper A — Push & Paddle", intensity: "hard", summary: "Incline-first chest day with paddle-specific finishers. Upper chest priority for fullness, with shoulder stability work for the 7-mile Mash paddle.", duration: "55-70 min", warmup: ["Band pull-aparts — 15 reps x 2", "Shoulder CARs — 10 each direction", "Wall slides — 10 reps", "Light DB press — 12 reps x 2"], exercises: [ { name: "Incline Barbell Press", sets: 4, reps: "8", weight: "70-75% 1RM", rest: "2-3 min", notes: "Bench at 30-45°. Bar to upper chest. Pause briefly." }, { name: "Incline Dumbbell Press", sets: 3, reps: "10-12", weight: "Moderate", rest: "90 sec", notes: "Slight squeeze at top. DBs nearly touching." }, { name: "Cable Incline Fly", sets: 3, reps: "12-15", weight: "Light-moderate", rest: "60 sec", notes: "Low-to-high arc. Squeeze upper chest at top." }, { name: "Standing Overhead Press", sets: 3, reps: "10", weight: "Moderate", rest: "90 sec", notes: "Tight core. No lower back arch." }, { name: "Cable Tricep Pushdown", sets: 3, reps: "12-15", weight: "Moderate", rest: "60 sec", notes: "Elbows pinned. Full extension." }, { name: "Prone Plank to Extend", sets: 3, reps: "10", weight: "Bodyweight", rest: "60 sec", notes: "Paddle simulation. Stretch shoulders forward." }, { name: "Cable Pulldown in Hip Hinge", sets: 3, reps: "12-15", weight: "Light", rest: "60 sec", notes: "Mimic paddle stroke. Hinge at hips." }, { name: "Cable Curl + DB Curl", sets: 2, reps: "15", weight: "Light pump", rest: "45 sec", notes: "Bicep finisher — burn out for size." } ], cooldown: ["Doorway pec stretch — 60 sec each side", "Cross-body shoulder stretch — 30 sec each", "Foam roll thoracic spine — 90 sec"], fueling: "Carbs around training. Hydrate aggressively given heavy sweat rate." },
   "Wednesday": { title: "Zone 2 + Full Mobility", intensity: "easy", summary: "The most underrated session of the week. Builds aerobic base and fixes mobility deficits spiking your vertical ratio on climbs. NEVER skip this.", duration: "50-60 min", warmup: ["5 min easy warm-up before main set"], exercises: [ { name: "Zone 2 Cardio (bike, swim, or easy run)", sets: 1, reps: "30-40 min", weight: "140-150bpm cap", rest: "—", notes: "Conversational pace. Nasal breathing. Builds the engine for the Mash." } ], cooldown: ["Foam roll thoracic spine — 2 min", "Foam roll quads — 2 min each leg", "Foam roll hamstrings — 2 min each leg", "Hip flexor stretch — 2 min each side", "Pigeon pose — 2 min each side", "Hamstring band floss — 1 min each side", "Doorway pec stretch — 1 min each side", "Ankle CARs + calf stretch — 2 min total"], fueling: "Light meal beforehand. Plenty of water + electrolytes." },
-  "Thursday": { title: "Trail Run", intensity: "moderate", summary: "The session that wins or loses the Mash. HR cap is non-negotiable — discipline now means you don't blow up on Gibraltar in October.", duration: "45-90 min", warmup: ["Bulgarian Split Squats — 8 reps each side x 2 (BW)", "Nordic curl negatives — 5 reps x 2", "Walking lunges — 10 each side", "Leg swings — 10 each direction", "5 min easy walk into slow jog"], exercises: [ { name: "Trail Run", sets: 1, reps: "Build to 90 min", weight: "140-150 bpm cap", rest: "—", notes: "Use HR monitor strictly. Walk hills if needed to stay under cap. Metronome at 170 spm — non-negotiable on climbs." } ], cooldown: ["Walk 5 min cool-down", "Calf stretch — 60 sec each", "Couch stretch — 90 sec each", "Pigeon pose — 90 sec each"], fueling: "If running >60 min: 30-60g carbs/hr + electrolytes. PRACTICE this — don't wait for race day." },
+  "Thursday": { title: "Trail Run", intensity: "moderate", summary: "The session that wins or loses the Mash. HR cap is non-negotiable — discipline now means you don't blow up on Gibraltar in October.", duration: "45-90 min", warmup: ["Walking lunges — 10 each side", "Leg swings — 10 each direction", "Bodyweight squats — 10 reps", "Glute bridges — 10 reps", "5 min easy walk into slow jog"], exercises: [ { name: "Nordic Curl Negatives", sets: 3, reps: "5", weight: "Bodyweight", rest: "60 sec", notes: "Progressive — these build hamstring resilience for steep descents. Control the eccentric." }, { name: "Banded Hip Flexor March", sets: 2, reps: "12 each", weight: "Light band", rest: "45 sec", notes: "Strengthens hip flexors for steep climbs — stretching alone doesn't fix the deficit." }, { name: "Trail Run", sets: 1, reps: "Build to 90 min", weight: "140-150 bpm cap", rest: "—", notes: "Use HR monitor strictly. Walk hills if needed to stay under cap. Metronome at 170 spm — non-negotiable on climbs." } ], cooldown: ["Walk 5 min cool-down", "Calf stretch — 60 sec each", "Couch stretch — 90 sec each", "Pigeon pose — 90 sec each"], fueling: "If running >60 min: 30-60g carbs/hr + electrolytes. PRACTICE this — don't wait for race day." },
   "Friday": { title: "Upper B — Pull & Biceps", intensity: "hard", summary: "Pull-up day. Posture, paddle power, and bicep size all built here. Highest direct bicep volume of the week — make it count.", duration: "55-70 min", warmup: ["Band pull-aparts — 15 x 2", "Dead hang — 20 sec x 2", "Scap pull-ups — 8 reps x 2", "Light DB row — 10 reps x 2"], exercises: [ { name: "Weighted Pull-Ups", sets: 4, reps: "6-8", weight: "Add weight as needed", rest: "2-3 min", notes: "Most important upper body lift for the Mash. Full ROM. Chin clears bar." }, { name: "Barbell or DB Row", sets: 4, reps: "10", weight: "Moderate-heavy", rest: "90 sec", notes: "Hinge to ~45°. Pull to lower chest/upper abs. Squeeze." }, { name: "Cable Face Pulls", sets: 3, reps: "15", weight: "Light-moderate", rest: "60 sec", notes: "External rotation at end. Shoulder health insurance." }, { name: "Single Arm Cable Row", sets: 3, reps: "12 each", weight: "Moderate", rest: "60 sec", notes: "Full stretch at start. Drive elbow back hard." }, { name: "Hammer Curl", sets: 3, reps: "12", weight: "Moderate", rest: "60 sec", notes: "Hits brachialis — adds arm thickness." }, { name: "Incline Dumbbell Curl", sets: 3, reps: "12", weight: "Moderate", rest: "60 sec", notes: "Bench 45-60°. Long head emphasis — KEY for size." }, { name: "Cable Curl", sets: 3, reps: "15", weight: "Moderate", rest: "45 sec", notes: "Constant tension burn. Squeeze at top." }, { name: "Pallof Press + Dead Bug", sets: 3, reps: "12 + 8", weight: "Cable + BW", rest: "45 sec", notes: "Anti-rotation core finisher." } ], cooldown: ["Lat stretch (overhead reach) — 60 sec each", "Bicep stretch (against wall) — 30 sec each", "Foam roll lats + upper back — 2 min"], fueling: "High protein day. ~30-40g protein at every meal." },
-  "Saturday": { title: "Long MTB Ride", intensity: "moderate", summary: "Race-specific bike training. Build to 2+ hours with sustained climbing. Practice fueling protocol that prevents Mash cramps.", duration: "90 min - 2.5 hrs", warmup: ["10 min easy spin to start", "Gradually build to working effort"], exercises: [ { name: "Long MTB Ride", sets: 1, reps: "Build to 2+ hrs", weight: "Mostly Z2, some Z3 climbs", rest: "—", notes: "Smooth pedaling. Higher cadence on climbs (don't grind). Practice descending technical terrain." } ], cooldown: ["10 min easy spin", "Hip flexor stretch 2 min each", "Foam roll quads + glutes", "Calf stretch each side"], fueling: "PRACTICE RACE FUELING: 500mg sodium pre-load 30 min before. 60g carbs/hour during." },
+  "Saturday": { title: "Long MTB Ride", intensity: "moderate", summary: "Race-specific bike training. Build to 2+ hours with sustained climbing. Practice fueling protocol that prevents Mash cramps. Cadence on climbs — don't grind.", duration: "90 min - 2.5 hrs", warmup: ["10 min easy spin to start", "Gradually build to working effort"], exercises: [ { name: "Long MTB Ride", sets: 1, reps: "Build to 2+ hrs", weight: "Mostly Z2, some Z3 climbs", rest: "—", notes: "Target 80+ RPM on climbs (same concept as 170spm for running). Never grind a low cadence — shift down and spin. Practice descending technical terrain." } ], cooldown: ["10 min easy spin", "Hip flexor stretch 2 min each", "Foam roll quads + glutes", "Calf stretch each side"], fueling: "PRACTICE RACE FUELING: 500mg sodium pre-load 30 min before. 60g carbs/hour during. This is rehearsal — race execution depends on it." },
   "Sunday": { title: "Rest / Active Recovery", intensity: "rest", summary: "Protect HRV. Sleep early. Walk, surf easy, foam roll. Sunday rest is what makes Monday's lift possible.", duration: "Optional 20-30 min easy", warmup: [], exercises: [ { name: "Easy walk, surf, or full rest", sets: 1, reps: "Optional", weight: "Conversational only", rest: "—", notes: "Body Battery should be charging not draining." } ], cooldown: ["Full body stretch routine — 15-20 min", "Hip + hamstring focus", "Thoracic spine mobility"], fueling: "Whole foods. Hydrate well." }
 };
 
@@ -988,6 +1000,8 @@ function computeReadiness(latest, history) {
   const sleepSecs = getField(latest, 'sleepSecs');
   const ctl = getField(latest, 'ctl');
   const atl = getField(latest, 'atl');
+  const stress = getField(latest, 'avgStressLevel');
+  const bodyBattery = getField(latest, 'bodyBatteryHighest', 'bodyBattery');
 
   if (hrv == null && sleepSecs == null) return null;
 
@@ -1021,6 +1035,18 @@ function computeReadiness(latest, history) {
     const acwr = atl / ctl;
     if (acwr > 1.3) score -= Math.min(15, (acwr - 1.3) * 30);
     else if (acwr < 0.7) score -= 5;
+    factors++;
+  }
+  // Factor in stress when available (lower stress = better readiness)
+  if (stress != null) {
+    if (stress > 50) score -= Math.min(10, (stress - 50) * 0.3);
+    else if (stress < 30) score += Math.min(5, (30 - stress) * 0.3);
+    factors++;
+  }
+  // Factor in body battery when available
+  if (bodyBattery != null) {
+    if (bodyBattery >= 75) score += Math.min(8, (bodyBattery - 75) * 0.4);
+    else if (bodyBattery < 40) score -= Math.min(10, (40 - bodyBattery) * 0.4);
     factors++;
   }
 
@@ -1286,6 +1312,93 @@ function activitiesForDay(activities, targetDate) {
   });
 }
 
+// Map each planned day to expected Garmin activity types
+const PLAN_EXPECTED_TYPES = {
+  Monday:    ['strength', 'weight'],
+  Tuesday:   ['strength', 'weight'],
+  Wednesday: ['ride', 'cycling', 'run', 'swim', 'walk'], // Z2 can be any cardio
+  Thursday:  ['run', 'trail'],
+  Friday:    ['strength', 'weight'],
+  Saturday:  ['ride', 'cycling', 'mtb', 'run'], // MTB or brick
+  Sunday:    [] // rest — anything is a bonus
+};
+
+function classifyActivityType(garminType) {
+  const t = (garminType || '').toLowerCase();
+  if (t.includes('strength') || t.includes('weight') || t.includes('training')) return 'strength';
+  if (t.includes('run') || t.includes('trail')) return 'run';
+  if (t.includes('ride') || t.includes('cycl') || t.includes('mtb') || t.includes('bike') || t.includes('gravel')) return 'ride';
+  if (t.includes('swim')) return 'swim';
+  if (t.includes('surf') || t.includes('paddle') || t.includes('kayak') || t.includes('row')) return 'water';
+  if (t.includes('hike') || t.includes('walk')) return 'walk';
+  if (t.includes('yoga') || t.includes('stretch') || t.includes('pilates')) return 'mobility';
+  return 'other';
+}
+
+function doesActivityMatchPlan(garminType, dayName) {
+  const expected = PLAN_EXPECTED_TYPES[dayName] || [];
+  if (expected.length === 0) return true; // rest day — anything counts
+  const classified = classifyActivityType(garminType);
+  // Check if the classified type matches any expected type for that day
+  return expected.some(exp => {
+    if (exp === classified) return true;
+    // Fuzzy matching: strength matches weight, run matches trail, etc.
+    if (exp === 'strength' && classified === 'strength') return true;
+    if (exp === 'weight' && classified === 'strength') return true;
+    if (exp === 'run' && classified === 'run') return true;
+    if (exp === 'trail' && classified === 'run') return true;
+    if (exp === 'ride' && (classified === 'ride')) return true;
+    if (exp === 'cycling' && classified === 'ride') return true;
+    if (exp === 'mtb' && classified === 'ride') return true;
+    if (exp === 'swim' && classified === 'swim') return true;
+    if (exp === 'walk' && classified === 'walk') return true;
+    return false;
+  });
+}
+
+// Smart short name: use activity type + key stats instead of Garmin's auto-generated location name
+function smartActivityName(activity) {
+  const raw = activity.name || '';
+  const type = (activity.type || '').toLowerCase();
+  
+  // Common Garmin auto-names that are useless: "San Luis Obispo County ...", "Morning Run", etc.
+  const isAutoName = /^(morning|afternoon|evening|lunch|night)\s/i.test(raw) ||
+                     /county|city|state|region/i.test(raw) ||
+                     raw.length > 30;
+
+  if (!isAutoName && raw.length > 0 && raw.length <= 24) return raw;
+
+  // Build a meaningful short name from activity type
+  const classified = classifyActivityType(activity.type);
+  const dur = activity.moving_time ? `${fmtMins(activity.moving_time)}min` : '';
+  
+  const typeLabels = {
+    strength: 'Strength',
+    run: 'Trail Run',
+    ride: 'MTB Ride',
+    swim: 'Swim',
+    water: 'Paddle/Surf',
+    walk: 'Walk/Hike',
+    mobility: 'Mobility',
+    other: 'Activity'
+  };
+  
+  // Refine run/ride labels
+  let label = typeLabels[classified] || 'Activity';
+  if (classified === 'run') {
+    if (type.includes('trail')) label = 'Trail Run';
+    else if (type.includes('treadmill')) label = 'Treadmill';
+    else label = 'Run';
+  }
+  if (classified === 'ride') {
+    if (type.includes('mtb') || type.includes('mountain')) label = 'MTB Ride';
+    else if (type.includes('gravel')) label = 'Gravel Ride';
+    else label = 'Ride';
+  }
+  
+  return label;
+}
+
 function renderWeekPlanner(activities = []) {
   const today = new Date();
   const todayName = dayName(today);
@@ -1310,7 +1423,7 @@ function renderWeekPlanner(activities = []) {
     const dayDate = new Date(weekStart);
     dayDate.setDate(weekStart.getDate() + idx);
     const logged = activitiesForDay(activities, dayDate);
-    const isPast = dayDate < today && !isToday;
+    const isPast = dayDate.toDateString() !== today.toDateString() && dayDate < today;
 
     const loggedHtml = logged.map(a => {
       const dist = a.distance ? `${fmtMiles(a.distance)}mi` : '';
@@ -1319,21 +1432,26 @@ function renderWeekPlanner(activities = []) {
       const hr = hrVal ? `${Math.round(hrVal)}bpm` : '';
       const stats = [dist, dur, hr].filter(Boolean).join(' · ');
       const icon = sportIcon(a.type);
-      // Shorten Garmin auto-names like "San Luis Obispo County..." 
-      const rawName = a.name || a.type || 'Activity';
-      const shortName = rawName.length > 28 ? rawName.slice(0, 26) + '…' : rawName;
+      const shortName = smartActivityName(a);
+      const matchesPlan = doesActivityMatchPlan(a.type, day);
+      const matchIcon = matchesPlan 
+        ? '<span class="day-log-check match">✓</span>' 
+        : '<span class="day-log-check swap">⚡</span>';
       return `
         <div class="day-log-entry">
           <span class="day-log-icon">${icon}</span>
           <span class="day-log-name">${shortName}</span>
           ${stats ? `<span class="day-log-stats">${stats}</span>` : ''}
-          <span class="day-log-check">✓</span>
+          ${matchIcon}
         </div>
       `;
     }).join('');
 
     const hasLog = logged.length > 0;
-    const doneClass = hasLog ? 'has-log' : (isPast && !isToday && intensity !== 'rest' ? 'missed' : '');
+    const anyMatch = hasLog && logged.some(a => doesActivityMatchPlan(a.type, day));
+    const doneClass = hasLog 
+      ? (anyMatch ? 'has-log' : 'has-log-swap') 
+      : (isPast && intensity !== 'rest' ? 'missed' : '');
 
     return `
       <div class="week-day-row ${isToday ? 'today' : ''} ${swap ? 'modified' : ''} ${isRest ? 'rest-day' : ''} ${doneClass}">
@@ -1352,12 +1470,81 @@ function renderWeekPlanner(activities = []) {
     `;
   }).join('');
 
+  // Compute weekly adherence: plan-aligned sessions vs planned sessions
+  const plannedCount = DAYS.filter(d => SESSIONS[d].intensity !== 'rest').length;
+  let alignedCount = 0;
+  let swappedCount = 0;
+  let missedCount = 0;
+  DAYS.forEach((day, idx) => {
+    if (SESSIONS[day].intensity === 'rest') return;
+    const dayDate = new Date(weekStart);
+    dayDate.setDate(weekStart.getDate() + idx);
+    if (dayDate > today) return;
+    const logged = activitiesForDay(activities, dayDate);
+    if (logged.length === 0) { missedCount++; return; }
+    const anyMatch = logged.some(a => doesActivityMatchPlan(a.type, day));
+    if (anyMatch) alignedCount++;
+    else swappedCount++;
+  });
+  const totalCompleted = alignedCount + swappedCount;
+  const pastPlannedCount = DAYS.filter((d, idx) => {
+    if (SESSIONS[d].intensity === 'rest') return false;
+    const dayDate = new Date(weekStart);
+    dayDate.setDate(weekStart.getDate() + idx);
+    return dayDate <= today;
+  }).length;
+  const adherencePct = pastPlannedCount > 0 ? Math.round((alignedCount / pastPlannedCount) * 100) : 0;
+  const activityPct = pastPlannedCount > 0 ? Math.round((totalCompleted / pastPlannedCount) * 100) : 0;
+  const adherenceColor = adherencePct >= 80 ? 'var(--green)' : adherencePct >= 60 ? 'var(--yellow)' : 'var(--orange)';
+  const adherenceRadius = 17;
+  const adherenceCirc = 2 * Math.PI * adherenceRadius;
+  const adherenceOffset = adherenceCirc * (1 - adherencePct / 100);
+  
+  // Detail line
+  let detailParts = [];
+  if (alignedCount > 0) detailParts.push(`${alignedCount} on plan`);
+  if (swappedCount > 0) detailParts.push(`${swappedCount} swapped`);
+  if (missedCount > 0) detailParts.push(`${missedCount} missed`);
+  const adherenceDetail = detailParts.length ? detailParts.join(' · ') : 'No sessions yet';
+
+  // Compute training streak (consecutive days with logged activity, going backward)
+  let streak = 0;
+  for (let i = 0; i < 60; i++) {
+    const checkDate = new Date(today);
+    checkDate.setDate(today.getDate() - i);
+    // Skip rest days (Sunday)
+    if (checkDate.getDay() === 0) { streak++; continue; }
+    const dayActivities = activitiesForDay(activities, checkDate);
+    if (dayActivities.length > 0) streak++;
+    else break;
+  }
+
+  // Fuel reminder for today's session
+  const todaySession = SESSIONS[todayName];
+  const isLongSession = todaySession && (todaySession.intensity === 'hard' || todaySession.intensity === 'moderate');
+  const fuelReminder = isLongSession ? `<div class="fuel-reminder">💧 ${todaySession.intensity === 'hard' ? 'Heavy session — 500mg sodium pre-load 30 min before. Protein + carbs within 60 min after.' : 'Trail/ride day — electrolytes + 60g carbs/hr if over 60 min. Practice race fueling.'}</div>` : '';
+
   return `
     <div class="week-planner">
       <div class="week-planner-header">
         <div class="week-planner-title">This Week</div>
         ${hasAnySwap ? `<button class="week-planner-reset" onclick="resetAllSwaps()">Reset all</button>` : ''}
       </div>
+      <div class="week-adherence">
+        <div class="adherence-ring">
+          <svg width="44" height="44">
+            <circle cx="22" cy="22" r="${adherenceRadius}" stroke="var(--surface-3)" stroke-width="4" fill="none"></circle>
+            <circle cx="22" cy="22" r="${adherenceRadius}" stroke="${adherenceColor}" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="${adherenceCirc}" stroke-dashoffset="${adherenceOffset}" style="transform:rotate(-90deg);transform-origin:center;"></circle>
+          </svg>
+          <div class="adherence-ring-text">${adherencePct}%</div>
+        </div>
+        <div class="adherence-info">
+          <div class="adherence-label">Weekly adherence</div>
+          <div class="adherence-detail">${adherenceDetail}</div>
+        </div>
+        ${streak >= 3 ? `<div class="streak-badge">🔥 ${streak}d</div>` : ''}
+      </div>
+      ${fuelReminder}
       <div class="week-days">${rows}</div>
     </div>
   `;
@@ -1368,11 +1555,13 @@ function renderHeader() {
   const daysToRace = Math.ceil((RACE_DATE - today) / 86400000);
   const phoneIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="2" width="8" height="12" rx="1.5"/><line x1="7" y1="12" x2="9" y2="12"/></svg>';
   const desktopIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="8" rx="1"/><line x1="6" y1="14" x2="10" y2="14"/><line x1="8" y1="11" x2="8" y2="14"/></svg>';
+  const hr = today.getHours();
+  const greeting = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
   return `
     <div class="header">
       <div class="header-row">
         <div>
-          <div class="greeting">Good morning, ${ATHLETE_NAME}</div>
+          <div class="greeting">${greeting}, ${ATHLETE_NAME}</div>
           <div class="date">${fmtDate(today)}</div>
         </div>
         <div class="view-toggle">
@@ -1391,19 +1580,32 @@ function renderPerfSubdate(latest, sorted) {
   const hrv = getField(latest, 'hrv', 'hrvWeeklyAverage');
   const tsb = (ctl != null && atl != null) ? ctl - atl : null;
 
+  const today = new Date();
+  const daysToRace = Math.ceil((RACE_DATE - today) / 86400000);
+  const weeksToRace = Math.ceil(daysToRace / 7);
+
+  // Compute current training week & phase
+  const planStart = new Date('2026-05-11');
+  const daysSinceStart = Math.floor((today - planStart) / 86400000);
+  const currentWeek = Math.min(16, Math.max(1, Math.ceil(daysSinceStart / 7)));
+  const phase = currentWeek <= 8 ? 1 : currentWeek <= 13 ? 2 : 3;
+  const phaseName = phase === 1 ? 'Base & Strength' : phase === 2 ? 'Race Specificity' : 'Peak & Taper';
+
   const parts = [];
+  parts.push(`Week ${currentWeek} · Phase ${phase}: ${phaseName}`);
   if (ctl != null) {
     const delta = Math.round(ctl - 219);
     const sign = delta >= 0 ? '+' : '';
-    parts.push(`Fitness ${Math.round(ctl)} (${sign}${delta} vs baseline)`);
+    parts.push(`Fitness ${Math.round(ctl)} (${sign}${delta})`);
   }
   if (tsb != null) {
     const form = tsb > 5 ? 'Fresh' : tsb > -10 ? 'Neutral' : tsb > -20 ? 'Building' : 'Fatigued';
-    parts.push(`Form: ${form} (TSB ${tsb > 0 ? '+' : ''}${Math.round(tsb)})`);
+    parts.push(`${form}`);
   }
   if (hrv != null) {
     parts.push(`HRV ${Math.round(hrv)}ms`);
   }
+  parts.push(`${daysToRace}d to Mash`);
   const el = document.getElementById('perf-subdate');
   if (el) el.textContent = parts.length ? parts.join(' · ') : 'Loading metrics...';
 }
@@ -1705,9 +1907,28 @@ function buildSummary(latest, history, activities) {
 
   if (adjustedReadiness == null && hrv == null && sleep == null) parts.push(`<em style="color: var(--text-dim);">Wellness data not syncing from Garmin — check Intervals settings.</em>`);
 
+  // Phase context
+  const planStart = new Date('2026-05-11');
+  const daysSinceStart = Math.floor((today - planStart) / 86400000);
+  const currentWeek = Math.min(16, Math.max(1, Math.ceil(daysSinceStart / 7)));
+  const phase = currentWeek <= 8 ? 1 : currentWeek <= 13 ? 2 : 3;
+  const phaseNames = { 1: 'Base & Strength', 2: 'Race Specificity', 3: 'Peak & Taper' };
+
   const days = Math.ceil((RACE_DATE - today) / 86400000);
   if (days <= 14) parts.push(`<span class="highlight-warn">${days} days to the Mash — race week mode.</span>`);
-  else if (days <= 60) parts.push(`${days} days to the Mash — entering peaking phase soon.`);
+  else if (days <= 60) parts.push(`${days} days to the Mash. Week ${currentWeek} of 16 — Phase ${phase}: ${phaseNames[phase]}.`);
+  else parts.push(`${days} days to the Mash. Phase ${phase}: ${phaseNames[phase]} (Week ${currentWeek}).`);
+
+  // Consistency callout — reference the boom-bust pattern
+  const recentActivities7d = activities.filter(a => {
+    const d = new Date(a.start_date_local);
+    return (today - d) < 7 * 86400000;
+  });
+  if (recentActivities7d.length <= 2 && days > 30) {
+    parts.push(`<span class="highlight-warn">Only ${recentActivities7d.length} sessions logged this week — consistency is your biggest liability. Break the boom-bust cycle.</span>`);
+  } else if (recentActivities7d.length >= 5) {
+    parts.push(`<span class="highlight-good">${recentActivities7d.length} sessions this week — consistency locked in.</span>`);
+  }
 
   return parts.join(' ');
 }
