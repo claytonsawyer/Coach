@@ -321,8 +321,11 @@ body.desktop-view .date { font-size: 28px; }
 .week-day-row.has-log { border-color: rgba(34,197,94,0.3); }
 .week-day-row.has-log-swap { border-color: rgba(249,115,22,0.3); }
 .week-day-row.missed { opacity: 0.5; }
-.day-log-entries { margin-top: 7px; padding-top: 7px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 3px; pointer-events: none; }
+.day-log-entries { margin-top: 7px; padding-top: 7px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 3px; }
 .day-log-entry { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+.day-log-entry.day-log-clickable { cursor: pointer; padding: 4px 6px; margin: -4px -6px; border-radius: 6px; transition: background 0.15s; pointer-events: auto; }
+.day-log-entry.day-log-clickable:hover { background: rgba(255,255,255,0.04); }
+.day-log-entry.day-log-clickable:active { background: rgba(255,255,255,0.08); }
 .day-log-icon { display: flex; align-items: center; color: var(--green); flex-shrink: 0; margin-top: 1px; }
 .day-log-icon svg { width: 12px; height: 12px; }
 .day-log-name { font-size: 11px; font-weight: 600; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 1; min-width: 0; max-width: 160px; }
@@ -330,12 +333,54 @@ body.desktop-view .date { font-size: 28px; }
 .day-log-check { margin-left: auto; font-size: 11px; font-weight: 700; flex-shrink: 0; padding-left: 4px; }
 .day-log-check.match { color: var(--green); }
 .day-log-check.swap { color: var(--orange); }
+.compliance-row { font-size: 10px; color: var(--text-dim); line-height: 1.5; margin-top: 3px; padding: 4px 0 0 20px; }
+.compliance-score { font-weight: 800; font-size: 11px; margin-right: 4px; }
+
+/* ACTIVITY DETAIL MODAL */
+.ad-modal { max-height: 90vh; }
+.ad-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.ad-type-icon { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: var(--surface-2); border-radius: 12px; color: var(--primary); flex-shrink: 0; }
+.ad-type-icon svg { width: 22px; height: 22px; }
+.ad-header-info { flex: 1; min-width: 0; }
+.ad-header-name { font-size: 16px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ad-header-meta { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+.ad-match-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 4px 10px; border-radius: 6px; flex-shrink: 0; }
+.ad-match-badge.match { background: var(--green-bg); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+.ad-match-badge.swap { background: var(--orange-bg); color: var(--orange); border: 1px solid rgba(249,115,22,0.2); }
+
+.ad-metrics { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 8px; margin-bottom: 16px; padding: 14px; background: var(--surface-2); border-radius: 12px; }
+.ad-metric { text-align: center; }
+.ad-metric-val { font-size: 20px; font-weight: 800; color: var(--text); line-height: 1.2; letter-spacing: -0.02em; }
+.ad-metric-label { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); margin-top: 2px; }
+
+.ad-section { margin-bottom: 14px; }
+.ad-section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 10px; }
+.ad-zone-bar { display: flex; height: 10px; border-radius: 5px; overflow: hidden; margin-bottom: 10px; gap: 1px; }
+.ad-zone-seg { min-width: 3px; transition: width 0.3s; }
+.ad-zone-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.ad-zone-item { display: flex; align-items: center; gap: 5px; font-size: 11px; }
+.ad-zone-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+.ad-zone-label { color: var(--text-muted); font-weight: 500; }
+.ad-zone-val { color: var(--text-dim); font-size: 10px; }
+
+.ad-verdict { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--surface-2); border-radius: 10px; margin-bottom: 10px; }
+.ad-verdict-score { font-size: 28px; font-weight: 800; flex-shrink: 0; min-width: 50px; text-align: center; }
+.ad-verdict-text { flex: 1; min-width: 0; }
+.ad-verdict-goal { font-size: 13px; font-weight: 700; color: var(--text); }
+.ad-verdict-line { font-size: 12px; color: var(--text-dim); margin-top: 3px; }
+
+.ad-checks { display: flex; flex-direction: column; gap: 6px; }
+.ad-check-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px; background: var(--surface-2); border-radius: 8px; }
+.ad-check-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; width: 18px; text-align: center; }
+.ad-check-info { flex: 1; min-width: 0; }
+.ad-check-label { font-size: 12px; color: var(--text); }
+.ad-check-desc { font-size: 11px; color: var(--text-dim); margin-top: 2px; line-height: 1.4; }
 
 /* SWAP MODAL */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; display: flex; align-items: flex-end; justify-content: center; animation: fadeIn 0.15s; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; display: flex; align-items: center; justify-content: center; animation: fadeIn 0.15s; padding: 20px; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-.modal { background: var(--surface); border-radius: 20px 20px 0 0; padding: 20px; width: 100%; max-width: 480px; max-height: 85vh; overflow-y: auto; animation: slideUp 0.2s cubic-bezier(0.34, 1.3, 0.64, 1); }
-@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal { background: var(--surface); border-radius: 20px; padding: 20px; width: 100%; max-width: 480px; max-height: 85vh; overflow-y: auto; animation: scaleIn 0.2s cubic-bezier(0.34, 1.3, 0.64, 1); }
+@keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .modal-handle { width: 36px; height: 4px; background: var(--border-strong); border-radius: 2px; margin: 0 auto 18px; }
 .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
 .modal-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 18px; }
@@ -947,7 +992,9 @@ const state = {
   feel: null,
   view: localStorage.getItem('view_mode') || 'phone',
   weekSwaps: loadWeekSwaps(),
-  swapModalDay: null
+  swapModalDay: null,
+  stale: false,
+  cacheTime: null
 };
 
 const savedFeelDate = localStorage.getItem('feel_date');
@@ -1073,6 +1120,19 @@ async function fetchData() {
   const fmt = d => d.toISOString().split('T')[0];
   const auth = 'Basic ' + btoa('API_KEY:' + state.apiKey);
 
+  // Try to load cached data immediately so we're never blank
+  const cachedWellness = localStorage.getItem('cache_wellness');
+  const cachedActivities = localStorage.getItem('cache_activities');
+  const cacheTime = localStorage.getItem('cache_time');
+  if (cachedWellness && cachedActivities) {
+    state.wellness = JSON.parse(cachedWellness);
+    state.activities = JSON.parse(cachedActivities);
+    state.loaded = true;
+    state.cacheTime = cacheTime ? new Date(parseInt(cacheTime)) : null;
+    state.stale = true;
+    render(); // show cached data immediately
+  }
+
   try {
     const wRes = await fetch(`https://intervals.icu/api/v1/athlete/${state.athleteId}/wellness?oldest=${fmt(monthAgo)}&newest=${fmt(today)}`, { headers: { Authorization: auth } });
     if (!wRes.ok) throw new Error(`Intervals API ${wRes.status}`);
@@ -1081,10 +1141,23 @@ async function fetchData() {
     if (aRes.ok) state.activities = await aRes.json();
     state.loaded = true;
     state.error = null;
+    state.stale = false;
+    state.cacheTime = new Date();
+    // Cache successful response
+    localStorage.setItem('cache_wellness', JSON.stringify(state.wellness));
+    localStorage.setItem('cache_activities', JSON.stringify(state.activities));
+    localStorage.setItem('cache_time', String(Date.now()));
     render();
   } catch (e) {
-    state.error = e.message;
-    render();
+    // If we have cached data, don't show an error — just keep showing stale
+    if (state.loaded && state.wellness.length > 0) {
+      state.stale = true;
+      state.error = null;
+      render();
+    } else {
+      state.error = e.message;
+      render();
+    }
   }
 }
 
@@ -1356,7 +1429,265 @@ function doesActivityMatchPlan(garminType, dayName) {
   });
 }
 
-// Smart short name: use activity type + key stats instead of Garmin's auto-generated location name
+// ════════════════════════════════════════════════════════════════════
+//  TRAINING STIMULUS ANALYSIS — outcome-based, not checkbox-based
+//  The question isn't "did you hit 45 min" — it's "did the session
+//  deliver the intended physiological adaptation?"
+// ════════════════════════════════════════════════════════════════════
+
+const TRAINING_GOALS = {
+  Monday:    { goal: 'Maximal strength + hypertrophy', stimulus: 'mechanical tension', minDur: 35, idealDur: [50, 75], hrRange: [90, 145] },
+  Tuesday:   { goal: 'Upper body push strength + paddle endurance', stimulus: 'mechanical tension', minDur: 35, idealDur: [45, 70], hrRange: [90, 145] },
+  Wednesday: { goal: 'Aerobic base + recovery', stimulus: 'aerobic efficiency', minDur: 25, idealDur: [35, 60], hrRange: [110, 155] },
+  Thursday:  { goal: 'Aerobic endurance + cadence patterning', stimulus: 'aerobic threshold', minDur: 30, idealDur: [45, 90], hrRange: [130, 155] },
+  Friday:    { goal: 'Pull strength + bicep hypertrophy', stimulus: 'mechanical tension', minDur: 35, idealDur: [45, 70], hrRange: [90, 145] },
+  Saturday:  { goal: 'Race-specific endurance + fueling rehearsal', stimulus: 'prolonged aerobic', minDur: 60, idealDur: [90, 180], hrRange: [120, 160] },
+  Sunday:    { goal: 'Full recovery', stimulus: 'parasympathetic', minDur: 0, idealDur: [0, 30], hrRange: [0, 120] },
+};
+
+function analyzeCompliance(activity, dayName) {
+  const goals = TRAINING_GOALS[dayName];
+  const plan = SESSIONS[dayName];
+  if (!goals || !plan) return null;
+  const classified = classifyActivityType(activity.type);
+  const checks = [];
+
+  const dur = activity.moving_time ? activity.moving_time / 60 : 0;
+  const hrVal = activity.icu_average_hr ?? activity.average_heartrate ?? null;
+  const maxHr = activity.icu_max_hr ?? activity.max_heartrate ?? null;
+  const zones = activity.icu_hr_zone_times || activity.icu_zone_times;
+  const cadence = activity.icu_average_cadence ?? activity.average_cadence;
+
+  // ── STIMULUS SUFFICIENCY ──
+  if (dur > 0) {
+    if (dur >= goals.minDur) {
+      const quality = dur >= goals.idealDur[0] ? 'Sufficient stimulus' : 'Minimal effective dose';
+      checks.push({ label: 'Stimulus', value: `${Math.round(dur)}min`, desc: quality, pass: true, weight: 1 });
+    } else {
+      const highIntensity = hrVal && hrVal > goals.hrRange[1] * 0.9;
+      if (highIntensity && dur >= goals.minDur * 0.7) {
+        checks.push({ label: 'Stimulus', value: `${Math.round(dur)}min`, desc: 'Short but high-intensity — partial stimulus', pass: true, weight: 0.7 });
+      } else {
+        checks.push({ label: 'Stimulus', value: `${Math.round(dur)}min`, desc: `Below minimum effective dose (${goals.minDur}min)`, pass: false, weight: 1 });
+      }
+    }
+  }
+
+  // ── INTENSITY COMPLIANCE ──
+  if (hrVal && goals.stimulus !== 'mechanical tension') {
+    if (goals.stimulus === 'aerobic efficiency' || goals.stimulus === 'aerobic threshold') {
+      const inZone = hrVal >= goals.hrRange[0] && hrVal <= goals.hrRange[1];
+      if (inZone) {
+        checks.push({ label: 'HR discipline', value: `${Math.round(hrVal)}bpm`, desc: 'In target zone — controlled effort', pass: true, weight: 2 });
+      } else if (hrVal > goals.hrRange[1]) {
+        const overBy = Math.round(hrVal - goals.hrRange[1]);
+        checks.push({ label: 'HR discipline', value: `${Math.round(hrVal)}bpm`, desc: `${overBy}bpm over cap — too hard for intended adaptation`, pass: false, critical: overBy > 10, weight: 2 });
+      } else {
+        checks.push({ label: 'HR discipline', value: `${Math.round(hrVal)}bpm`, desc: 'Below target — consider pushing slightly harder', pass: true, weight: 1 });
+      }
+    }
+    if (goals.stimulus === 'prolonged aerobic') {
+      const pass = hrVal <= 160;
+      checks.push({ label: 'Aerobic ceiling', value: `${Math.round(hrVal)}bpm`, desc: pass ? 'Sustained effort without redlining' : 'Avg too high — cramp risk on race day', pass, critical: !pass, weight: 2 });
+    }
+  }
+
+  // ── ZONE DISTRIBUTION (all cardio with zone data) ──
+  if (zones && zones.length >= 3) {
+    const totalZ = zones.reduce((a, b) => a + (b || 0), 0);
+    if (totalZ > 0) {
+      const z12pct = Math.round(((zones[0] || 0) + (zones[1] || 0)) / totalZ * 100);
+      const z3pct = 100 - z12pct;
+      if (classified === 'run' || goals.stimulus === 'aerobic efficiency' || goals.stimulus === 'aerobic threshold') {
+        const targetZ12 = goals.stimulus === 'aerobic efficiency' ? 80 : 70;
+        const pass = z12pct >= targetZ12;
+        checks.push({ label: 'Zone split', value: `${z12pct}% Z1-Z2`, desc: pass ? 'Polarized correctly — aerobic adaptation maximized' : `Too much Z3+ time (${z3pct}%) — defeats the aerobic purpose`, pass, critical: z3pct > 40, weight: 2 });
+      } else if (goals.stimulus === 'prolonged aerobic') {
+        const pass = z12pct >= 60;
+        checks.push({ label: 'Zone split', value: `${z12pct}% Z1-Z2`, desc: pass ? 'Good endurance distribution' : 'Too much high-intensity — race pacing needs discipline', pass, weight: 1.5 });
+      }
+    }
+  }
+
+  // ── CADENCE (run) ──
+  if (cadence && classified === 'run') {
+    const spm = cadence < 100 ? cadence * 2 : cadence;
+    if (spm >= 168) checks.push({ label: 'Cadence', value: `${Math.round(spm)}spm`, desc: 'On target — movement economy maintained', pass: true, weight: 1.5 });
+    else if (spm >= 160) checks.push({ label: 'Cadence', value: `${Math.round(spm)}spm`, desc: 'Slightly low — watch for collapse on climbs', pass: true, weight: 0.8 });
+    else checks.push({ label: 'Cadence', value: `${Math.round(spm)}spm`, desc: 'Collapsing under 160 — race-day failure mode', pass: false, critical: true, weight: 1.5 });
+  }
+
+  // ── CARDIAC DRIFT ──
+  if (dur > 30 && hrVal && maxHr && classified !== 'strength') {
+    const drift = maxHr - hrVal;
+    if (drift > 30) checks.push({ label: 'Cardiac drift', value: `+${Math.round(drift)}bpm`, desc: 'Large spread — possible dehydration or sodium deficit', pass: false, critical: drift > 40, weight: 1 });
+  }
+
+  // ── RIDE CADENCE ──
+  if (cadence && classified === 'ride' && dayName === 'Saturday') {
+    const pass = cadence >= 72;
+    checks.push({ label: 'Pedal cadence', value: `${Math.round(cadence)}rpm`, desc: pass ? 'Spinning efficiently' : 'Low cadence = cramps on Gibraltar', pass, weight: 1 });
+  }
+
+  // ── HYDRATION ──
+  if (dur >= 30 && classified !== 'strength') {
+    const sweatOz = Math.round(dur * 16.9 / 29.57);
+    checks.push({ label: 'Est. sweat loss', value: `~${sweatOz}oz`, desc: sweatOz > 34 ? 'Heavy loss — verify you replaced 80%+' : 'Standard hydration', pass: true, info: true, weight: 0 });
+  }
+
+  if (checks.length === 0) return null;
+  const scoreable = checks.filter(c => !c.info);
+  let weightedPass = 0, totalWeight = 0;
+  scoreable.forEach(c => { totalWeight += c.weight; if (c.pass) weightedPass += c.weight; });
+  const pct = totalWeight > 0 ? Math.round((weightedPass / totalWeight) * 100) : 100;
+
+  let verdict;
+  if (pct >= 85) verdict = 'Session delivered the intended adaptation.';
+  else if (pct >= 60) verdict = 'Partially effective — coaching points to address.';
+  else verdict = 'Session missed its intended purpose.';
+
+  return { checks, pct, verdict, goal: goals.goal };
+}
+
+function renderCompliance(analysis) {
+  if (!analysis) return '';
+  const { checks, pct, verdict } = analysis;
+  const color = pct >= 85 ? 'var(--green)' : pct >= 60 ? 'var(--orange)' : 'var(--red)';
+  const critical = checks.find(c => c.critical && !c.pass);
+  const mainMsg = critical ? critical.desc : (checks.find(c => !c.info)?.desc || verdict);
+  return `<div class="compliance-row"><span class="compliance-score" style="color:${color};">${pct}%</span> <span style="opacity:0.75;">${mainMsg}</span></div>`;
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  ACTIVITY DETAIL MODAL
+// ════════════════════════════════════════════════════════════════════
+
+function openActivityModal(activityId, dayName) {
+  const activity = state.activities.find(a => String(a.id) === String(activityId));
+  if (!activity) return;
+
+  const classified = classifyActivityType(activity.type);
+  const matchesPlan = doesActivityMatchPlan(activity.type, dayName);
+  const analysis = matchesPlan ? analyzeCompliance(activity, dayName) : null;
+  const goals = TRAINING_GOALS[dayName];
+  const plan = SESSIONS[dayName];
+
+  const dur = activity.moving_time ? activity.moving_time / 60 : 0;
+  const hrVal = activity.icu_average_hr ?? activity.average_heartrate ?? null;
+  const maxHr = activity.icu_max_hr ?? activity.max_heartrate ?? null;
+  const dist = activity.distance ? (activity.distance / 1609.34).toFixed(1) : null;
+  const calories = activity.icu_calories ?? activity.calories ?? null;
+  const cadence = activity.icu_average_cadence ?? activity.average_cadence ?? null;
+  const zones = activity.icu_hr_zone_times || activity.icu_zone_times;
+  const elev = activity.total_elevation_gain ?? activity.icu_total_elevation_gain ?? null;
+  const pace = (dist && dur > 0) ? (dur / parseFloat(dist)).toFixed(1) : null;
+  const shortName = smartActivityName(activity);
+  const rawName = activity.name || activity.type || 'Activity';
+  const sweatOz = classified !== 'strength' && dur >= 15 ? Math.round(dur * 16.9 / 29.57) : null;
+
+  // Zone bars
+  let zoneBarHtml = '';
+  if (zones && zones.length >= 3) {
+    const totalZ = zones.reduce((a, b) => a + (b || 0), 0);
+    if (totalZ > 0) {
+      const zC = ['#6B7280', '#22C55E', '#3B82F6', '#F97316', '#EF4444'];
+      const zN = ['Z1 Recovery', 'Z2 Endurance', 'Z3 Tempo', 'Z4 Threshold', 'Z5 VO2max'];
+      zoneBarHtml = `
+        <div class="ad-section">
+          <div class="ad-section-title">Heart Rate Zones</div>
+          <div class="ad-zone-bar">${zones.slice(0, 5).map((z, i) => {
+            const pct = ((z || 0) / totalZ) * 100;
+            return pct > 1 ? `<div class="ad-zone-seg" style="width:${pct}%;background:${zC[i]};"></div>` : '';
+          }).join('')}</div>
+          <div class="ad-zone-legend">${zones.slice(0, 5).map((z, i) => {
+            const pct = Math.round(((z || 0) / totalZ) * 100);
+            const mins = Math.round((z || 0) / 60);
+            return pct >= 1 ? `<div class="ad-zone-item"><span class="ad-zone-dot" style="background:${zC[i]}"></span><span class="ad-zone-label">${zN[i].split(' ')[0]}</span><span class="ad-zone-val">${pct}% · ${mins}min</span></div>` : '';
+          }).join('')}</div>
+        </div>`;
+    }
+  } else if (hrVal && dur > 0) {
+    // Estimate zone from avg HR when Garmin zone data is missing
+    // Using standard zones based on ~190 max HR
+    const maxHrEst = maxHr || 190;
+    const z1Max = maxHrEst * 0.60, z2Max = maxHrEst * 0.70, z3Max = maxHrEst * 0.80, z4Max = maxHrEst * 0.90;
+    let zoneName, zoneColor, zoneDesc;
+    if (hrVal <= z1Max) { zoneName = 'Z1 Recovery'; zoneColor = '#6B7280'; zoneDesc = 'Very easy effort — active recovery zone'; }
+    else if (hrVal <= z2Max) { zoneName = 'Z2 Endurance'; zoneColor = '#22C55E'; zoneDesc = 'Aerobic base building — conversational pace'; }
+    else if (hrVal <= z3Max) { zoneName = 'Z3 Tempo'; zoneColor = '#3B82F6'; zoneDesc = 'Moderate effort — sustainably hard'; }
+    else if (hrVal <= z4Max) { zoneName = 'Z4 Threshold'; zoneColor = '#F97316'; zoneDesc = 'Hard effort — lactate accumulating'; }
+    else { zoneName = 'Z5 VO2max'; zoneColor = '#EF4444'; zoneDesc = 'Max effort — unsustainable'; }
+    zoneBarHtml = `
+      <div class="ad-section">
+        <div class="ad-section-title">Estimated Effort Zone</div>
+        <div class="ad-zone-bar"><div class="ad-zone-seg" style="width:100%;background:${zoneColor};"></div></div>
+        <div class="ad-zone-legend">
+          <div class="ad-zone-item"><span class="ad-zone-dot" style="background:${zoneColor}"></span><span class="ad-zone-label">${zoneName}</span></div>
+        </div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:6px;">${zoneDesc} · Based on avg HR ${Math.round(hrVal)}bpm. Detailed zone data not available from Garmin for this activity.</div>
+      </div>`;
+  }
+
+  // Analysis section
+  let analysisHtml = '';
+  if (analysis) {
+    const color = analysis.pct >= 85 ? 'var(--green)' : analysis.pct >= 60 ? 'var(--orange)' : 'var(--red)';
+    const checkRows = analysis.checks.map(c => {
+      const icon = c.info ? '<span style="color:var(--primary)">ℹ</span>' : (c.pass ? '<span style="color:var(--green)">✓</span>' : (c.critical ? '<span style="color:var(--red)">✗</span>' : '<span style="color:var(--orange)">⚠</span>'));
+      return `<div class="ad-check-row"><div class="ad-check-icon">${icon}</div><div class="ad-check-info"><div class="ad-check-label">${c.label}: <strong>${c.value}</strong></div><div class="ad-check-desc">${c.desc}</div></div></div>`;
+    }).join('');
+    analysisHtml = `
+      <div class="ad-section">
+        <div class="ad-section-title">Training Stimulus Analysis</div>
+        <div class="ad-verdict" style="border-left: 3px solid ${color};">
+          <div class="ad-verdict-score" style="color:${color}">${analysis.pct}%</div>
+          <div class="ad-verdict-text"><div class="ad-verdict-goal">${analysis.goal}</div><div class="ad-verdict-line">${analysis.verdict}</div></div>
+        </div>
+        <div class="ad-checks">${checkRows}</div>
+      </div>`;
+  } else if (!matchesPlan) {
+    analysisHtml = `
+      <div class="ad-section">
+        <div class="ad-section-title">Plan Alignment</div>
+        <div class="ad-verdict" style="border-left: 3px solid var(--orange);">
+          <div class="ad-verdict-score" style="color:var(--orange)">⚡</div>
+          <div class="ad-verdict-text"><div class="ad-verdict-goal">Planned: ${plan.title}</div><div class="ad-verdict-line">Different activity type — logged as an unplanned swap.</div></div>
+        </div>
+      </div>`;
+  }
+
+  const existing = document.getElementById('activity-modal-overlay');
+  if (existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'activity-modal-overlay';
+  overlay.className = 'modal-overlay';
+  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+  overlay.innerHTML = `
+    <div class="modal ad-modal">
+      <div class="modal-handle"></div>
+      <div class="ad-header">
+        <div class="ad-type-icon">${sportIcon(activity.type)}</div>
+        <div class="ad-header-info"><div class="ad-header-name">${rawName}</div><div class="ad-header-meta">${shortName} · ${activity.start_date_local ? new Date(activity.start_date_local).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : ''}</div></div>
+        ${matchesPlan ? '<div class="ad-match-badge match">On Plan</div>' : '<div class="ad-match-badge swap">Swapped</div>'}
+      </div>
+      <div class="ad-metrics">
+        ${dur ? `<div class="ad-metric"><div class="ad-metric-val">${Math.round(dur)}</div><div class="ad-metric-label">min</div></div>` : ''}
+        ${dist ? `<div class="ad-metric"><div class="ad-metric-val">${dist}</div><div class="ad-metric-label">miles</div></div>` : ''}
+        ${hrVal ? `<div class="ad-metric"><div class="ad-metric-val">${Math.round(hrVal)}</div><div class="ad-metric-label">avg bpm</div></div>` : ''}
+        ${maxHr ? `<div class="ad-metric"><div class="ad-metric-val">${Math.round(maxHr)}</div><div class="ad-metric-label">max bpm</div></div>` : ''}
+        ${elev ? `<div class="ad-metric"><div class="ad-metric-val">${Math.round(elev * 3.281)}</div><div class="ad-metric-label">ft gain</div></div>` : ''}
+        ${calories ? `<div class="ad-metric"><div class="ad-metric-val">${Math.round(calories)}</div><div class="ad-metric-label">cal</div></div>` : ''}
+        ${pace && classified === 'run' ? `<div class="ad-metric"><div class="ad-metric-val">${pace}</div><div class="ad-metric-label">min/mi</div></div>` : ''}
+        ${cadence ? `<div class="ad-metric"><div class="ad-metric-val">${classified === 'run' ? Math.round(cadence < 100 ? cadence * 2 : cadence) : Math.round(cadence)}</div><div class="ad-metric-label">${classified === 'run' ? 'spm' : 'rpm'}</div></div>` : ''}
+        ${sweatOz ? `<div class="ad-metric"><div class="ad-metric-val">~${sweatOz}</div><div class="ad-metric-label">oz sweat</div></div>` : ''}
+      </div>
+      ${zoneBarHtml}
+      ${analysisHtml}
+      <button class="modal-btn modal-btn-confirm" style="margin-top:16px;width:100%;" onclick="document.getElementById('activity-modal-overlay').remove()">Close</button>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
 function smartActivityName(activity) {
   const raw = activity.name || '';
   const type = (activity.type || '').toLowerCase();
@@ -1437,13 +1768,18 @@ function renderWeekPlanner(activities = []) {
       const matchIcon = matchesPlan 
         ? '<span class="day-log-check match">✓</span>' 
         : '<span class="day-log-check swap">⚡</span>';
+      // Compliance analysis for matched activities
+      const compliance = matchesPlan ? analyzeCompliance(a, day) : null;
+      const complianceHtml = renderCompliance(compliance);
+      const actId = a.id || '';
       return `
-        <div class="day-log-entry">
+        <div class="day-log-entry day-log-clickable" onclick="event.stopPropagation();openActivityModal('${actId}','${day}')">
           <span class="day-log-icon">${icon}</span>
           <span class="day-log-name">${shortName}</span>
           ${stats ? `<span class="day-log-stats">${stats}</span>` : ''}
           ${matchIcon}
         </div>
+        ${complianceHtml}
       `;
     }).join('');
 
@@ -1930,6 +2266,20 @@ function buildSummary(latest, history, activities) {
     parts.push(`<span class="highlight-good">${recentActivities7d.length} sessions this week — consistency locked in.</span>`);
   }
 
+  // 7-day rolling HR discipline check for runs — the biggest coaching issue
+  const recentRuns = recentActivities7d.filter(a => classifyActivityType(a.type) === 'run');
+  if (recentRuns.length > 0) {
+    const runsOverCap = recentRuns.filter(a => {
+      const hr = a.icu_average_hr ?? a.average_heartrate;
+      return hr && hr > 155;
+    });
+    if (runsOverCap.length > 0) {
+      parts.push(`<span class="highlight-warn">${runsOverCap.length} of ${recentRuns.length} runs exceeded 155bpm avg — you still default to 90%+ max HR. This is the habit that loses the Mash.</span>`);
+    } else if (recentRuns.length >= 2) {
+      parts.push(`<span class="highlight-good">All runs under HR cap this week — discipline is building.</span>`);
+    }
+  }
+
   return parts.join(' ');
 }
 
@@ -2414,7 +2764,8 @@ function renderPhone(latest, sorted) {
     <div class="footer">
       <a href="#" onclick="clearCredentials();return false;">Reset</a> ·
       <a href="https://intervals.icu" target="_blank">Intervals.icu</a> ·
-      Updated ${new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+      ${state.stale ? `<span style="color:var(--orange);">⚠ Cached data${state.cacheTime ? ' from ' + state.cacheTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : ''}</span>` : `Updated ${new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`}
+      ${state.stale ? ` · <a href="#" onclick="fetchData();return false;" style="color:var(--primary);">Retry</a>` : ''}
     </div>
     <button class="coach-button-fixed" id="coach-btn-fixed" onclick="generateSession('coach-btn-fixed')">⚡ Get AI Coach Response</button>
   `;
@@ -2464,12 +2815,17 @@ function renderDesktop(latest, sorted) {
     <div class="footer">
       <a href="#" onclick="clearCredentials();return false;">Reset</a> ·
       <a href="https://intervals.icu" target="_blank">Intervals.icu</a> ·
-      Updated ${new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+      ${state.stale ? `<span style="color:var(--orange);">⚠ Cached data${state.cacheTime ? ' from ' + state.cacheTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : ''}</span> · <a href="#" onclick="fetchData();return false;" style="color:var(--primary);">Retry</a>` : `Updated ${new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`}
     </div>
   `;
 }
 
 fetchData();
+
+// Auto-refresh every 15 minutes to keep data current
+setInterval(() => {
+  if (state.athleteId && state.apiKey) fetchData();
+}, 15 * 60 * 1000);
 </script>
 </body>
 </html>
