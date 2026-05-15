@@ -296,6 +296,25 @@ body.desktop-view .date { font-size: 28px; }
 .adherence-detail { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
 .streak-badge { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: var(--orange); background: var(--orange-bg); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(249,115,22,0.2); flex-shrink: 0; }
 .fuel-reminder { margin-top: 10px; padding: 8px 12px; background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); border-radius: 8px; font-size: 11px; color: var(--primary); font-weight: 500; }
+
+/* PROGRESSION CARD */
+.progression-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+.prog-rows { display: flex; flex-direction: column; gap: 14px; }
+@media (min-width: 900px) {
+  body.desktop-view .progression-card .prog-rows { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+}
+.prog-row { padding: 10px 12px; background: var(--surface-2); border-radius: 10px; border: 1px solid var(--border); }
+.prog-header-line { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+.prog-label-block { flex: 1; min-width: 0; }
+.prog-label { font-size: 12px; font-weight: 700; color: var(--text); }
+.prog-sub { font-size: 10px; color: var(--text-dim); margin-top: 1px; line-height: 1.3; }
+.prog-value-block { text-align: right; flex-shrink: 0; }
+.prog-value { font-size: 15px; font-weight: 800; color: var(--text); letter-spacing: -0.01em; line-height: 1.1; }
+.prog-arrow { font-size: 10px; font-weight: 700; display: inline-block; margin-top: 2px; padding: 2px 6px; border-radius: 4px; }
+.prog-arrow.up { background: var(--green-bg); color: var(--green); }
+.prog-arrow.down { background: var(--red-bg); color: var(--red); }
+.prog-arrow.flat { background: var(--surface-3); color: var(--text-dim); }
+.prog-spark { margin-top: 4px; }
 .week-days { display: flex; flex-direction: column; gap: 6px; }
 .week-day-row { display: flex; flex-direction: column; padding: 10px 12px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border); transition: all 0.15s; position: relative; }
 .week-day-row:hover { border-color: var(--border-strong); background: var(--surface-3); }
@@ -1120,41 +1139,96 @@ async function fetchData() {
   const fmt = d => d.toISOString().split('T')[0];
   const auth = 'Basic ' + btoa('API_KEY:' + state.apiKey);
 
-  // Try to load cached data immediately so we're never blank
+  // Load cached data immediately so we're never blank
   const cachedWellness = localStorage.getItem('cache_wellness');
   const cachedActivities = localStorage.getItem('cache_activities');
   const cacheTime = localStorage.getItem('cache_time');
   if (cachedWellness && cachedActivities) {
-    state.wellness = JSON.parse(cachedWellness);
-    state.activities = JSON.parse(cachedActivities);
-    state.loaded = true;
-    state.cacheTime = cacheTime ? new Date(parseInt(cacheTime)) : null;
-    state.stale = true;
-    render(); // show cached data immediately
+    try {
+      const cw = JSON.parse(cachedWellness);
+      const ca = JSON.parse(cachedActivities);
+      if (Array.isArray(cw) && cw.length > 0) {
+        state.wellness = cw;
+        state.activities = Array.isArray(ca) ? ca : [];
+        state.loaded = true;
+        state.cacheTime = cacheTime ? new Date(parseInt(cacheTime)) : null;
+        state.stale = true;
+        state.error = null;
+        render(); // show cached data immediately
+      }
+    } catch (parseErr) {
+      console.warn('Cache parse failed:', parseErr);
+    }
+  }
+
+  // Helper: fetch with timeout and retry
+  async function fetchWithRetry(url, retries = 2, timeoutMs = 15000) {
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const res = await fetch(url, { headers: { Authorization: auth }, signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (res.ok) return res;
+        // 4xx errors won't be helped by retry
+        if (res.status >= 400 && res.status < 500) throw new Error(`Intervals API ${res.status}`);
+        // 5xx: retry
+        if (attempt < retries) {
+          await new Promise(r => setTimeout(r, 1500 * (attempt + 1)));
+          continue;
+        }
+        throw new Error(`Intervals API ${res.status}`);
+      } catch (e) {
+        clearTimeout(timeoutId);
+        if (attempt >= retries) throw e;
+        await new Promise(r => setTimeout(r, 1500 * (attempt + 1)));
+      }
+    }
   }
 
   try {
-    const wRes = await fetch(`https://intervals.icu/api/v1/athlete/${state.athleteId}/wellness?oldest=${fmt(monthAgo)}&newest=${fmt(today)}`, { headers: { Authorization: auth } });
-    if (!wRes.ok) throw new Error(`Intervals API ${wRes.status}`);
-    state.wellness = await wRes.json();
-    const aRes = await fetch(`https://intervals.icu/api/v1/athlete/${state.athleteId}/activities?oldest=${fmt(monthAgo)}&newest=${fmt(today)}`, { headers: { Authorization: auth } });
-    if (aRes.ok) state.activities = await aRes.json();
+    const wRes = await fetchWithRetry(`https://intervals.icu/api/v1/athlete/${state.athleteId}/wellness?oldest=${fmt(monthAgo)}&newest=${fmt(today)}`);
+    const wData = await wRes.json();
+
+    // Protection: if API returns empty array but we have cache, keep cache
+    if (!Array.isArray(wData) || wData.length === 0) {
+      if (state.loaded && state.wellness.length > 0) {
+        state.stale = true;
+        state.error = null;
+        render();
+        return;
+      }
+      throw new Error('Empty response from Intervals.icu');
+    }
+
+    state.wellness = wData;
+
+    try {
+      const aRes = await fetchWithRetry(`https://intervals.icu/api/v1/athlete/${state.athleteId}/activities?oldest=${fmt(monthAgo)}&newest=${fmt(today)}`);
+      const aData = await aRes.json();
+      if (Array.isArray(aData)) state.activities = aData;
+    } catch (actErr) {
+      // Activities fetch failed — keep cached activities if we have them
+      console.warn('Activities fetch failed, using cached:', actErr.message);
+    }
+
     state.loaded = true;
     state.error = null;
     state.stale = false;
     state.cacheTime = new Date();
-    // Cache successful response
     localStorage.setItem('cache_wellness', JSON.stringify(state.wellness));
     localStorage.setItem('cache_activities', JSON.stringify(state.activities));
     localStorage.setItem('cache_time', String(Date.now()));
     render();
   } catch (e) {
-    // If we have cached data, don't show an error — just keep showing stale
+    console.warn('Intervals.icu fetch failed:', e.message);
+    // Always prefer showing cached data over an error
     if (state.loaded && state.wellness.length > 0) {
       state.stale = true;
       state.error = null;
       render();
     } else {
+      // No cache, no data — only then show the error
       state.error = e.message;
       render();
     }
@@ -1408,19 +1482,48 @@ function classifyActivityType(garminType) {
   return 'other';
 }
 
-function doesActivityMatchPlan(garminType, dayName) {
+function doesActivityMatchPlan(garminType, dayName, swap) {
+  // If day has been swapped, check against the swap activity type instead
+  if (swap) {
+    const classified = classifyActivityType(garminType);
+    const swapClassified = classifyActivityType(swap.id === 'surf' ? 'surf' :
+      swap.id === 'paddle' ? 'paddle' :
+      swap.id === 'swim' ? 'swim' :
+      swap.id === 'mtb' ? 'ride' :
+      swap.id === 'trail_run' ? 'run' :
+      swap.id === 'zone2' ? 'ride' :
+      swap.id === 'dirt_bike' ? 'ride' :
+      swap.id === 'mobility' ? 'mobility' :
+      swap.id === 'rest' ? 'rest' :
+      swap.id);
+    // For water activities (surf/paddle) accept water or swim classifications
+    if (swap.id === 'surf' || swap.id === 'paddle') {
+      return ['water', 'swim', 'run', 'walk'].includes(classified) ||
+        (garminType || '').toLowerCase().includes('surf') ||
+        (garminType || '').toLowerCase().includes('paddle') ||
+        (garminType || '').toLowerCase().includes('kayak') ||
+        (garminType || '').toLowerCase().includes('swim') ||
+        (garminType || '').toLowerCase().includes('open');
+    }
+    // For rest day swaps, anything counts
+    if (swap.id === 'rest') return true;
+    // For zone2 swaps, accept any cardio
+    if (swap.id === 'zone2') return ['run', 'ride', 'swim', 'water', 'walk'].includes(classified);
+    // For custom swaps, just accept any logged activity
+    if (swap.id === 'custom') return true;
+    return classified === swapClassified;
+  }
+  // No swap — check against original plan
   const expected = PLAN_EXPECTED_TYPES[dayName] || [];
-  if (expected.length === 0) return true; // rest day — anything counts
+  if (expected.length === 0) return true;
   const classified = classifyActivityType(garminType);
-  // Check if the classified type matches any expected type for that day
   return expected.some(exp => {
     if (exp === classified) return true;
-    // Fuzzy matching: strength matches weight, run matches trail, etc.
     if (exp === 'strength' && classified === 'strength') return true;
     if (exp === 'weight' && classified === 'strength') return true;
     if (exp === 'run' && classified === 'run') return true;
     if (exp === 'trail' && classified === 'run') return true;
-    if (exp === 'ride' && (classified === 'ride')) return true;
+    if (exp === 'ride' && classified === 'ride') return true;
     if (exp === 'cycling' && classified === 'ride') return true;
     if (exp === 'mtb' && classified === 'ride') return true;
     if (exp === 'swim' && classified === 'swim') return true;
@@ -1567,7 +1670,8 @@ function openActivityModal(activityId, dayName) {
   if (!activity) return;
 
   const classified = classifyActivityType(activity.type);
-  const matchesPlan = doesActivityMatchPlan(activity.type, dayName);
+  const daySwap = state.weekSwaps[dayName];
+  const matchesPlan = doesActivityMatchPlan(activity.type, dayName, daySwap);
   const analysis = matchesPlan ? analyzeCompliance(activity, dayName) : null;
   const goals = TRAINING_GOALS[dayName];
   const plan = SESSIONS[dayName];
@@ -1764,7 +1868,7 @@ function renderWeekPlanner(activities = []) {
       const stats = [dist, dur, hr].filter(Boolean).join(' · ');
       const icon = sportIcon(a.type);
       const shortName = smartActivityName(a);
-      const matchesPlan = doesActivityMatchPlan(a.type, day);
+      const matchesPlan = doesActivityMatchPlan(a.type, day, swap);
       const matchIcon = matchesPlan 
         ? '<span class="day-log-check match">✓</span>' 
         : '<span class="day-log-check swap">⚡</span>';
@@ -1784,7 +1888,7 @@ function renderWeekPlanner(activities = []) {
     }).join('');
 
     const hasLog = logged.length > 0;
-    const anyMatch = hasLog && logged.some(a => doesActivityMatchPlan(a.type, day));
+    const anyMatch = hasLog && logged.some(a => doesActivityMatchPlan(a.type, day, swap));
     const doneClass = hasLog 
       ? (anyMatch ? 'has-log' : 'has-log-swap') 
       : (isPast && intensity !== 'rest' ? 'missed' : '');
@@ -1806,31 +1910,35 @@ function renderWeekPlanner(activities = []) {
     `;
   }).join('');
 
-  // Compute weekly adherence: plan-aligned sessions vs planned sessions
-  const plannedCount = DAYS.filter(d => SESSIONS[d].intensity !== 'rest').length;
+  // Compute 14-day rolling adherence: looks back 14 days, counts plan-aligned vs planned sessions
+  const ROLLING_DAYS = 14;
   let alignedCount = 0;
   let swappedCount = 0;
   let missedCount = 0;
-  DAYS.forEach((day, idx) => {
-    if (SESSIONS[day].intensity === 'rest') return;
-    const dayDate = new Date(weekStart);
-    dayDate.setDate(weekStart.getDate() + idx);
-    if (dayDate > today) return;
-    const logged = activitiesForDay(activities, dayDate);
-    if (logged.length === 0) { missedCount++; return; }
-    const anyMatch = logged.some(a => doesActivityMatchPlan(a.type, day));
+  let plannedInWindow = 0;
+  for (let i = 0; i < ROLLING_DAYS; i++) {
+    const checkDate = new Date(today);
+    checkDate.setDate(today.getDate() - i);
+    checkDate.setHours(0, 0, 0, 0);
+    if (checkDate > today) continue;
+    const checkDayName = DAYS[(checkDate.getDay() + 6) % 7]; // Convert to Mon=0..Sun=6
+    if (SESSIONS[checkDayName].intensity === 'rest') continue;
+    plannedInWindow++;
+    const dayLogged = activitiesForDay(activities, checkDate);
+    if (dayLogged.length === 0) { missedCount++; continue; }
+    // Check swap for that specific date — only current week swaps are tracked,
+    // but we can check at least for this week's swap if the date is in this week
+    const checkWeekStart = new Date(today);
+    checkWeekStart.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+    checkWeekStart.setHours(0, 0, 0, 0);
+    const isThisWeek = checkDate >= checkWeekStart;
+    const checkSwap = isThisWeek ? state.weekSwaps[checkDayName] : null;
+    const anyMatch = dayLogged.some(a => doesActivityMatchPlan(a.type, checkDayName, checkSwap));
     if (anyMatch) alignedCount++;
     else swappedCount++;
-  });
+  }
   const totalCompleted = alignedCount + swappedCount;
-  const pastPlannedCount = DAYS.filter((d, idx) => {
-    if (SESSIONS[d].intensity === 'rest') return false;
-    const dayDate = new Date(weekStart);
-    dayDate.setDate(weekStart.getDate() + idx);
-    return dayDate <= today;
-  }).length;
-  const adherencePct = pastPlannedCount > 0 ? Math.round((alignedCount / pastPlannedCount) * 100) : 0;
-  const activityPct = pastPlannedCount > 0 ? Math.round((totalCompleted / pastPlannedCount) * 100) : 0;
+  const adherencePct = plannedInWindow > 0 ? Math.round((alignedCount / plannedInWindow) * 100) : 0;
   const adherenceColor = adherencePct >= 80 ? 'var(--green)' : adherencePct >= 60 ? 'var(--yellow)' : 'var(--orange)';
   const adherenceRadius = 17;
   const adherenceCirc = 2 * Math.PI * adherenceRadius;
@@ -1875,7 +1983,7 @@ function renderWeekPlanner(activities = []) {
           <div class="adherence-ring-text">${adherencePct}%</div>
         </div>
         <div class="adherence-info">
-          <div class="adherence-label">Weekly adherence</div>
+          <div class="adherence-label">14-day adherence</div>
           <div class="adherence-detail">${adherenceDetail}</div>
         </div>
         ${streak >= 3 ? `<div class="streak-badge">🔥 ${streak}d</div>` : ''}
@@ -2358,7 +2466,237 @@ function renderChart(history, key, title, color, days=14, height=80) {
   `;
 }
 
-// Multi-line CTL/ATL/TSB chart for desktop
+// ════════════════════════════════════════════════════════════════════
+//  PROGRESSION CARD — multi-metric weekly trend tracker
+// ════════════════════════════════════════════════════════════════════
+
+function computeWeeklyMetrics(activities, weeksBack = 8) {
+  // Group activities into 7-day rolling buckets, ending at today
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
+  const weeks = [];
+
+  for (let w = weeksBack - 1; w >= 0; w--) {
+    const weekEnd = new Date(today);
+    weekEnd.setDate(today.getDate() - w * 7);
+    const weekStart = new Date(weekEnd);
+    weekStart.setDate(weekEnd.getDate() - 6);
+    weekStart.setHours(0, 0, 0, 0);
+
+    const weekActs = activities.filter(a => {
+      const d = new Date(a.start_date_local);
+      return d >= weekStart && d <= weekEnd;
+    });
+
+    // Aerobic efficiency — pace at sub-150bpm for runs
+    const easyRuns = weekActs.filter(a => {
+      const cl = classifyActivityType(a.type);
+      const hr = a.icu_average_hr ?? a.average_heartrate;
+      return cl === 'run' && hr && hr <= 152 && a.moving_time > 20*60 && a.distance > 1000;
+    });
+    let aeroEff = null;
+    if (easyRuns.length > 0) {
+      const paces = easyRuns.map(a => (a.moving_time / 60) / (a.distance / 1609.34));
+      aeroEff = paces.reduce((x, y) => x + y, 0) / paces.length;
+    }
+
+    // Avg cadence for runs (single-leg normalized)
+    const runsCadence = weekActs.filter(a => {
+      const cl = classifyActivityType(a.type);
+      const cad = a.icu_average_cadence ?? a.average_cadence;
+      return cl === 'run' && cad;
+    });
+    let avgCadence = null;
+    if (runsCadence.length > 0) {
+      const cads = runsCadence.map(a => {
+        const c = a.icu_average_cadence ?? a.average_cadence;
+        return c < 100 ? c * 2 : c;
+      });
+      avgCadence = cads.reduce((x, y) => x + y, 0) / cads.length;
+    }
+
+    // Weekly volume (hours of training)
+    const totalSec = weekActs.reduce((sum, a) => sum + (a.moving_time || 0), 0);
+    const weeklyHrs = totalSec / 3600;
+
+    // Avg compliance score for plan-aligned sessions
+    const compliances = [];
+    weekActs.forEach(a => {
+      const dn = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date(a.start_date_local).getDay()];
+      if (doesActivityMatchPlan(a.type, dn)) {
+        const ana = analyzeCompliance(a, dn);
+        if (ana) compliances.push(ana.pct);
+      }
+    });
+    const avgCompliance = compliances.length > 0 ? compliances.reduce((x,y) => x+y, 0) / compliances.length : null;
+
+    // Session count
+    const sessionCount = weekActs.length;
+
+    weeks.push({ start: weekStart, end: weekEnd, aeroEff, avgCadence, weeklyHrs, avgCompliance, sessionCount });
+  }
+  return weeks;
+}
+
+function renderSparkline(values, width = 100, height = 30, color = 'var(--primary)') {
+  const valid = values.map((v, i) => ({ v, i })).filter(d => d.v != null);
+  if (valid.length < 2) return `<div style="height:${height}px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text-dim);">Not enough data</div>`;
+  const min = Math.min(...valid.map(d => d.v));
+  const max = Math.max(...valid.map(d => d.v));
+  const range = max - min || 1;
+  const pad = 2;
+  const w = width, h = height;
+  const stepX = (w - pad*2) / (values.length - 1);
+  const yFor = v => pad + (h - pad*2) * (1 - (v - min) / range);
+
+  // Build path with gaps for null values
+  let path = '', area = '', firstX = null, lastX = null;
+  let pen = false;
+  values.forEach((v, i) => {
+    const x = pad + i * stepX;
+    if (v == null) { pen = false; return; }
+    const y = yFor(v);
+    if (!pen) {
+      path += ` M ${x.toFixed(1)},${y.toFixed(1)}`;
+      if (firstX == null) firstX = x;
+      pen = true;
+    } else {
+      path += ` L ${x.toFixed(1)},${y.toFixed(1)}`;
+    }
+    lastX = x;
+  });
+  if (firstX != null && lastX != null) {
+    area = `M ${firstX.toFixed(1)},${(h-pad).toFixed(1)} `;
+    let drewFirst = false;
+    values.forEach((v, i) => {
+      const x = pad + i * stepX;
+      if (v == null) return;
+      const y = yFor(v);
+      area += `${drewFirst ? 'L' : 'L'} ${x.toFixed(1)},${y.toFixed(1)} `;
+      drewFirst = true;
+    });
+    area += `L ${lastX.toFixed(1)},${(h-pad).toFixed(1)} Z`;
+  }
+
+  // Highlight dot on last point
+  const lastValid = [...valid].reverse()[0];
+  const lastDotX = pad + lastValid.i * stepX;
+  const lastDotY = yFor(lastValid.v);
+
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="width:100%;height:${h}px;display:block;">
+    <path d="${area}" fill="${color}" opacity="0.12"/>
+    <path d="${path}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${lastDotX.toFixed(1)}" cy="${lastDotY.toFixed(1)}" r="2.5" fill="${color}"/>
+  </svg>`;
+}
+
+function trendDirection(values, betterIsHigher = true) {
+  const valid = values.filter(v => v != null);
+  if (valid.length < 3) return { dir: 'flat', pct: 0 };
+  // Compare last 3 weeks avg vs prior 3 weeks avg
+  const recent = valid.slice(-3);
+  const prior = valid.slice(-6, -3);
+  if (prior.length === 0) return { dir: 'flat', pct: 0 };
+  const rAvg = recent.reduce((a,b) => a+b, 0) / recent.length;
+  const pAvg = prior.reduce((a,b) => a+b, 0) / prior.length;
+  const pct = ((rAvg - pAvg) / pAvg) * 100;
+  if (Math.abs(pct) < 2) return { dir: 'flat', pct: 0 };
+  const goingUp = pct > 0;
+  const improving = betterIsHigher ? goingUp : !goingUp;
+  return { dir: improving ? 'up' : 'down', pct: Math.abs(Math.round(pct)) };
+}
+
+function renderProgression(activities) {
+  const weeks = computeWeeklyMetrics(activities, 8);
+  if (weeks.length < 2) {
+    return `<div class="card"><div class="card-label">Progression</div><div style="color:var(--text-dim);font-size:13px;text-align:center;padding:30px 0;">Not enough data — need 2+ weeks</div></div>`;
+  }
+
+  const aeroEffs = weeks.map(w => w.aeroEff);
+  const cadences = weeks.map(w => w.avgCadence);
+  const volumes = weeks.map(w => w.weeklyHrs);
+  const compliances = weeks.map(w => w.avgCompliance);
+
+  // Aerobic efficiency — lower min/mi is better, so betterIsHigher = false
+  const aeroTrend = trendDirection(aeroEffs, false);
+  const cadTrend = trendDirection(cadences, true);
+  const volTrend = trendDirection(volumes, true);
+  const compTrend = trendDirection(compliances, true);
+
+  const lastAero = [...aeroEffs].reverse().find(v => v != null);
+  const lastCad = [...cadences].reverse().find(v => v != null);
+  const lastVol = volumes[volumes.length - 1];
+  const lastComp = [...compliances].reverse().find(v => v != null);
+
+  const arrowFor = t => {
+    if (t.dir === 'up') return `<span class="prog-arrow up">↗ +${t.pct}%</span>`;
+    if (t.dir === 'down') return `<span class="prog-arrow down">↘ -${t.pct}%</span>`;
+    return `<span class="prog-arrow flat">→ stable</span>`;
+  };
+
+  const rows = [
+    {
+      label: 'Aerobic efficiency',
+      sub: 'Pace at sub-150bpm — running faster at same HR',
+      value: lastAero ? `${lastAero.toFixed(1)} min/mi` : '—',
+      values: aeroEffs,
+      trend: aeroTrend,
+      color: '#22C55E',
+    },
+    {
+      label: 'Avg cadence',
+      sub: 'Steps per minute — target 170+',
+      value: lastCad ? `${Math.round(lastCad)} spm` : '—',
+      values: cadences,
+      trend: cadTrend,
+      color: '#A78BFA',
+    },
+    {
+      label: 'Weekly volume',
+      sub: 'Total training hours — consistency over intensity',
+      value: lastVol > 0 ? `${lastVol.toFixed(1)} hrs` : '0 hrs',
+      values: volumes,
+      trend: volTrend,
+      color: '#3B82F6',
+    },
+    {
+      label: 'Session quality',
+      sub: 'Avg stimulus score on plan-aligned sessions',
+      value: lastComp ? `${Math.round(lastComp)}%` : '—',
+      values: compliances,
+      trend: compTrend,
+      color: '#F97316',
+    },
+  ];
+
+  const rowsHtml = rows.map(r => `
+    <div class="prog-row">
+      <div class="prog-header-line">
+        <div class="prog-label-block">
+          <div class="prog-label">${r.label}</div>
+          <div class="prog-sub">${r.sub}</div>
+        </div>
+        <div class="prog-value-block">
+          <div class="prog-value">${r.value}</div>
+          ${arrowFor(r.trend)}
+        </div>
+      </div>
+      <div class="prog-spark">${renderSparkline(r.values, 280, 28, r.color)}</div>
+    </div>
+  `).join('');
+
+  return `
+    <div class="card progression-card">
+      <div class="card-header">
+        <div class="card-title">Progression</div>
+        <div class="card-meta">Last 8 weeks</div>
+      </div>
+      <div class="prog-rows">${rowsHtml}</div>
+    </div>
+  `;
+}
+
+
 function renderLoadFullChart(history, days=60) {
   const data = history.slice(-days).map(d => ({ date: d.id, ctl: getField(d, 'ctl'), atl: getField(d, 'atl') })).filter(d => d.ctl != null && d.atl != null);
   if (data.length < 2) return '<div class="chart-card"><div class="card-label">Training Load</div><div style="color:var(--text-dim);font-size:13px;text-align:center;padding:30px 0;">Not enough load data yet</div></div>';
@@ -2760,6 +3098,7 @@ function renderPhone(latest, sorted) {
       ${renderWeeklyVolume(state.activities)}
     </div>
     ${renderWeekPlanner(state.activities)}
+    ${renderProgression(state.activities)}
     ${renderSession()}
     <div class="footer">
       <a href="#" onclick="clearCredentials();return false;">Reset</a> ·
@@ -2799,6 +3138,9 @@ function renderDesktop(latest, sorted) {
 
       <!-- FULL WIDTH: Training Load -->
       <div class="col-12">${renderLoadFullChart(sorted, 60)}</div>
+
+      <!-- FULL WIDTH: Progression -->
+      <div class="col-12">${renderProgression(state.activities)}</div>
 
       <!-- FULL WIDTH: Recent Activities -->
       <div class="col-12">
