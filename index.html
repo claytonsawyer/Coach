@@ -13,444 +13,74 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+/* ════════════════════════════════════════════════════════
+   TOKENS
+   ════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
 :root {
-  --bg: #0B0F14;
-  --surface: #121821;
-  --surface-2: #1A222D;
-  --surface-3: #243040;
-  --border: #1E2632;
-  --border-strong: #2A3544;
-  --text: #E5E7EB;
-  --text-muted: #9CA3AF;
-  --text-dim: #6B7280;
-  --primary: #3B82F6;
-  --primary-bg: rgba(59,130,246,0.12);
-  --green: #22C55E;
-  --green-bg: rgba(34,197,94,0.12);
-  --yellow: #EAB308;
-  --yellow-bg: rgba(234,179,8,0.12);
-  --orange: #F97316;
-  --orange-bg: rgba(249,115,22,0.12);
-  --red: #EF4444;
-  --red-bg: rgba(239,68,68,0.12);
-  --purple: #A78BFA;
-  --pink: #EC4899;
-  --teal: #14B8A6;
+  --bg:           #080C12;
+  --surface:      #111827;
+  --surface-2:    #0F1924;
+  --surface-3:    #1a2535;
+  --border:       #1E293B;
+  --border-strong:#263548;
+  --text:         #F1F5F9;
+  --text-muted:   #94A3B8;
+  --text-dim:     #475569;
+  --primary:      #4F8EF7;
+  --primary-bg:   rgba(79,142,247,0.10);
+  --green:        #34D399;
+  --green-bg:     rgba(34,197,94,0.10);
+  --yellow:       #FBBF24;
+  --yellow-bg:    rgba(251,191,36,0.10);
+  --orange:       #FB923C;
+  --orange-bg:    rgba(249,115,22,0.10);
+  --red:          #F87171;
+  --red-bg:       rgba(239,68,68,0.10);
+  --purple:       #A78BFA;
+  --teal:         #2DD4BF;
+  /* spacing rhythm */
+  --gap-card:     14px;
+  --gap-section:  22px;
+  --r-card:       16px;
+  --r-inner:      10px;
 }
 
+/* ════════════════════════════════════════════════════════
+   BASE
+   ════════════════════════════════════════════════════════ */
+html, body { background: var(--bg); }
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  background: var(--bg); color: var(--text);
-  -webkit-font-smoothing: antialiased; font-size: 15px; line-height: 1.45;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  font-size: 15px; line-height: 1.5;
   min-height: 100vh;
 }
 
-/* ═══════════════════════════════════════════════════
-   PHONE VIEW (default)
-   ═══════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════
+   LAYOUT — PHONE (default)
+   ════════════════════════════════════════════════════════ */
 body.phone-view {
   padding: max(20px, env(safe-area-inset-top)) 16px calc(96px + env(safe-area-inset-bottom));
   max-width: 480px; margin: 0 auto;
 }
 
-/* ═══════════════════════════════════════════════════
-   DESKTOP VIEW (when toggled on)
-   ═══════════════════════════════════════════════════ */
-body.desktop-view {
-  padding: 24px 32px 32px;
-  max-width: 1440px; margin: 0 auto;
-}
-
-/* HEADER */
-.header { margin-bottom: 16px; }
-.header-row {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 12px; margin-bottom: 8px;
-}
-.greeting { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; }
-.date { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
-body.desktop-view .date { font-size: 28px; }
-.subdate { font-size: 12px; color: var(--text-muted); margin-top: 6px; font-weight: 500; }
-.race-countdown {
-  display: inline-block; margin-top: 6px; font-size: 11px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.08em;
-  color: var(--orange); background: var(--orange-bg);
-  padding: 4px 10px; border-radius: 100px;
-  border: 1px solid rgba(249,115,22,0.25);
-}
-
-/* VIEW TOGGLE */
-.view-toggle {
-  display: inline-flex; background: var(--surface);
-  border: 1px solid var(--border); border-radius: 8px;
-  padding: 3px; gap: 2px;
-}
-.view-toggle button {
-  background: transparent; border: none;
-  color: var(--text-muted); font-size: 12px; font-weight: 600;
-  padding: 6px 12px; border-radius: 5px;
-  cursor: pointer; font-family: inherit;
-  display: flex; align-items: center; gap: 6px;
-  transition: all 0.15s;
-}
-.view-toggle button.active {
-  background: var(--surface-3); color: var(--text);
-}
-.view-toggle button svg { width: 14px; height: 14px; }
-
-/* SETUP */
-.setup { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 16px; max-width: 480px; }
-.setup h3 { font-size: 16px; margin-bottom: 12px; font-weight: 600; }
-.setup label { font-size: 12px; color: var(--text-muted); display: block; margin: 12px 0 6px; font-weight: 500; }
-.setup input { width: 100%; padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; font-family: inherit; }
-.setup input:focus { outline: none; border-color: var(--primary); }
-.setup button { width: 100%; margin-top: 16px; padding: 12px; background: var(--text); color: var(--bg); border: none; border-radius: 8px; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; }
-.setup-note { font-size: 11px; color: var(--text-dim); margin-top: 10px; line-height: 1.5; }
-
-/* CARD BASE */
-.card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 14px; padding: 18px;
-}
-.card-label {
-  font-size: 11px; font-weight: 700; color: var(--text-muted);
-  text-transform: uppercase; letter-spacing: 0.1em;
-  margin-bottom: 10px;
-}
-.card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
-.card-title { font-size: 14px; font-weight: 600; color: var(--text); }
-.card-meta { font-size: 11px; color: var(--text-dim); }
-
-/* FEEL CHECK-IN */
-.feel-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; }
-.feel-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
-.feel-edit { font-size: 11px; color: var(--primary); font-weight: 600; cursor: pointer; }
-.feel-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-.feel-btn {
-  background: var(--surface-2); border: 1px solid var(--border);
-  border-radius: 10px; padding: 10px 4px;
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
-  cursor: pointer; transition: all 0.15s;
-  font-family: inherit; color: var(--text);
-}
-.feel-btn:active { transform: scale(0.96); }
-.feel-btn:hover { background: var(--surface-3); }
-.feel-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); }
-.feel-btn-emoji { font-size: 22px; line-height: 1; }
-.feel-btn-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
-.feel-selected { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; }
-.feel-selected-info { display: flex; align-items: center; gap: 10px; }
-.feel-selected-emoji { font-size: 24px; }
-.feel-selected-text { display: flex; flex-direction: column; }
-.feel-selected-label { font-size: 13px; font-weight: 600; }
-.feel-selected-sub { font-size: 11px; color: var(--text-muted); }
-
-/* HEALTH SNAPSHOT */
-.snapshot { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 12px; }
-.snapshot-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.snapshot-title { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
-.snapshot-time { font-size: 11px; color: var(--text-dim); }
-
-.readiness-block { display: flex; align-items: center; gap: 16px; padding-bottom: 14px; margin-bottom: 14px; border-bottom: 1px solid var(--border); }
-.readiness-ring { position: relative; width: 76px; height: 76px; flex-shrink: 0; }
-.readiness-ring svg { transform: rotate(-90deg); }
-.readiness-ring-bg { stroke: var(--surface-2); stroke-width: 7; fill: none; }
-.readiness-ring-fill { stroke-width: 7; fill: none; stroke-linecap: round; transition: stroke-dashoffset 0.6s; }
-.readiness-ring-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
-.readiness-info { flex: 1; min-width: 0; }
-.readiness-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
-.readiness-status { font-size: 17px; font-weight: 700; margin: 2px 0; }
-.readiness-msg { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
-
-.snap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.snap-metric { cursor: pointer; }
-.snap-metric-top { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
-.snap-metric-label { font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
-.snap-metric-help { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; background: var(--surface-2); color: var(--text-dim); font-size: 9px; font-weight: 700; }
-.snap-metric-value { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
-.snap-metric-na { font-size: 22px; color: var(--text-dim); font-weight: 600; line-height: 1.1; }
-.snap-metric-unit { font-size: 12px; color: var(--text-dim); font-weight: 500; margin-left: 2px; }
-.snap-metric-trend { font-size: 10px; margin-top: 2px; font-weight: 600; }
-.snap-metric-meta { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
-.trend-up { color: var(--green); }
-.trend-down { color: var(--red); }
-.trend-flat { color: var(--text-dim); }
-
-.help-drawer { display: none; grid-column: 1 / -1; background: var(--surface-2); border-radius: 8px; padding: 10px 12px; font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-top: 4px; }
-.help-drawer.open { display: block; }
-.help-drawer strong { color: var(--text); font-weight: 600; }
-
-/* COACH'S READ */
-.ai-summary { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
-.ai-summary-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-.ai-summary-icon { width: 22px; height: 22px; background: var(--text); color: var(--bg); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
-.ai-summary-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
-.ai-summary-text { font-size: 14px; line-height: 1.6; color: var(--text); }
-.ai-summary-text strong { color: var(--text); font-weight: 600; }
-.ai-summary-text .highlight-good { color: var(--green); font-weight: 600; }
-.ai-summary-text .highlight-warn { color: var(--orange); font-weight: 600; }
-.ai-summary-text .highlight-bad { color: var(--red); font-weight: 600; }
-
-/* SESSION CARD */
-.session-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 12px; }
-.session-tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 6px; font-weight: 700; }
-.session-override-banner { background: var(--primary-bg); border: 1px solid rgba(59,130,246,0.25); border-radius: 8px; padding: 8px 10px; margin-bottom: 12px; font-size: 11px; color: var(--primary); font-weight: 600; }
-.session-title { font-size: 19px; font-weight: 700; margin-bottom: 6px; line-height: 1.25; letter-spacing: -0.01em; }
-.session-detail { font-size: 13px; color: var(--text-muted); line-height: 1.55; margin-bottom: 14px; }
-.session-pill { display: inline-block; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 8px; border-radius: 4px; margin-bottom: 10px; }
-.pill-hard { background: var(--red-bg); color: var(--red); }
-.pill-moderate { background: var(--orange-bg); color: var(--orange); }
-.pill-easy { background: var(--green-bg); color: var(--green); }
-.pill-rest { background: rgba(156,163,175,0.15); color: var(--text-muted); }
-
-.session-section { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
-.session-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 10px; }
-.exercise { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
-.exercise:last-child { border-bottom: none; }
-.exercise-check { width: 22px; height: 22px; border: 1.5px solid var(--border-strong); border-radius: 50%; flex-shrink: 0; margin-top: 1px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
-.exercise-check.checked { background: var(--green); border-color: var(--green); }
-.exercise-check.checked::after { content: '✓'; color: #000; font-size: 14px; font-weight: 700; }
-.exercise-info { flex: 1; min-width: 0; }
-.exercise-name { font-size: 14.5px; font-weight: 600; margin-bottom: 3px; line-height: 1.3; }
-.exercise-prescription { font-size: 12.5px; color: var(--text-muted); display: flex; gap: 10px; flex-wrap: wrap; }
-.prescription-item { display: inline-flex; align-items: center; gap: 3px; }
-.prescription-key { color: var(--text-dim); font-weight: 500; }
-.prescription-val { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
-.exercise-note { font-size: 11px; color: var(--text-dim); margin-top: 4px; font-style: italic; line-height: 1.4; }
-.exercise.checked .exercise-name { color: var(--text-dim); text-decoration: line-through; text-decoration-color: var(--border-strong); }
-
-.protocol-block { background: var(--surface-2); border-radius: 10px; padding: 12px 14px; margin: 12px 0; }
-.protocol-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px; }
-.protocol-list { font-size: 13px; color: var(--text); line-height: 1.8; }
-.protocol-list span { display: block; }
-
-.section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin: 22px 0 10px; font-weight: 700; }
-
-/* CHARTS */
-.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 8px; }
-.chart-svg { width: 100%; height: auto; display: block; }
-
-/* ACTIVITIES */
-.activity { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 6px; display: flex; gap: 12px; align-items: center; }
-.activity-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--surface-2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; }
-.activity-info { flex: 1; min-width: 0; }
-.activity-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.activity-stats { font-size: 12px; color: var(--text-muted); display: flex; gap: 10px; flex-wrap: wrap; }
-.activity-date { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
-.activity-spark { flex-shrink: 0; width: 60px; height: 24px; }
-
-/* COACH BUTTON (phone) */
-.coach-button-fixed { position: fixed; bottom: max(16px, env(safe-area-inset-bottom)); left: 16px; right: 16px; max-width: 448px; margin: 0 auto; background: var(--text); color: var(--bg); border: none; border-radius: 14px; padding: 16px; font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; gap: 8px; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; z-index: 100; }
-.coach-button-fixed:active { transform: scale(0.98); }
-.coach-button-fixed.success { background: var(--green); color: #000; }
-
-/* INLINE COACH BUTTON (desktop) */
-.coach-button-inline {
-  background: var(--text); color: var(--bg); border: none;
-  border-radius: 10px; padding: 10px 16px;
-  font-size: 13px; font-weight: 700; font-family: inherit;
-  cursor: pointer; display: flex; align-items: center; gap: 6px;
-  transition: opacity 0.15s;
-}
-.coach-button-inline:hover { opacity: 0.9; }
-.coach-button-inline.success { background: var(--green); color: #000; }
-
-/* ALERTS */
-.alert { background: var(--orange-bg); border: 1px solid rgba(249,115,22,0.25); border-radius: 12px; padding: 11px 13px; margin-bottom: 12px; font-size: 13px; color: var(--orange); font-weight: 600; }
-.alert-poor { background: var(--red-bg); border-color: rgba(239,68,68,0.25); color: var(--red); }
-
-/* LOADING / ERROR */
-.loading { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 14px; }
-.spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--text); border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 8px; vertical-align: middle; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.error { background: var(--red-bg); border: 1px solid rgba(239,68,68,0.25); border-radius: 12px; padding: 14px; font-size: 13px; color: var(--red); margin-bottom: 12px; line-height: 1.5; }
-
-/* INSIGHTS PANEL */
-.insight-row { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); align-items: center; }
-.insight-row:last-child { border-bottom: none; }
-.insight-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; }
-.insight-text { font-size: 13px; line-height: 1.4; }
-.insight-text strong { font-weight: 600; }
-
-/* ZONE DONUT LEGEND */
-.zone-donut-wrap { display: flex; gap: 16px; align-items: center; }
-.zone-legend { flex: 1; display: flex; flex-direction: column; gap: 6px; }
-.zone-legend-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
-.zone-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
-.zone-name { font-weight: 600; min-width: 22px; }
-.zone-pct { color: var(--text-muted); font-variant-numeric: tabular-nums; }
-
-/* WEEK PLANNER */
-.week-planner { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
-.week-planner-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.week-planner-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
-.week-planner-reset { font-size: 11px; color: var(--primary); font-weight: 600; cursor: pointer; background: none; border: none; font-family: inherit; padding: 0; }
-.week-adherence { display: flex; gap: 12px; margin-bottom: 12px; padding: 10px 12px; background: var(--surface-2); border-radius: 10px; align-items: center; }
-.adherence-ring { position: relative; width: 44px; height: 44px; flex-shrink: 0; }
-.adherence-ring svg { transform: rotate(-90deg); }
-.adherence-ring-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 13px; font-weight: 700; }
-.adherence-info { flex: 1; min-width: 0; }
-.adherence-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
-.adherence-detail { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
-.streak-badge { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: var(--orange); background: var(--orange-bg); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(249,115,22,0.2); flex-shrink: 0; }
-.fuel-reminder { margin-top: 10px; padding: 8px 12px; background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); border-radius: 8px; font-size: 11px; color: var(--primary); font-weight: 500; }
-
-/* PROGRESSION CARD */
-.progression-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
-.prog-rows { display: flex; flex-direction: column; gap: 14px; }
-@media (min-width: 900px) {
-  body.desktop-view .progression-card .prog-rows { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-}
-.prog-row { padding: 10px 12px; background: var(--surface-2); border-radius: 10px; border: 1px solid var(--border); }
-.prog-header-line { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
-.prog-label-block { flex: 1; min-width: 0; }
-.prog-label { font-size: 12px; font-weight: 700; color: var(--text); }
-.prog-sub { font-size: 10px; color: var(--text-dim); margin-top: 1px; line-height: 1.3; }
-.prog-value-block { text-align: right; flex-shrink: 0; }
-.prog-value { font-size: 15px; font-weight: 800; color: var(--text); letter-spacing: -0.01em; line-height: 1.1; }
-.prog-arrow { font-size: 10px; font-weight: 700; display: inline-block; margin-top: 2px; padding: 2px 6px; border-radius: 4px; }
-.prog-arrow.up { background: var(--green-bg); color: var(--green); }
-.prog-arrow.down { background: var(--red-bg); color: var(--red); }
-.prog-arrow.flat { background: var(--surface-3); color: var(--text-dim); }
-.prog-spark { margin-top: 4px; }
-.week-days { display: flex; flex-direction: column; gap: 6px; }
-.week-day-row { display: flex; flex-direction: column; padding: 10px 12px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border); transition: all 0.15s; position: relative; }
-.week-day-row:hover { border-color: var(--border-strong); background: var(--surface-3); }
-.week-day-row.today { border-color: rgba(59,130,246,0.4); background: rgba(59,130,246,0.06); }
-.week-day-row.modified { border-color: rgba(249,115,22,0.35); }
-.week-day-row.rest-day { opacity: 0.6; }
-.week-day-label { font-size: 11px; font-weight: 700; color: var(--text-muted); min-width: 28px; text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0; }
-.week-day-row.today .week-day-label { color: var(--primary); }
-.week-day-session { flex: 1; min-width: 0; }
-.week-day-session-name { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.week-day-session-meta { font-size: 11px; color: var(--text-dim); margin-top: 1px; }
-.week-day-badge { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; padding: 3px 7px; border-radius: 4px; flex-shrink: 0; }
-.badge-hard { background: var(--red-bg); color: var(--red); }
-.badge-moderate { background: var(--orange-bg); color: var(--orange); }
-.badge-easy { background: var(--green-bg); color: var(--green); }
-.badge-rest { background: rgba(156,163,175,0.12); color: var(--text-dim); }
-.badge-custom { background: rgba(249,115,22,0.15); color: var(--orange); }
-.week-day-edit { font-size: 18px; color: var(--text-dim); flex-shrink: 0; line-height: 1; }
-.week-day-row.today .week-day-edit { color: var(--primary); }
-.today-pill { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--primary); background: var(--primary-bg); padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
-.modified-tag { font-size: 9px; font-weight: 700; color: var(--orange); opacity: 0.8; }
-.week-day-main { display: flex; align-items: center; gap: 10px; width: 100%; cursor: pointer; }
-.week-day-row.has-log { border-color: rgba(34,197,94,0.3); }
-.week-day-row.has-log-swap { border-color: rgba(249,115,22,0.3); }
-.week-day-row.missed { opacity: 0.5; }
-.day-log-entries { margin-top: 7px; padding-top: 7px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 3px; }
-.day-log-entry { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
-.day-log-entry.day-log-clickable { cursor: pointer; padding: 4px 6px; margin: -4px -6px; border-radius: 6px; transition: background 0.15s; pointer-events: auto; }
-.day-log-entry.day-log-clickable:hover { background: rgba(255,255,255,0.04); }
-.day-log-entry.day-log-clickable:active { background: rgba(255,255,255,0.08); }
-.day-log-icon { display: flex; align-items: center; color: var(--green); flex-shrink: 0; margin-top: 1px; }
-.day-log-icon svg { width: 12px; height: 12px; }
-.day-log-name { font-size: 11px; font-weight: 600; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 1; min-width: 0; max-width: 160px; }
-.day-log-stats { font-size: 10.5px; color: var(--text-dim); white-space: nowrap; flex-shrink: 0; }
-.day-log-check { margin-left: auto; font-size: 11px; font-weight: 700; flex-shrink: 0; padding-left: 4px; }
-.day-log-check.match { color: var(--green); }
-.day-log-check.swap { color: var(--orange); }
-.compliance-row { font-size: 10px; color: var(--text-dim); line-height: 1.5; margin-top: 3px; padding: 4px 0 0 20px; }
-.compliance-score { font-weight: 800; font-size: 11px; margin-right: 4px; }
-
-/* ACTIVITY DETAIL MODAL */
-.ad-modal { max-height: 90vh; }
-.ad-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
-.ad-type-icon { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: var(--surface-2); border-radius: 12px; color: var(--primary); flex-shrink: 0; }
-.ad-type-icon svg { width: 22px; height: 22px; }
-.ad-header-info { flex: 1; min-width: 0; }
-.ad-header-name { font-size: 16px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ad-header-meta { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
-.ad-match-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 4px 10px; border-radius: 6px; flex-shrink: 0; }
-.ad-match-badge.match { background: var(--green-bg); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
-.ad-match-badge.swap { background: var(--orange-bg); color: var(--orange); border: 1px solid rgba(249,115,22,0.2); }
-
-.ad-metrics { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 8px; margin-bottom: 16px; padding: 14px; background: var(--surface-2); border-radius: 12px; }
-.ad-metric { text-align: center; }
-.ad-metric-val { font-size: 20px; font-weight: 800; color: var(--text); line-height: 1.2; letter-spacing: -0.02em; }
-.ad-metric-label { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); margin-top: 2px; }
-
-.ad-section { margin-bottom: 14px; }
-.ad-section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 10px; }
-.ad-zone-bar { display: flex; height: 10px; border-radius: 5px; overflow: hidden; margin-bottom: 10px; gap: 1px; }
-.ad-zone-seg { min-width: 3px; transition: width 0.3s; }
-.ad-zone-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; }
-.ad-zone-item { display: flex; align-items: center; gap: 5px; font-size: 11px; }
-.ad-zone-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
-.ad-zone-label { color: var(--text-muted); font-weight: 500; }
-.ad-zone-val { color: var(--text-dim); font-size: 10px; }
-
-.ad-verdict { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--surface-2); border-radius: 10px; margin-bottom: 10px; }
-.ad-verdict-score { font-size: 28px; font-weight: 800; flex-shrink: 0; min-width: 50px; text-align: center; }
-.ad-verdict-text { flex: 1; min-width: 0; }
-.ad-verdict-goal { font-size: 13px; font-weight: 700; color: var(--text); }
-.ad-verdict-line { font-size: 12px; color: var(--text-dim); margin-top: 3px; }
-
-.ad-checks { display: flex; flex-direction: column; gap: 6px; }
-.ad-check-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px; background: var(--surface-2); border-radius: 8px; }
-.ad-check-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; width: 18px; text-align: center; }
-.ad-check-info { flex: 1; min-width: 0; }
-.ad-check-label { font-size: 12px; color: var(--text); }
-.ad-check-desc { font-size: 11px; color: var(--text-dim); margin-top: 2px; line-height: 1.4; }
-
-/* SWAP MODAL */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; display: flex; align-items: center; justify-content: center; animation: fadeIn 0.15s; padding: 20px; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-.modal { background: var(--surface); border-radius: 20px; padding: 20px; width: 100%; max-width: 480px; max-height: 85vh; overflow-y: auto; animation: scaleIn 0.2s cubic-bezier(0.34, 1.3, 0.64, 1); }
-@keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.modal-handle { width: 36px; height: 4px; background: var(--border-strong); border-radius: 2px; margin: 0 auto 18px; }
-.modal-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
-.modal-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 18px; }
-.modal-section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin: 14px 0 8px; }
-.swap-option { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-2); margin-bottom: 6px; cursor: pointer; transition: all 0.15s; }
-.swap-option:hover { border-color: var(--border-strong); background: var(--surface-3); }
-.swap-option.selected { border-color: var(--primary); background: var(--primary-bg); }
-.swap-option-icon { font-size: 22px; width: 36px; text-align: center; flex-shrink: 0; }
-.swap-option-info { flex: 1; min-width: 0; }
-.swap-option-name { font-size: 13px; font-weight: 600; color: var(--text); }
-.swap-option-meta { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
-.custom-input-wrap { display: flex; gap: 8px; margin-top: 8px; }
-.custom-input { flex: 1; padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 13px; font-family: inherit; }
-.custom-input:focus { outline: none; border-color: var(--primary); }
-.modal-actions { display: flex; gap: 8px; margin-top: 18px; }
-.modal-btn { flex: 1; padding: 13px; border-radius: 10px; font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; border: none; }
-.modal-btn-cancel { background: var(--surface-2); color: var(--text-muted); border: 1px solid var(--border); }
-.modal-btn-confirm { background: var(--text); color: var(--bg); }
-.modal-btn-confirm:disabled { opacity: 0.4; cursor: not-allowed; }
-
-/* PHONE MINI DATA CARDS */
-.phone-data-grid .card,
-.phone-data-grid .chart-card {
-  margin-bottom: 0;
-  padding: 12px;
-}
-.phone-data-grid .card-label,
-.phone-data-grid .card-title { font-size: 10px; }
-.phone-data-grid .zone-legend-row { font-size: 10px; }
-.phone-data-grid .zone-dot { width: 8px; height: 8px; }
-.phone-data-grid .card-meta { font-size: 9px; }
-
-/* FOOTER */
-.footer { text-align: center; font-size: 11px; color: var(--text-dim); margin-top: 24px; padding-bottom: 20px; }
-.footer a { color: var(--text-muted); text-decoration: none; margin: 0 4px; }
-
-/* ═══════════════════════════════════════════════════
-   DESKTOP LAYOUT GRID
-   ═══════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════
+   LAYOUT — DESKTOP
+   ════════════════════════════════════════════════════════ */
+body.desktop-view { padding: 24px 32px 32px; max-width: 1440px; margin: 0 auto; }
 body.desktop-view .desktop-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 16px;
+  display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px;
 }
-body.desktop-view .col-3 { grid-column: span 3; }
-body.desktop-view .col-4 { grid-column: span 4; }
-body.desktop-view .col-5 { grid-column: span 5; }
-body.desktop-view .col-6 { grid-column: span 6; }
-body.desktop-view .col-7 { grid-column: span 7; }
-body.desktop-view .col-8 { grid-column: span 8; }
-body.desktop-view .col-9 { grid-column: span 9; }
+body.desktop-view .col-3  { grid-column: span 3; }
+body.desktop-view .col-4  { grid-column: span 4; }
+body.desktop-view .col-5  { grid-column: span 5; }
+body.desktop-view .col-6  { grid-column: span 6; }
+body.desktop-view .col-7  { grid-column: span 7; }
+body.desktop-view .col-8  { grid-column: span 8; }
+body.desktop-view .col-9  { grid-column: span 9; }
 body.desktop-view .col-12 { grid-column: span 12; }
 body.desktop-view .feel-card,
 body.desktop-view .snapshot,
@@ -459,463 +89,515 @@ body.desktop-view .session-card,
 body.desktop-view .chart-card,
 body.desktop-view .card,
 body.desktop-view .alert,
+body.desktop-view .week-planner,
 body.desktop-view .activity { margin-bottom: 0; }
+body.desktop-view .date { font-size: 28px; }
 body.desktop-view .footer { margin-top: 32px; }
 body.desktop-view .coach-button-fixed { display: none; }
-
 @media (max-width: 900px) {
   body.desktop-view .desktop-grid { grid-template-columns: repeat(6, 1fr); }
-  body.desktop-view .col-3 { grid-column: span 6; }
-  body.desktop-view .col-4 { grid-column: span 6; }
-  body.desktop-view .col-5 { grid-column: span 6; }
-  body.desktop-view .col-6 { grid-column: span 6; }
-  body.desktop-view .col-7 { grid-column: span 6; }
-  body.desktop-view .col-8 { grid-column: span 6; }
-  body.desktop-view .col-9 { grid-column: span 6; }
+  body.desktop-view [class*="col-"] { grid-column: span 6; }
 }
 
+/* ════════════════════════════════════════════════════════
+   CARD BASE  (shared by all surface cards)
+   ════════════════════════════════════════════════════════ */
+.card, .snapshot, .feel-card, .session-card, .week-planner, .chart-card, .activity {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  margin-bottom: var(--gap-card);
+}
+.card { padding: 18px; }
+.card-label {
+  font-size: 10px; font-weight: 700; color: var(--text-dim);
+  text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 10px;
+}
+.card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+.card-title { font-size: 13px; font-weight: 700; color: var(--text); }
+.card-meta { font-size: 10.5px; color: var(--text-dim); font-weight: 600; }
 
-  /* ══════════════════════════════════════════
-     ENHANCED VISUAL DESIGN — Claude improvements
-     ══════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════
+   HEADER
+   ════════════════════════════════════════════════════════ */
+.header { margin-bottom: var(--gap-section); }
+.header-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.greeting { font-size: 11px; color: var(--primary); text-transform: uppercase; letter-spacing: 0.15em; font-weight: 700; margin-bottom: 1px; }
+.date { font-size: 27px; font-weight: 800; letter-spacing: -0.035em; line-height: 1.1; color: var(--text); }
+.subdate { font-size: 11px; color: var(--text-dim); margin-top: 5px; font-weight: 500; }
+.race-countdown {
+  display: inline-block; margin-top: 8px; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--orange); background: var(--orange-bg);
+  padding: 4px 10px; border-radius: 100px;
+  border: 1px solid rgba(249,115,22,0.25);
+}
 
-  /* === GLOBAL === */
-  body { background: #080C12; }
-  html { background: #080C12; }
+/* ════════════════════════════════════════════════════════
+   VIEW TOGGLE
+   ════════════════════════════════════════════════════════ */
+.view-toggle { display: inline-flex; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 3px; gap: 2px; }
+.view-toggle button {
+  background: transparent; border: none; color: var(--text-muted);
+  font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 5px;
+  cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 6px; transition: all 0.15s;
+}
+.view-toggle button svg { width: 14px; height: 14px; }
+.view-toggle button.active { background: rgba(79,142,247,0.15); color: var(--primary); border: 1px solid rgba(79,142,247,0.3); }
 
-  /* === HEADER === */
-  .greeting {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: #4F8EF7;
-    margin-bottom: 1px;
-  }
-  .date {
-    font-size: 27px;
-    font-weight: 800;
-    letter-spacing: -0.035em;
-    line-height: 1.1;
-    color: #F1F5F9;
-  }
-  .subdate {
-    font-size: 11px;
-    color: #475569;
-    margin-top: 5px;
-  }
+/* ════════════════════════════════════════════════════════
+   SETUP
+   ════════════════════════════════════════════════════════ */
+.setup { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); padding: 20px; margin-bottom: 16px; max-width: 480px; }
+.setup h3 { font-size: 16px; margin-bottom: 12px; font-weight: 600; }
+.setup label { font-size: 12px; color: var(--text-muted); display: block; margin: 12px 0 6px; font-weight: 500; }
+.setup input { width: 100%; padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; font-family: inherit; }
+.setup input:focus { outline: none; border-color: var(--primary); }
+.setup button { width: 100%; margin-top: 16px; padding: 12px; background: var(--text); color: var(--bg); border: none; border-radius: 8px; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; }
+.setup-note { font-size: 11px; color: var(--text-dim); margin-top: 10px; line-height: 1.5; }
 
-  /* === VIEW TOGGLE === */
-  .view-toggle button.active {
-    background: rgba(79, 142, 247, 0.15);
-    color: #4F8EF7;
-    border: 1px solid rgba(79, 142, 247, 0.3);
-  }
+/* ════════════════════════════════════════════════════════
+   SECTION LABELS  (between major blocks)
+   ════════════════════════════════════════════════════════ */
+.section-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--text-dim);
+  margin: var(--gap-section) 0 10px;
+}
 
-  /* === FEEL CARD === */
-  .feel-card {
-    background: #111827;
-    border: 1px solid #1E293B;
-    border-radius: 16px;
-  }
-  .feel-title {
-    font-size: 9.5px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    color: #475569;
-    text-transform: uppercase;
-  }
-  .feel-btn {
-    background: #1E293B;
-    border: 1px solid #263548;
-    border-radius: 12px;
-    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  .feel-btn:hover {
-    background: #243245;
-    border-color: #334155;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
-  }
-  .feel-btn.active {
-    background: #F1F5F9;
-    border-color: #F1F5F9;
-    color: #080C12;
-    transform: none;
-  }
-  .feel-btn-emoji { font-size: 24px; }
-  .feel-btn-label {
-    font-size: 9.5px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    margin-top: 5px;
-    color: #94A3B8;
-  }
+/* ════════════════════════════════════════════════════════
+   FEEL CHECK-IN
+   ════════════════════════════════════════════════════════ */
+.feel-card { padding: 14px 16px; margin-bottom: var(--gap-card); }
+.feel-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-dim); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+.feel-edit { font-size: 11px; color: var(--primary); font-weight: 600; cursor: pointer; }
+.feel-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.feel-btn {
+  background: var(--surface-2); border: 1px solid var(--border-strong);
+  border-radius: var(--r-inner); padding: 10px 4px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  cursor: pointer; transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  font-family: inherit; color: var(--text);
+}
+.feel-btn:active { transform: scale(0.96); }
+.feel-btn:hover { background: var(--surface-3); border-color: var(--border-strong); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.3); }
+.feel-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); transform: none; }
+.feel-btn-emoji { font-size: 22px; line-height: 1; }
+.feel-btn-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-top: 4px; }
+.feel-btn.active .feel-btn-label { color: var(--bg); }
+.feel-selected { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; }
+.feel-selected-info { display: flex; align-items: center; gap: 10px; }
+.feel-selected-emoji { font-size: 24px; }
+.feel-selected-text { display: flex; flex-direction: column; }
+.feel-selected-label { font-size: 13px; font-weight: 600; }
+.feel-selected-sub { font-size: 11px; color: var(--text-muted); }
 
-  /* === HEALTH SNAPSHOT === */
-  .snapshot {
-    background: #111827;
-    border: 1px solid #1E293B;
-    border-radius: 18px;
-  }
-  .snapshot-title {
-    font-size: 9.5px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: #475569;
-  }
-  .snapshot-time {
-    font-size: 11px;
-    color: #374151;
-  }
-  .readiness-block {
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.07), rgba(34, 197, 94, 0.02));
-    border: 1px solid rgba(34, 197, 94, 0.15);
-    border-radius: 14px;
-  }
-  .readiness-ring {
-    filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.4));
-  }
-  .readiness-label {
-    font-size: 9.5px;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    color: #4B5563;
-    text-transform: uppercase;
-  }
-  .readiness-status {
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    color: #34D399;
-  }
-  .readiness-msg {
-    font-size: 12px;
-    color: #6B7280;
-    margin-top: 2px;
-  }
-  .snap-metric-label {
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.13em;
-    text-transform: uppercase;
-    color: #475569;
-    margin-bottom: 3px;
-  }
-  .snap-metric-value {
-    font-size: 28px;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    line-height: 1.05;
-    color: #F1F5F9;
-  }
-  .snap-metric-unit {
-    font-size: 12px;
-    font-weight: 500;
-    color: #6B7280;
-  }
-  .snap-metric-meta {
-    font-size: 11px;
-    color: #6B7280;
-    margin-top: 2px;
-  }
-  .snap-metric-trend {
-    font-size: 10.5px;
-    font-weight: 600;
-    margin-top: 3px;
-  }
-  .trend-up { color: #34D399; }
-  .trend-down { color: #F87171; }
+/* ════════════════════════════════════════════════════════
+   HEALTH SNAPSHOT
+   ════════════════════════════════════════════════════════ */
+.snapshot { padding: 18px; margin-bottom: var(--gap-card); border-radius: 18px; }
+.snapshot-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.snapshot-title { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.14em; }
+.snapshot-time { font-size: 11px; color: var(--text-dim); }
 
-  /* === COACH'S READ === */
-  .ai-summary {
-    background: linear-gradient(135deg, rgba(79, 142, 247, 0.08) 0%, rgba(124, 92, 246, 0.05) 100%);
-    border: 1px solid rgba(79, 142, 247, 0.2);
-    border-radius: 18px;
-  }
-  .ai-summary-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-  .ai-summary-icon {
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    background: rgba(79, 142, 247, 0.15);
-    border: 1px solid rgba(79, 142, 247, 0.25);
-    font-size: 12px;
-    font-weight: 800;
-    color: #4F8EF7;
-  }
-  .ai-summary-title {
-    font-size: 9.5px;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: #4F8EF7;
-  }
-  .ai-summary-text {
-    font-size: 14px;
-    line-height: 1.7;
-    color: #CBD5E1;
-  }
-  .highlight-good {
-    color: #34D399;
-    font-weight: 700;
-  }
+.readiness-block {
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 16px; margin-bottom: 16px;
+  border-radius: var(--r-inner);
+  border: 1px solid rgba(34,197,94,0.15);
+}
+/* ring SVG is self-contained — no wrapper divs needed */
+.readiness-ring { display: block; flex-shrink: 0; }
+.readiness-info { flex: 1; min-width: 0; }
+.readiness-label { font-size: 9.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; }
+.readiness-status { font-size: 17px; font-weight: 800; margin: 2px 0; letter-spacing: -0.02em; }
+.readiness-msg { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
 
-  /* === SESSION CARD === */
-  .session-card {
-    background: #111827;
-    border: 1px solid #1E293B;
-    border-radius: 18px;
-  }
-  .session-tag {
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: #475569;
-    display: block;
-    margin-bottom: 8px;
-  }
-  .session-pill {
-    border-radius: 6px;
-    padding: 4px 10px;
-    font-size: 9.5px;
-    font-weight: 800;
-    letter-spacing: 0.1em;
-    margin-bottom: 12px;
-  }
-  .pill-moderate {
-    background: rgba(249, 115, 22, 0.12);
-    color: #FB923C;
-  }
-  .pill-hard {
-    background: rgba(239, 68, 68, 0.12);
-    color: #F87171;
-  }
-  .pill-easy {
-    background: rgba(34, 197, 94, 0.12);
-    color: #34D399;
-  }
-  .session-title {
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    color: #F1F5F9;
-    margin-bottom: 8px;
-  }
-  .session-detail {
-    font-size: 13px;
-    line-height: 1.65;
-    color: #94A3B8;
-  }
-  .session-section {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid rgba(30, 41, 59, 0.8);
-  }
-  .session-section-title {
-    font-size: 9.5px;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: #475569;
-    margin-bottom: 12px;
-  }
-  .exercise-check {
-    border: 1.5px solid #263548;
-    transition: border-color 0.2s;
-  }
-  .exercise:hover .exercise-check {
-    border-color: #4F8EF7;
-  }
-  .exercise-name {
-    font-size: 15px;
-    font-weight: 700;
-    color: #E2E8F0;
-  }
-  .prescription-key {
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: #475569;
-  }
-  .prescription-val {
-    font-size: 13px;
-    font-weight: 600;
-    color: #CBD5E1;
-  }
-  .exercise-note {
-    font-size: 12px;
-    color: #4B5563;
-    font-style: italic;
-    line-height: 1.55;
-  }
-  .protocol-block {
-    background: #0F1924;
-    border-radius: 10px;
-  }
-  .protocol-list {
-    font-size: 13px;
-    color: #94A3B8;
-    line-height: 2;
-  }
-  .protocol-title {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    color: #475569;
-    text-transform: uppercase;
-  }
+.snap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.snap-metric { cursor: pointer; }
+.snap-metric-top { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+.snap-metric-label { font-size: 9.5px; color: var(--text-dim); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
+.snap-metric-help { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; background: var(--surface-2); color: var(--text-dim); font-size: 9px; font-weight: 700; }
+.snap-metric-value { font-size: 24px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+.snap-metric-na { font-size: 24px; color: var(--text-dim); font-weight: 600; line-height: 1.1; }
+.snap-metric-unit { font-size: 12px; color: var(--text-dim); font-weight: 500; margin-left: 2px; }
+.snap-metric-trend { font-size: 10.5px; margin-top: 3px; font-weight: 600; }
+.snap-metric-meta { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+.trend-up { color: var(--green); }
+.trend-down { color: var(--red); }
+.trend-flat { color: var(--text-dim); }
+.help-drawer { display: none; grid-column: 1/-1; background: var(--surface-2); border-radius: 8px; padding: 10px 12px; font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-top: 4px; }
+.help-drawer.open { display: block; }
+.help-drawer strong { color: var(--text); font-weight: 600; }
 
-  /* === TRENDS & CHARTS === */
-  .section-label {
-    font-size: 9.5px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: #475569;
-  }
-  .chart-card {
-    background: #111827;
-    border: 1px solid #1E293B;
-    border-radius: 14px;
-  }
-  .card-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: #E2E8F0;
-  }
-  .card-meta {
-    font-size: 10.5px;
-    color: #475569;
-    font-weight: 600;
-  }
+/* ════════════════════════════════════════════════════════
+   COACH'S READ
+   ════════════════════════════════════════════════════════ */
+.ai-summary {
+  background: var(--surface);
+  border: 1px solid rgba(79,142,247,0.2);
+  border-radius: 18px;
+  margin-bottom: var(--gap-section);
+  overflow: hidden;
+}
+.ai-summary-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 13px 16px 12px; border-bottom: 1px solid var(--border);
+}
+.ai-summary-header-left { display: flex; align-items: center; gap: 8px; }
+.ai-summary-icon {
+  width: 24px; height: 24px; background: rgba(79,142,247,0.15);
+  border: 1px solid rgba(79,142,247,0.3); color: var(--primary);
+  border-radius: 7px; display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; flex-shrink: 0;
+}
+.ai-summary-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--primary); }
 
-  /* === ACTIVITY LIST === */
-  .activity-icon {
-    background: #1E293B;
-    border: 1px solid #263548;
-    border-radius: 10px;
-  }
-  .activity-name {
-    font-size: 13.5px;
-    font-weight: 600;
-    color: #E2E8F0;
-  }
-  .activity-stats {
-    font-size: 11.5px;
-    color: #64748B;
-  }
-  .activity-date {
-    font-size: 10px;
-    color: #374151;
-  }
+/* ── Shared gauge/ring tokens ── */
+/* Both the Health Snapshot ring and Coach's Read arcs use SVG-native text
+   so positioning is always pixel-perfect regardless of font rendering.    */
 
-  /* === AI COACH BUTTON === */
-  .coach-button-fixed button {
-    background: linear-gradient(135deg, #4F8EF7 0%, #7C5CF6 100%);
-    border: none;
-    border-radius: 14px;
-    padding: 15px 24px;
-    font-size: 14px;
-    font-weight: 700;
-    color: white;
-    box-shadow: 0 4px 20px rgba(79, 142, 247, 0.35), 0 1px 0 rgba(255,255,255,0.1) inset;
-    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-    letter-spacing: 0.01em;
-  }
-  .coach-button-fixed button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 28px rgba(79, 142, 247, 0.5);
-  }
-  .coach-button-fixed button:active {
-    transform: scale(0.97);
-  }
+/* Gauge row (Coach's Read) */
+.cr-gauge-row { display: flex; border-bottom: 1px solid var(--border); }
+.cr-gauge-cell {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: flex-start; padding: 14px 4px 12px; min-width: 0;
+}
+.cr-gauge-cell + .cr-gauge-cell { border-left: 1px solid var(--border); }
+.cr-gauge-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin-bottom: 6px; white-space: nowrap; }
+/* gauge SVGs are self-contained — number lives inside as <text> */
+.cr-gauge-svg  { display: block; }
+.cr-gauge-status { font-size: 10px; font-weight: 700; margin-top: 5px; text-align: center; white-space: nowrap; }
 
-  /* === FOOTER === */
-  .footer {
-    font-size: 11px;
-    color: #374151;
-  }
-  .footer a {
-    color: #4F8EF7;
-    opacity: 0.7;
-    text-decoration: none;
-  }
+/* Gauge entrance animation */
+@keyframes arcDraw {
+  from { stroke-dashoffset: var(--arc-len); }
+  to   { stroke-dashoffset: 0; }
+}
+.cr-arc-animated {
+  stroke-dasharray: var(--arc-len);
+  stroke-dashoffset: var(--arc-len);
+  animation: arcDraw 0.7s cubic-bezier(0.4,0,0.2,1) forwards;
+  animation-delay: var(--arc-delay, 0s);
+}
 
-  /* === WEEK PLANNER ENHANCED === */
-  .week-planner {
-    background: #111827;
-    border: 1px solid #1E293B;
-    border-radius: 18px;
-  }
-  .week-day-row {
-    background: #0F1924;
-    border: 1px solid #1E293B;
-    border-radius: 12px;
-    transition: all 0.2s;
-  }
-  .week-day-row:hover {
-    background: #1a2535;
-    border-color: #263548;
-  }
-  .week-day-row.today {
-    background: rgba(79, 142, 247, 0.08);
-    border-color: rgba(79, 142, 247, 0.35);
-  }
-  .week-day-row.modified {
-    border-color: rgba(249, 115, 22, 0.4);
-    background: rgba(249, 115, 22, 0.05);
-  }
-  .week-day-label {
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.1em;
-    color: #475569;
-    min-width: 30px;
-  }
-  .week-day-row.today .week-day-label { color: #4F8EF7; }
-  .week-day-session-name {
-    font-size: 13px;
-    font-weight: 700;
-    color: #E2E8F0;
-  }
-  .week-day-session-meta {
-    font-size: 10.5px;
-    color: #475569;
-  }
-  /* === MODAL ENHANCED === */
-  .modal {
-    background: #111827;
-    border-top: 1px solid #1E293B;
-  }
-  .modal-title { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; color: #F1F5F9; }
-  .modal-sub { color: #475569; }
-  .swap-option {
-    background: #0F1924;
-    border: 1px solid #1E293B;
-    border-radius: 12px;
-  }
-  .swap-option:hover { background: #1a2535; border-color: #263548; }
-  .swap-option.selected { border-color: #4F8EF7; background: rgba(79, 142, 247, 0.1); }
-  .swap-option-name { font-size: 13.5px; font-weight: 700; color: #E2E8F0; }
-  .swap-option-meta { color: #475569; }
-  .custom-input {
-    background: #0F1924;
-    border: 1px solid #1E293B;
-    color: #E2E8F0;
-    border-radius: 10px;
-  }
-  .custom-input:focus { border-color: #4F8EF7; }
-  .modal-btn-cancel { background: #1E293B; border: 1px solid #263548; color: #94A3B8; }
-  .modal-btn-confirm { background: #F1F5F9; color: #080C12; }
+/* Narrative */
+.cr-narrative {
+  padding: 14px 16px 12px; font-size: 13.5px; line-height: 1.65;
+  color: var(--text-muted); border-bottom: 1px solid var(--border);
+}
+.cr-narrative strong { color: var(--text); font-weight: 600; }
+.cr-narrative .highlight-good { color: var(--green); font-weight: 600; }
+.cr-narrative .highlight-warn { color: var(--orange); font-weight: 600; }
+.cr-narrative .highlight-bad  { color: var(--red);    font-weight: 600; }
+
+/* Signal rows */
+.cr-signals { padding: 4px 0 6px; }
+.cr-signal { display: flex; align-items: flex-start; gap: 10px; padding: 8px 16px; }
+.cr-signal-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.cr-signal-dot.green  { background: var(--green);  box-shadow: 0 0 6px rgba(52,211,153,0.5); }
+.cr-signal-dot.yellow { background: var(--yellow); box-shadow: 0 0 6px rgba(251,191,36,0.5); }
+.cr-signal-dot.orange { background: var(--orange); box-shadow: 0 0 6px rgba(251,146,60,0.5); }
+.cr-signal-dot.red    { background: var(--red);    box-shadow: 0 0 6px rgba(248,113,113,0.5); }
+.cr-signal-dot.blue   { background: var(--primary); }
+.cr-signal-dot.gray   { background: var(--text-dim); }
+.cr-signal-content { flex: 1; min-width: 0; }
+.cr-signal-title { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.3; }
+.cr-signal-sub { font-size: 11.5px; color: var(--text-dim); margin-top: 2px; line-height: 1.35; }
+.cr-signal-value { font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; flex-shrink: 0; padding-top: 3px; align-self: flex-start; }
+.cr-spark-chip { display: flex; align-items: center; flex-shrink: 0; align-self: center; opacity: 0.75; }
+.cr-spark-chip svg { display: block; }
+
+/* compat aliases */
+.ai-summary-text strong { color: var(--text); font-weight: 600; }
+.ai-summary-text .highlight-good { color: var(--green); font-weight: 600; }
+.ai-summary-text .highlight-warn { color: var(--orange); font-weight: 600; }
+.ai-summary-text .highlight-bad  { color: var(--red);    font-weight: 600; }
+
+/* ════════════════════════════════════════════════════════
+   SESSION CARD  + Progressive Disclosure
+   ════════════════════════════════════════════════════════ */
+.session-card { padding: 20px; margin-bottom: var(--gap-card); border-radius: 18px; border-color: var(--border-strong); }
+.session-override-banner { background: var(--primary-bg); border: 1px solid rgba(79,142,247,0.25); border-radius: 8px; padding: 8px 10px; margin-bottom: 12px; font-size: 11px; color: var(--primary); font-weight: 600; }
+.session-tag { font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 8px; }
+.session-pill { display: inline-block; font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; padding: 4px 10px; border-radius: 6px; margin-bottom: 12px; }
+.pill-hard     { background: var(--red-bg);    color: var(--red); }
+.pill-moderate { background: var(--orange-bg); color: var(--orange); }
+.pill-easy     { background: var(--green-bg);  color: var(--green); }
+.pill-rest     { background: rgba(148,163,184,0.12); color: var(--text-muted); }
+.session-title { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; color: var(--text); margin-bottom: 8px; line-height: 1.2; }
+.session-detail { font-size: 13px; line-height: 1.65; color: var(--text-muted); margin-bottom: 4px; }
+
+/* Collapsible section */
+.session-section { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border); }
+.session-section-title { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 12px; }
+.exercise { display: flex; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+.exercise:last-child { border-bottom: none; }
+.exercise-check {
+  width: 22px; height: 22px; border: 1.5px solid var(--border-strong);
+  border-radius: 50%; flex-shrink: 0; margin-top: 1px; cursor: pointer;
+  transition: all 0.15s; display: flex; align-items: center; justify-content: center;
+}
+.exercise:hover .exercise-check { border-color: var(--primary); }
+.exercise-check.checked { background: var(--green); border-color: var(--green); }
+.exercise-check.checked::after { content: "✓"; color: #000; font-size: 13px; font-weight: 700; }
+.exercise-info { flex: 1; min-width: 0; }
+.exercise-name { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 3px; line-height: 1.3; }
+.exercise.checked .exercise-name { color: var(--text-dim); text-decoration: line-through; text-decoration-color: var(--border-strong); }
+.exercise-prescription { font-size: 12.5px; color: var(--text-muted); display: flex; gap: 10px; flex-wrap: wrap; }
+.prescription-item { display: inline-flex; align-items: center; gap: 3px; }
+.prescription-key { color: var(--text-dim); font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
+.prescription-val { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+.exercise-note { font-size: 11.5px; color: var(--text-dim); margin-top: 5px; font-style: italic; line-height: 1.45; }
+
+/* Collapsible protocol blocks (warmup / cooldown / fueling) */
+.proto-toggle {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px 14px; cursor: pointer; user-select: none;
+  border-radius: var(--r-inner);
+  background: var(--surface-2); border: 1px solid var(--border);
+  margin: 8px 0 0; transition: background 0.15s;
+}
+.proto-toggle:hover { background: var(--surface-3); }
+.proto-toggle-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--text-dim);
+  display: flex; align-items: center; gap: 6px;
+}
+.proto-toggle-count {
+  font-size: 10px; font-weight: 700;
+  background: var(--surface-3); color: var(--text-dim);
+  padding: 2px 7px; border-radius: 20px;
+}
+.proto-toggle-chevron {
+  color: var(--text-dim); transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+  flex-shrink: 0;
+}
+.proto-toggle.open .proto-toggle-chevron { transform: rotate(180deg); }
+.proto-body {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.25s;
+  opacity: 0;
+}
+.proto-body.open { max-height: 600px; opacity: 1; }
+.proto-body-inner {
+  padding: 10px 14px 12px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-top: none; border-radius: 0 0 var(--r-inner) var(--r-inner);
+  font-size: 13px; color: var(--text-muted); line-height: 1.8;
+}
+.proto-body-inner span { display: block; }
+
+/* ════════════════════════════════════════════════════════
+   CHARTS
+   ════════════════════════════════════════════════════════ */
+.chart-card { padding: 14px; margin-bottom: 8px; }
+.chart-svg { width: 100%; height: auto; display: block; }
+
+/* ════════════════════════════════════════════════════════
+   ACTIVITIES
+   ════════════════════════════════════════════════════════ */
+.activity { padding: 12px; margin-bottom: 6px; display: flex; gap: 12px; align-items: center; }
+.activity-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border-strong); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; }
+.activity-info { flex: 1; min-width: 0; }
+.activity-name { font-size: 13.5px; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
+.activity-stats { font-size: 11.5px; color: var(--text-dim); display: flex; gap: 10px; flex-wrap: wrap; }
+.activity-date { font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+.activity-spark { flex-shrink: 0; width: 60px; height: 24px; }
+
+/* ════════════════════════════════════════════════════════
+   COACH BUTTONS
+   ════════════════════════════════════════════════════════ */
+.coach-button-fixed {
+  position: fixed; bottom: max(16px, env(safe-area-inset-bottom));
+  left: 16px; right: 16px; max-width: 448px; margin: 0 auto;
+  background: linear-gradient(135deg, var(--primary) 0%, #7C5CF6 100%);
+  color: #fff; border: none; border-radius: 14px; padding: 16px;
+  font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer;
+  box-shadow: 0 4px 20px rgba(79,142,247,0.35);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; z-index: 100;
+  transition: all 0.2s;
+}
+.coach-button-fixed:active { transform: scale(0.98); }
+.coach-button-fixed.success { background: var(--green); color: #000; }
+.coach-button-inline {
+  background: var(--surface-2); color: var(--text-muted); border: 1px solid var(--border-strong);
+  border-radius: 10px; padding: 8px 14px; font-size: 12px; font-weight: 700;
+  font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: all 0.15s;
+}
+.coach-button-inline:hover { background: var(--surface-3); color: var(--text); border-color: var(--primary); }
+.coach-button-inline.success { background: var(--green-bg); color: var(--green); border-color: rgba(52,211,153,0.3); }
+
+/* ════════════════════════════════════════════════════════
+   ALERTS
+   ════════════════════════════════════════════════════════ */
+.alert { background: var(--orange-bg); border: 1px solid rgba(251,146,60,0.25); border-radius: var(--r-card); padding: 11px 13px; margin-bottom: var(--gap-card); font-size: 13px; color: var(--orange); font-weight: 600; }
+.alert-poor { background: var(--red-bg); border-color: rgba(248,113,113,0.25); color: var(--red); }
+
+/* ════════════════════════════════════════════════════════
+   LOADING / ERROR
+   ════════════════════════════════════════════════════════ */
+.loading { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 14px; }
+.spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--text); border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 8px; vertical-align: middle; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.error { background: var(--red-bg); border: 1px solid rgba(248,113,113,0.25); border-radius: var(--r-card); padding: 14px; font-size: 13px; color: var(--red); margin-bottom: var(--gap-card); line-height: 1.5; }
+
+/* ════════════════════════════════════════════════════════
+   INSIGHTS PANEL  (desktop trends section)
+   ════════════════════════════════════════════════════════ */
+.insight-row { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+.insight-row:last-child { border-bottom: none; }
+.insight-icon { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; }
+.insight-text { font-size: 13px; line-height: 1.45; }
+.insight-text strong { font-weight: 600; }
+
+/* ════════════════════════════════════════════════════════
+   ZONE DONUT
+   ════════════════════════════════════════════════════════ */
+.zone-donut-wrap { display: flex; gap: 16px; align-items: center; }
+.zone-legend { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.zone-legend-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.zone-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+.zone-name { font-weight: 600; min-width: 22px; }
+.zone-pct { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+/* ════════════════════════════════════════════════════════
+   WEEK PLANNER
+   ════════════════════════════════════════════════════════ */
+.week-planner { padding: 16px; margin-bottom: var(--gap-card); border-radius: 18px; }
+.week-planner-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.week-planner-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-dim); }
+.week-planner-reset { font-size: 11px; color: var(--primary); font-weight: 600; cursor: pointer; background: none; border: none; font-family: inherit; padding: 0; }
+.week-days { display: flex; flex-direction: column; gap: 6px; }
+.week-day-row { display: flex; flex-direction: column; padding: 10px 12px; border-radius: var(--r-inner); background: var(--surface-2); border: 1px solid var(--border); transition: all 0.15s; position: relative; }
+.week-day-row:hover { border-color: var(--border-strong); background: var(--surface-3); }
+.week-day-row.today { border-color: rgba(79,142,247,0.35); background: rgba(79,142,247,0.06); }
+.week-day-row.modified { border-color: rgba(251,146,60,0.35); background: rgba(249,115,22,0.04); }
+.week-day-row.rest-day { opacity: 0.6; }
+.week-day-row.has-log { border-color: rgba(52,211,153,0.25); }
+.week-day-row.missed { opacity: 0.5; }
+.week-day-label { font-size: 10px; font-weight: 800; color: var(--text-dim); min-width: 30px; text-transform: uppercase; letter-spacing: 0.08em; flex-shrink: 0; }
+.week-day-row.today .week-day-label { color: var(--primary); }
+.week-day-session { flex: 1; min-width: 0; }
+.week-day-session-name { font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.week-day-session-meta { font-size: 10.5px; color: var(--text-dim); margin-top: 1px; }
+.week-day-badge { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; padding: 3px 7px; border-radius: 4px; flex-shrink: 0; }
+.badge-hard     { background: var(--red-bg);    color: var(--red); }
+.badge-moderate { background: var(--orange-bg); color: var(--orange); }
+.badge-easy     { background: var(--green-bg);  color: var(--green); }
+.badge-rest     { background: rgba(148,163,184,0.1); color: var(--text-dim); }
+.badge-custom   { background: var(--orange-bg); color: var(--orange); }
+.week-day-edit { font-size: 18px; color: var(--text-dim); flex-shrink: 0; line-height: 1; }
+.week-day-row.today .week-day-edit { color: var(--primary); }
+.today-pill { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--primary); background: var(--primary-bg); padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
+.modified-tag { font-size: 9px; font-weight: 700; color: var(--orange); opacity: 0.8; }
+.week-day-main { display: flex; align-items: center; gap: 10px; width: 100%; cursor: pointer; }
+.day-log-entries { margin-top: 7px; padding-top: 7px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 3px; pointer-events: none; }
+.day-log-entry { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+.day-log-icon { display: flex; align-items: center; color: var(--green); flex-shrink: 0; margin-top: 1px; }
+.day-log-icon svg { width: 12px; height: 12px; }
+.day-log-name { font-size: 11px; font-weight: 600; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 1; min-width: 0; max-width: 160px; }
+.day-log-stats { font-size: 10.5px; color: var(--text-dim); white-space: nowrap; flex-shrink: 0; }
+.day-log-check { margin-left: auto; color: var(--green); font-size: 11px; font-weight: 700; flex-shrink: 0; padding-left: 4px; }
+
+/* ════════════════════════════════════════════════════════
+   SWAP MODAL
+   ════════════════════════════════════════════════════════ */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; display: flex; align-items: flex-end; justify-content: center; animation: fadeIn 0.15s; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal { background: var(--surface); border-top: 1px solid var(--border); border-radius: 20px 20px 0 0; padding: 20px; width: 100%; max-width: 480px; max-height: 85vh; overflow-y: auto; animation: slideUp 0.2s cubic-bezier(0.34,1.3,0.64,1); }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-handle { width: 36px; height: 4px; background: var(--border-strong); border-radius: 2px; margin: 0 auto 18px; }
+.modal-title { font-size: 18px; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.01em; color: var(--text); }
+.modal-sub { font-size: 12px; color: var(--text-dim); margin-bottom: 18px; }
+.modal-section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin: 14px 0 8px; }
+.swap-option { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: var(--r-inner); border: 1px solid var(--border); background: var(--surface-2); margin-bottom: 6px; cursor: pointer; transition: all 0.15s; }
+.swap-option:hover { border-color: var(--border-strong); background: var(--surface-3); }
+.swap-option.selected { border-color: var(--primary); background: var(--primary-bg); }
+.swap-option-icon { font-size: 22px; width: 36px; text-align: center; flex-shrink: 0; }
+.swap-option-info { flex: 1; min-width: 0; }
+.swap-option-name { font-size: 13.5px; font-weight: 700; color: var(--text); }
+.swap-option-meta { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+.custom-input-wrap { display: flex; gap: 8px; margin-top: 8px; }
+.custom-input { flex: 1; padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-inner); color: var(--text); font-size: 13px; font-family: inherit; }
+.custom-input:focus { outline: none; border-color: var(--primary); }
+.modal-actions { display: flex; gap: 8px; margin-top: 18px; }
+.modal-btn { flex: 1; padding: 13px; border-radius: var(--r-inner); font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; border: none; }
+.modal-btn-cancel { background: var(--surface-2); color: var(--text-muted); border: 1px solid var(--border); }
+.modal-btn-confirm { background: var(--text); color: var(--bg); }
+.modal-btn-confirm:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ════════════════════════════════════════════════════════
+   PHONE MINI DATA GRID
+   ════════════════════════════════════════════════════════ */
+.phone-data-grid .card, .phone-data-grid .chart-card { margin-bottom: 0; padding: 12px; }
+.phone-data-grid .card-label, .phone-data-grid .card-title { font-size: 10px; }
+.phone-data-grid .zone-legend-row { font-size: 10px; }
+.phone-data-grid .zone-dot { width: 8px; height: 8px; }
+.phone-data-grid .card-meta { font-size: 9px; }
+
+/* ════════════════════════════════════════════════════════
+   FOOTER
+   ════════════════════════════════════════════════════════ */
+.footer { text-align: center; font-size: 11px; color: var(--text-dim); margin-top: 24px; padding-bottom: 20px; }
+.footer a { color: var(--primary); opacity: 0.7; text-decoration: none; margin: 0 4px; }
+
+/* ════════════════════════════════════════════════════════
+   RECOVERY PANEL
+   ════════════════════════════════════════════════════════ */
+.rec-section-label {
+  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em;
+  color: var(--text-dim); margin: 16px 0 8px; padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.rec-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.rec-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+.rec-tile {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--r-inner); padding: 11px 12px; cursor: pointer;
+  transition: border-color 0.15s;
+}
+.rec-tile:hover { border-color: var(--border-strong); }
+.rec-tile-empty { opacity: 0.45; cursor: default; }
+.rec-tile-empty:hover { border-color: var(--border); }
+.rec-tile-label {
+  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--text-dim); margin-bottom: 5px; display: flex; align-items: center; gap: 4px;
+}
+.rec-tile-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 6px; }
+.rec-tile-value { font-size: 22px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+.rec-tile-na { font-size: 18px; color: var(--text-dim); font-weight: 600; }
+.rec-tile-unit { font-size: 11px; font-weight: 500; color: var(--text-dim); margin-left: 1px; }
+.rec-tile-meta { font-size: 10.5px; color: var(--text-dim); margin-top: 4px; line-height: 1.35; }
+.rec-tile-sub { font-size: 10.5px; margin-top: 3px; }
+.rec-tile-spark { flex-shrink: 0; opacity: 0.85; }
+
+/* Sleep row — wider layout */
+.rec-sleep-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+.rec-sleep-main, .rec-sleep-spark {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--r-inner); padding: 11px 12px;
+}
+
+/* Score/stress bar */
+.rec-bar-track {
+  height: 3px; background: var(--border); border-radius: 2px;
+  margin-top: 6px; overflow: hidden;
+}
+.rec-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s; }
+
+/* Subjective alignment block */
+.rec-align-block {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--r-inner); padding: 12px 14px; cursor: pointer;
+}
+.rec-align-status { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+.rec-align-note { font-size: 12px; color: var(--text-dim); line-height: 1.4; }
 
 </style>
 </head>
@@ -952,12 +634,12 @@ const FEEL_OPTIONS = [
 ];
 
 const SESSIONS = {
-  "Monday": { title: "Lower A — Heavy Bilateral", intensity: "hard", summary: "Low volume, high quality. The two big lifts get all your focus. Bulgarian split squats and calf raises directly fix your Hill Score of 30 and prevent Gibraltar cramps.", duration: "60-75 min", warmup: ["Hip 90/90s — 1 min each side", "Goblet squat hold — 30 sec x 2", "Ankle CARs — 10 each", "Glute bridges — 15 reps", "Empty bar squats — 10 reps"], exercises: [ { name: "Trap Bar Deadlift", sets: 4, reps: "5", weight: "Build to top set", rest: "3 min", notes: "Reset each rep. Brace HARD. Top set leaves 1-2 in tank." }, { name: "Barbell Back Squat", sets: 3, reps: "6", weight: "75-80% 1RM", rest: "2-3 min", notes: "Below parallel. Vertical torso. Drive knees out." }, { name: "Bulgarian Split Squat", sets: 3, reps: "8 each", weight: "DBs or barbell", rest: "90 sec", notes: "THE climb exercise. Rear foot elevated. Deep stretch at bottom. Directly builds Gibraltar legs." }, { name: "Romanian Deadlift", sets: 3, reps: "8", weight: "Moderate-heavy", rest: "90 sec", notes: "Feel hamstrings load. Bar stays close to legs." }, { name: "Standing Calf Raise", sets: 3, reps: "15", weight: "Heavy DB or barbell", rest: "60 sec", notes: "Full ROM — 3 sec negative. Calves cramp first on climbs. Build them." }, { name: "Hanging Knee Raise", sets: 3, reps: "10", weight: "Bodyweight", rest: "60 sec", notes: "Slow controlled. Or sub Ab Wheel x10." } ], cooldown: ["Couch stretch — 90 sec each side", "Pigeon pose — 90 sec each side", "Foam roll quads + IT band — 2 min"], fueling: "Pre: oats + banana + protein shake. Post: protein + carbs within 60 min." },
+  "Monday": { title: "Lower A — Heavy Bilateral", intensity: "hard", summary: "Low volume, high quality. The two big lifts get all your focus. Builds the legs to climb Gibraltar without cramping.", duration: "60-75 min", warmup: ["Hip 90/90s — 1 min each side", "Goblet squat hold — 30 sec x 2", "Ankle CARs — 10 each", "Glute bridges — 15 reps", "Empty bar squats — 10 reps"], exercises: [ { name: "Trap Bar Deadlift", sets: 4, reps: "5", weight: "Build to top set", rest: "3 min", notes: "Reset each rep. Brace HARD. Top set leaves 1-2 in tank." }, { name: "Barbell Back Squat", sets: 3, reps: "6", weight: "75-80% 1RM", rest: "2-3 min", notes: "Below parallel. Vertical torso. Drive knees out." }, { name: "Romanian Deadlift", sets: 3, reps: "8", weight: "Moderate-heavy", rest: "90 sec", notes: "Feel hamstrings load. Bar stays close to legs." }, { name: "Hanging Knee Raise", sets: 3, reps: "10", weight: "Bodyweight", rest: "60 sec", notes: "Slow controlled. Or sub Ab Wheel x10." } ], cooldown: ["Couch stretch — 90 sec each side", "Pigeon pose — 90 sec each side", "Foam roll quads + IT band — 2 min"], fueling: "Pre: oats + banana + protein shake. Post: protein + carbs within 60 min." },
   "Tuesday": { title: "Upper A — Push & Paddle", intensity: "hard", summary: "Incline-first chest day with paddle-specific finishers. Upper chest priority for fullness, with shoulder stability work for the 7-mile Mash paddle.", duration: "55-70 min", warmup: ["Band pull-aparts — 15 reps x 2", "Shoulder CARs — 10 each direction", "Wall slides — 10 reps", "Light DB press — 12 reps x 2"], exercises: [ { name: "Incline Barbell Press", sets: 4, reps: "8", weight: "70-75% 1RM", rest: "2-3 min", notes: "Bench at 30-45°. Bar to upper chest. Pause briefly." }, { name: "Incline Dumbbell Press", sets: 3, reps: "10-12", weight: "Moderate", rest: "90 sec", notes: "Slight squeeze at top. DBs nearly touching." }, { name: "Cable Incline Fly", sets: 3, reps: "12-15", weight: "Light-moderate", rest: "60 sec", notes: "Low-to-high arc. Squeeze upper chest at top." }, { name: "Standing Overhead Press", sets: 3, reps: "10", weight: "Moderate", rest: "90 sec", notes: "Tight core. No lower back arch." }, { name: "Cable Tricep Pushdown", sets: 3, reps: "12-15", weight: "Moderate", rest: "60 sec", notes: "Elbows pinned. Full extension." }, { name: "Prone Plank to Extend", sets: 3, reps: "10", weight: "Bodyweight", rest: "60 sec", notes: "Paddle simulation. Stretch shoulders forward." }, { name: "Cable Pulldown in Hip Hinge", sets: 3, reps: "12-15", weight: "Light", rest: "60 sec", notes: "Mimic paddle stroke. Hinge at hips." }, { name: "Cable Curl + DB Curl", sets: 2, reps: "15", weight: "Light pump", rest: "45 sec", notes: "Bicep finisher — burn out for size." } ], cooldown: ["Doorway pec stretch — 60 sec each side", "Cross-body shoulder stretch — 30 sec each", "Foam roll thoracic spine — 90 sec"], fueling: "Carbs around training. Hydrate aggressively given heavy sweat rate." },
   "Wednesday": { title: "Zone 2 + Full Mobility", intensity: "easy", summary: "The most underrated session of the week. Builds aerobic base and fixes mobility deficits spiking your vertical ratio on climbs. NEVER skip this.", duration: "50-60 min", warmup: ["5 min easy warm-up before main set"], exercises: [ { name: "Zone 2 Cardio (bike, swim, or easy run)", sets: 1, reps: "30-40 min", weight: "140-150bpm cap", rest: "—", notes: "Conversational pace. Nasal breathing. Builds the engine for the Mash." } ], cooldown: ["Foam roll thoracic spine — 2 min", "Foam roll quads — 2 min each leg", "Foam roll hamstrings — 2 min each leg", "Hip flexor stretch — 2 min each side", "Pigeon pose — 2 min each side", "Hamstring band floss — 1 min each side", "Doorway pec stretch — 1 min each side", "Ankle CARs + calf stretch — 2 min total"], fueling: "Light meal beforehand. Plenty of water + electrolytes." },
-  "Thursday": { title: "Trail Run", intensity: "moderate", summary: "The session that wins or loses the Mash. HR cap is non-negotiable — discipline now means you don't blow up on Gibraltar in October.", duration: "45-90 min", warmup: ["Walking lunges — 10 each side", "Leg swings — 10 each direction", "Bodyweight squats — 10 reps", "Glute bridges — 10 reps", "5 min easy walk into slow jog"], exercises: [ { name: "Nordic Curl Negatives", sets: 3, reps: "5", weight: "Bodyweight", rest: "60 sec", notes: "Progressive — these build hamstring resilience for steep descents. Control the eccentric." }, { name: "Banded Hip Flexor March", sets: 2, reps: "12 each", weight: "Light band", rest: "45 sec", notes: "Strengthens hip flexors for steep climbs — stretching alone doesn't fix the deficit." }, { name: "Trail Run", sets: 1, reps: "Build to 90 min", weight: "140-150 bpm cap", rest: "—", notes: "Use HR monitor strictly. Walk hills if needed to stay under cap. Metronome at 170 spm — non-negotiable on climbs." } ], cooldown: ["Walk 5 min cool-down", "Calf stretch — 60 sec each", "Couch stretch — 90 sec each", "Pigeon pose — 90 sec each"], fueling: "If running >60 min: 30-60g carbs/hr + electrolytes. PRACTICE this — don't wait for race day." },
+  "Thursday": { title: "Trail Run", intensity: "moderate", summary: "The session that wins or loses the Mash. HR cap is non-negotiable — discipline now means you don't blow up on Gibraltar in October.", duration: "45-90 min", warmup: ["Bulgarian Split Squats — 8 reps each side x 2 (BW)", "Nordic curl negatives — 5 reps x 2", "Walking lunges — 10 each side", "Leg swings — 10 each direction", "5 min easy walk into slow jog"], exercises: [ { name: "Trail Run", sets: 1, reps: "Build to 90 min", weight: "140-150 bpm cap", rest: "—", notes: "Use HR monitor strictly. Walk hills if needed to stay under cap. Metronome at 170 spm — non-negotiable on climbs." } ], cooldown: ["Walk 5 min cool-down", "Calf stretch — 60 sec each", "Couch stretch — 90 sec each", "Pigeon pose — 90 sec each"], fueling: "If running >60 min: 30-60g carbs/hr + electrolytes. PRACTICE this — don't wait for race day." },
   "Friday": { title: "Upper B — Pull & Biceps", intensity: "hard", summary: "Pull-up day. Posture, paddle power, and bicep size all built here. Highest direct bicep volume of the week — make it count.", duration: "55-70 min", warmup: ["Band pull-aparts — 15 x 2", "Dead hang — 20 sec x 2", "Scap pull-ups — 8 reps x 2", "Light DB row — 10 reps x 2"], exercises: [ { name: "Weighted Pull-Ups", sets: 4, reps: "6-8", weight: "Add weight as needed", rest: "2-3 min", notes: "Most important upper body lift for the Mash. Full ROM. Chin clears bar." }, { name: "Barbell or DB Row", sets: 4, reps: "10", weight: "Moderate-heavy", rest: "90 sec", notes: "Hinge to ~45°. Pull to lower chest/upper abs. Squeeze." }, { name: "Cable Face Pulls", sets: 3, reps: "15", weight: "Light-moderate", rest: "60 sec", notes: "External rotation at end. Shoulder health insurance." }, { name: "Single Arm Cable Row", sets: 3, reps: "12 each", weight: "Moderate", rest: "60 sec", notes: "Full stretch at start. Drive elbow back hard." }, { name: "Hammer Curl", sets: 3, reps: "12", weight: "Moderate", rest: "60 sec", notes: "Hits brachialis — adds arm thickness." }, { name: "Incline Dumbbell Curl", sets: 3, reps: "12", weight: "Moderate", rest: "60 sec", notes: "Bench 45-60°. Long head emphasis — KEY for size." }, { name: "Cable Curl", sets: 3, reps: "15", weight: "Moderate", rest: "45 sec", notes: "Constant tension burn. Squeeze at top." }, { name: "Pallof Press + Dead Bug", sets: 3, reps: "12 + 8", weight: "Cable + BW", rest: "45 sec", notes: "Anti-rotation core finisher." } ], cooldown: ["Lat stretch (overhead reach) — 60 sec each", "Bicep stretch (against wall) — 30 sec each", "Foam roll lats + upper back — 2 min"], fueling: "High protein day. ~30-40g protein at every meal." },
-  "Saturday": { title: "Long MTB Ride", intensity: "moderate", summary: "Race-specific bike training. Build to 2+ hours with sustained climbing. Practice fueling protocol that prevents Mash cramps. Cadence on climbs — don't grind.", duration: "90 min - 2.5 hrs", warmup: ["10 min easy spin to start", "Gradually build to working effort"], exercises: [ { name: "Long MTB Ride", sets: 1, reps: "Build to 2+ hrs", weight: "Mostly Z2, some Z3 climbs", rest: "—", notes: "Target 80+ RPM on climbs (same concept as 170spm for running). Never grind a low cadence — shift down and spin. Practice descending technical terrain." } ], cooldown: ["10 min easy spin", "Hip flexor stretch 2 min each", "Foam roll quads + glutes", "Calf stretch each side"], fueling: "PRACTICE RACE FUELING: 500mg sodium pre-load 30 min before. 60g carbs/hour during. This is rehearsal — race execution depends on it." },
+  "Saturday": { title: "Long MTB Ride", intensity: "moderate", summary: "Race-specific bike training. Build to 2+ hours with sustained climbing. Practice fueling protocol that prevents Mash cramps.", duration: "90 min - 2.5 hrs", warmup: ["10 min easy spin to start", "Gradually build to working effort"], exercises: [ { name: "Long MTB Ride", sets: 1, reps: "Build to 2+ hrs", weight: "Mostly Z2, some Z3 climbs", rest: "—", notes: "Smooth pedaling. Higher cadence on climbs (don't grind). Practice descending technical terrain." } ], cooldown: ["10 min easy spin", "Hip flexor stretch 2 min each", "Foam roll quads + glutes", "Calf stretch each side"], fueling: "PRACTICE RACE FUELING: 500mg sodium pre-load 30 min before. 60g carbs/hour during." },
   "Sunday": { title: "Rest / Active Recovery", intensity: "rest", summary: "Protect HRV. Sleep early. Walk, surf easy, foam roll. Sunday rest is what makes Monday's lift possible.", duration: "Optional 20-30 min easy", warmup: [], exercises: [ { name: "Easy walk, surf, or full rest", sets: 1, reps: "Optional", weight: "Conversational only", rest: "—", notes: "Body Battery should be charging not draining." } ], cooldown: ["Full body stretch routine — 15-20 min", "Hip + hamstring focus", "Thoracic spine mobility"], fueling: "Whole foods. Hydrate well." }
 };
 
@@ -1011,9 +693,7 @@ const state = {
   feel: null,
   view: localStorage.getItem('view_mode') || 'phone',
   weekSwaps: loadWeekSwaps(),
-  swapModalDay: null,
-  stale: false,
-  cacheTime: null
+  swapModalDay: null
 };
 
 const savedFeelDate = localStorage.getItem('feel_date');
@@ -1066,8 +746,6 @@ function computeReadiness(latest, history) {
   const sleepSecs = getField(latest, 'sleepSecs');
   const ctl = getField(latest, 'ctl');
   const atl = getField(latest, 'atl');
-  const stress = getField(latest, 'avgStressLevel');
-  const bodyBattery = getField(latest, 'bodyBatteryHighest', 'bodyBattery');
 
   if (hrv == null && sleepSecs == null) return null;
 
@@ -1103,18 +781,6 @@ function computeReadiness(latest, history) {
     else if (acwr < 0.7) score -= 5;
     factors++;
   }
-  // Factor in stress when available (lower stress = better readiness)
-  if (stress != null) {
-    if (stress > 50) score -= Math.min(10, (stress - 50) * 0.3);
-    else if (stress < 30) score += Math.min(5, (30 - stress) * 0.3);
-    factors++;
-  }
-  // Factor in body battery when available
-  if (bodyBattery != null) {
-    if (bodyBattery >= 75) score += Math.min(8, (bodyBattery - 75) * 0.4);
-    else if (bodyBattery < 40) score -= Math.min(10, (40 - bodyBattery) * 0.4);
-    factors++;
-  }
 
   if (factors === 0) return null;
   return Math.max(0, Math.min(100, Math.round(score)));
@@ -1139,99 +805,18 @@ async function fetchData() {
   const fmt = d => d.toISOString().split('T')[0];
   const auth = 'Basic ' + btoa('API_KEY:' + state.apiKey);
 
-  // Load cached data immediately so we're never blank
-  const cachedWellness = localStorage.getItem('cache_wellness');
-  const cachedActivities = localStorage.getItem('cache_activities');
-  const cacheTime = localStorage.getItem('cache_time');
-  if (cachedWellness && cachedActivities) {
-    try {
-      const cw = JSON.parse(cachedWellness);
-      const ca = JSON.parse(cachedActivities);
-      if (Array.isArray(cw) && cw.length > 0) {
-        state.wellness = cw;
-        state.activities = Array.isArray(ca) ? ca : [];
-        state.loaded = true;
-        state.cacheTime = cacheTime ? new Date(parseInt(cacheTime)) : null;
-        state.stale = true;
-        state.error = null;
-        render(); // show cached data immediately
-      }
-    } catch (parseErr) {
-      console.warn('Cache parse failed:', parseErr);
-    }
-  }
-
-  // Helper: fetch with timeout and retry
-  async function fetchWithRetry(url, retries = 2, timeoutMs = 15000) {
-    for (let attempt = 0; attempt <= retries; attempt++) {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-      try {
-        const res = await fetch(url, { headers: { Authorization: auth }, signal: controller.signal });
-        clearTimeout(timeoutId);
-        if (res.ok) return res;
-        // 4xx errors won't be helped by retry
-        if (res.status >= 400 && res.status < 500) throw new Error(`Intervals API ${res.status}`);
-        // 5xx: retry
-        if (attempt < retries) {
-          await new Promise(r => setTimeout(r, 1500 * (attempt + 1)));
-          continue;
-        }
-        throw new Error(`Intervals API ${res.status}`);
-      } catch (e) {
-        clearTimeout(timeoutId);
-        if (attempt >= retries) throw e;
-        await new Promise(r => setTimeout(r, 1500 * (attempt + 1)));
-      }
-    }
-  }
-
   try {
-    const wRes = await fetchWithRetry(`https://intervals.icu/api/v1/athlete/${state.athleteId}/wellness?oldest=${fmt(monthAgo)}&newest=${fmt(today)}`);
-    const wData = await wRes.json();
-
-    // Protection: if API returns empty array but we have cache, keep cache
-    if (!Array.isArray(wData) || wData.length === 0) {
-      if (state.loaded && state.wellness.length > 0) {
-        state.stale = true;
-        state.error = null;
-        render();
-        return;
-      }
-      throw new Error('Empty response from Intervals.icu');
-    }
-
-    state.wellness = wData;
-
-    try {
-      const aRes = await fetchWithRetry(`https://intervals.icu/api/v1/athlete/${state.athleteId}/activities?oldest=${fmt(monthAgo)}&newest=${fmt(today)}`);
-      const aData = await aRes.json();
-      if (Array.isArray(aData)) state.activities = aData;
-    } catch (actErr) {
-      // Activities fetch failed — keep cached activities if we have them
-      console.warn('Activities fetch failed, using cached:', actErr.message);
-    }
-
+    const wRes = await fetch(`https://intervals.icu/api/v1/athlete/${state.athleteId}/wellness?oldest=${fmt(monthAgo)}&newest=${fmt(today)}`, { headers: { Authorization: auth } });
+    if (!wRes.ok) throw new Error(`Intervals API ${wRes.status}`);
+    state.wellness = await wRes.json();
+    const aRes = await fetch(`https://intervals.icu/api/v1/athlete/${state.athleteId}/activities?oldest=${fmt(monthAgo)}&newest=${fmt(today)}`, { headers: { Authorization: auth } });
+    if (aRes.ok) state.activities = await aRes.json();
     state.loaded = true;
     state.error = null;
-    state.stale = false;
-    state.cacheTime = new Date();
-    localStorage.setItem('cache_wellness', JSON.stringify(state.wellness));
-    localStorage.setItem('cache_activities', JSON.stringify(state.activities));
-    localStorage.setItem('cache_time', String(Date.now()));
     render();
   } catch (e) {
-    console.warn('Intervals.icu fetch failed:', e.message);
-    // Always prefer showing cached data over an error
-    if (state.loaded && state.wellness.length > 0) {
-      state.stale = true;
-      state.error = null;
-      render();
-    } else {
-      // No cache, no data — only then show the error
-      state.error = e.message;
-      render();
-    }
+    state.error = e.message;
+    render();
   }
 }
 
@@ -1459,381 +1044,6 @@ function activitiesForDay(activities, targetDate) {
   });
 }
 
-// Map each planned day to expected Garmin activity types
-const PLAN_EXPECTED_TYPES = {
-  Monday:    ['strength', 'weight'],
-  Tuesday:   ['strength', 'weight'],
-  Wednesday: ['ride', 'cycling', 'run', 'swim', 'walk'], // Z2 can be any cardio
-  Thursday:  ['run', 'trail'],
-  Friday:    ['strength', 'weight'],
-  Saturday:  ['ride', 'cycling', 'mtb', 'run'], // MTB or brick
-  Sunday:    [] // rest — anything is a bonus
-};
-
-function classifyActivityType(garminType) {
-  const t = (garminType || '').toLowerCase();
-  if (t.includes('strength') || t.includes('weight') || t.includes('training')) return 'strength';
-  if (t.includes('run') || t.includes('trail')) return 'run';
-  if (t.includes('ride') || t.includes('cycl') || t.includes('mtb') || t.includes('bike') || t.includes('gravel')) return 'ride';
-  if (t.includes('swim')) return 'swim';
-  if (t.includes('surf') || t.includes('paddle') || t.includes('kayak') || t.includes('row')) return 'water';
-  if (t.includes('hike') || t.includes('walk')) return 'walk';
-  if (t.includes('yoga') || t.includes('stretch') || t.includes('pilates')) return 'mobility';
-  return 'other';
-}
-
-function doesActivityMatchPlan(garminType, dayName, swap) {
-  // If day has been swapped, check against the swap activity type instead
-  if (swap) {
-    const classified = classifyActivityType(garminType);
-    const swapClassified = classifyActivityType(swap.id === 'surf' ? 'surf' :
-      swap.id === 'paddle' ? 'paddle' :
-      swap.id === 'swim' ? 'swim' :
-      swap.id === 'mtb' ? 'ride' :
-      swap.id === 'trail_run' ? 'run' :
-      swap.id === 'zone2' ? 'ride' :
-      swap.id === 'dirt_bike' ? 'ride' :
-      swap.id === 'mobility' ? 'mobility' :
-      swap.id === 'rest' ? 'rest' :
-      swap.id);
-    // For water activities (surf/paddle) accept water or swim classifications
-    if (swap.id === 'surf' || swap.id === 'paddle') {
-      return ['water', 'swim', 'run', 'walk'].includes(classified) ||
-        (garminType || '').toLowerCase().includes('surf') ||
-        (garminType || '').toLowerCase().includes('paddle') ||
-        (garminType || '').toLowerCase().includes('kayak') ||
-        (garminType || '').toLowerCase().includes('swim') ||
-        (garminType || '').toLowerCase().includes('open');
-    }
-    // For rest day swaps, anything counts
-    if (swap.id === 'rest') return true;
-    // For zone2 swaps, accept any cardio
-    if (swap.id === 'zone2') return ['run', 'ride', 'swim', 'water', 'walk'].includes(classified);
-    // For custom swaps, just accept any logged activity
-    if (swap.id === 'custom') return true;
-    return classified === swapClassified;
-  }
-  // No swap — check against original plan
-  const expected = PLAN_EXPECTED_TYPES[dayName] || [];
-  if (expected.length === 0) return true;
-  const classified = classifyActivityType(garminType);
-  return expected.some(exp => {
-    if (exp === classified) return true;
-    if (exp === 'strength' && classified === 'strength') return true;
-    if (exp === 'weight' && classified === 'strength') return true;
-    if (exp === 'run' && classified === 'run') return true;
-    if (exp === 'trail' && classified === 'run') return true;
-    if (exp === 'ride' && classified === 'ride') return true;
-    if (exp === 'cycling' && classified === 'ride') return true;
-    if (exp === 'mtb' && classified === 'ride') return true;
-    if (exp === 'swim' && classified === 'swim') return true;
-    if (exp === 'walk' && classified === 'walk') return true;
-    return false;
-  });
-}
-
-// ════════════════════════════════════════════════════════════════════
-//  TRAINING STIMULUS ANALYSIS — outcome-based, not checkbox-based
-//  The question isn't "did you hit 45 min" — it's "did the session
-//  deliver the intended physiological adaptation?"
-// ════════════════════════════════════════════════════════════════════
-
-const TRAINING_GOALS = {
-  Monday:    { goal: 'Maximal strength + hypertrophy', stimulus: 'mechanical tension', minDur: 35, idealDur: [50, 75], hrRange: [90, 145] },
-  Tuesday:   { goal: 'Upper body push strength + paddle endurance', stimulus: 'mechanical tension', minDur: 35, idealDur: [45, 70], hrRange: [90, 145] },
-  Wednesday: { goal: 'Aerobic base + recovery', stimulus: 'aerobic efficiency', minDur: 25, idealDur: [35, 60], hrRange: [110, 155] },
-  Thursday:  { goal: 'Aerobic endurance + cadence patterning', stimulus: 'aerobic threshold', minDur: 30, idealDur: [45, 90], hrRange: [130, 155] },
-  Friday:    { goal: 'Pull strength + bicep hypertrophy', stimulus: 'mechanical tension', minDur: 35, idealDur: [45, 70], hrRange: [90, 145] },
-  Saturday:  { goal: 'Race-specific endurance + fueling rehearsal', stimulus: 'prolonged aerobic', minDur: 60, idealDur: [90, 180], hrRange: [120, 160] },
-  Sunday:    { goal: 'Full recovery', stimulus: 'parasympathetic', minDur: 0, idealDur: [0, 30], hrRange: [0, 120] },
-};
-
-function analyzeCompliance(activity, dayName) {
-  const goals = TRAINING_GOALS[dayName];
-  const plan = SESSIONS[dayName];
-  if (!goals || !plan) return null;
-  const classified = classifyActivityType(activity.type);
-  const checks = [];
-
-  const dur = activity.moving_time ? activity.moving_time / 60 : 0;
-  const hrVal = activity.icu_average_hr ?? activity.average_heartrate ?? null;
-  const maxHr = activity.icu_max_hr ?? activity.max_heartrate ?? null;
-  const zones = activity.icu_hr_zone_times || activity.icu_zone_times;
-  const cadence = activity.icu_average_cadence ?? activity.average_cadence;
-
-  // ── STIMULUS SUFFICIENCY ──
-  if (dur > 0) {
-    if (dur >= goals.minDur) {
-      const quality = dur >= goals.idealDur[0] ? 'Sufficient stimulus' : 'Minimal effective dose';
-      checks.push({ label: 'Stimulus', value: `${Math.round(dur)}min`, desc: quality, pass: true, weight: 1 });
-    } else {
-      const highIntensity = hrVal && hrVal > goals.hrRange[1] * 0.9;
-      if (highIntensity && dur >= goals.minDur * 0.7) {
-        checks.push({ label: 'Stimulus', value: `${Math.round(dur)}min`, desc: 'Short but high-intensity — partial stimulus', pass: true, weight: 0.7 });
-      } else {
-        checks.push({ label: 'Stimulus', value: `${Math.round(dur)}min`, desc: `Below minimum effective dose (${goals.minDur}min)`, pass: false, weight: 1 });
-      }
-    }
-  }
-
-  // ── INTENSITY COMPLIANCE ──
-  if (hrVal && goals.stimulus !== 'mechanical tension') {
-    if (goals.stimulus === 'aerobic efficiency' || goals.stimulus === 'aerobic threshold') {
-      const inZone = hrVal >= goals.hrRange[0] && hrVal <= goals.hrRange[1];
-      if (inZone) {
-        checks.push({ label: 'HR discipline', value: `${Math.round(hrVal)}bpm`, desc: 'In target zone — controlled effort', pass: true, weight: 2 });
-      } else if (hrVal > goals.hrRange[1]) {
-        const overBy = Math.round(hrVal - goals.hrRange[1]);
-        checks.push({ label: 'HR discipline', value: `${Math.round(hrVal)}bpm`, desc: `${overBy}bpm over cap — too hard for intended adaptation`, pass: false, critical: overBy > 10, weight: 2 });
-      } else {
-        checks.push({ label: 'HR discipline', value: `${Math.round(hrVal)}bpm`, desc: 'Below target — consider pushing slightly harder', pass: true, weight: 1 });
-      }
-    }
-    if (goals.stimulus === 'prolonged aerobic') {
-      const pass = hrVal <= 160;
-      checks.push({ label: 'Aerobic ceiling', value: `${Math.round(hrVal)}bpm`, desc: pass ? 'Sustained effort without redlining' : 'Avg too high — cramp risk on race day', pass, critical: !pass, weight: 2 });
-    }
-  }
-
-  // ── ZONE DISTRIBUTION (all cardio with zone data) ──
-  if (zones && zones.length >= 3) {
-    const totalZ = zones.reduce((a, b) => a + (b || 0), 0);
-    if (totalZ > 0) {
-      const z12pct = Math.round(((zones[0] || 0) + (zones[1] || 0)) / totalZ * 100);
-      const z3pct = 100 - z12pct;
-      if (classified === 'run' || goals.stimulus === 'aerobic efficiency' || goals.stimulus === 'aerobic threshold') {
-        const targetZ12 = goals.stimulus === 'aerobic efficiency' ? 80 : 70;
-        const pass = z12pct >= targetZ12;
-        checks.push({ label: 'Zone split', value: `${z12pct}% Z1-Z2`, desc: pass ? 'Polarized correctly — aerobic adaptation maximized' : `Too much Z3+ time (${z3pct}%) — defeats the aerobic purpose`, pass, critical: z3pct > 40, weight: 2 });
-      } else if (goals.stimulus === 'prolonged aerobic') {
-        const pass = z12pct >= 60;
-        checks.push({ label: 'Zone split', value: `${z12pct}% Z1-Z2`, desc: pass ? 'Good endurance distribution' : 'Too much high-intensity — race pacing needs discipline', pass, weight: 1.5 });
-      }
-    }
-  }
-
-  // ── CADENCE (run) ──
-  if (cadence && classified === 'run') {
-    const spm = cadence < 100 ? cadence * 2 : cadence;
-    if (spm >= 168) checks.push({ label: 'Cadence', value: `${Math.round(spm)}spm`, desc: 'On target — movement economy maintained', pass: true, weight: 1.5 });
-    else if (spm >= 160) checks.push({ label: 'Cadence', value: `${Math.round(spm)}spm`, desc: 'Slightly low — watch for collapse on climbs', pass: true, weight: 0.8 });
-    else checks.push({ label: 'Cadence', value: `${Math.round(spm)}spm`, desc: 'Collapsing under 160 — race-day failure mode', pass: false, critical: true, weight: 1.5 });
-  }
-
-  // ── CARDIAC DRIFT ──
-  if (dur > 30 && hrVal && maxHr && classified !== 'strength') {
-    const drift = maxHr - hrVal;
-    if (drift > 30) checks.push({ label: 'Cardiac drift', value: `+${Math.round(drift)}bpm`, desc: 'Large spread — possible dehydration or sodium deficit', pass: false, critical: drift > 40, weight: 1 });
-  }
-
-  // ── RIDE CADENCE ──
-  if (cadence && classified === 'ride' && dayName === 'Saturday') {
-    const pass = cadence >= 72;
-    checks.push({ label: 'Pedal cadence', value: `${Math.round(cadence)}rpm`, desc: pass ? 'Spinning efficiently' : 'Low cadence = cramps on Gibraltar', pass, weight: 1 });
-  }
-
-  // ── HYDRATION ──
-  if (dur >= 30 && classified !== 'strength') {
-    const sweatOz = Math.round(dur * 16.9 / 29.57);
-    checks.push({ label: 'Est. sweat loss', value: `~${sweatOz}oz`, desc: sweatOz > 34 ? 'Heavy loss — verify you replaced 80%+' : 'Standard hydration', pass: true, info: true, weight: 0 });
-  }
-
-  if (checks.length === 0) return null;
-  const scoreable = checks.filter(c => !c.info);
-  let weightedPass = 0, totalWeight = 0;
-  scoreable.forEach(c => { totalWeight += c.weight; if (c.pass) weightedPass += c.weight; });
-  const pct = totalWeight > 0 ? Math.round((weightedPass / totalWeight) * 100) : 100;
-
-  let verdict;
-  if (pct >= 85) verdict = 'Session delivered the intended adaptation.';
-  else if (pct >= 60) verdict = 'Partially effective — coaching points to address.';
-  else verdict = 'Session missed its intended purpose.';
-
-  return { checks, pct, verdict, goal: goals.goal };
-}
-
-function renderCompliance(analysis) {
-  if (!analysis) return '';
-  const { checks, pct, verdict } = analysis;
-  const color = pct >= 85 ? 'var(--green)' : pct >= 60 ? 'var(--orange)' : 'var(--red)';
-  const critical = checks.find(c => c.critical && !c.pass);
-  const mainMsg = critical ? critical.desc : (checks.find(c => !c.info)?.desc || verdict);
-  return `<div class="compliance-row"><span class="compliance-score" style="color:${color};">${pct}%</span> <span style="opacity:0.75;">${mainMsg}</span></div>`;
-}
-
-// ════════════════════════════════════════════════════════════════════
-//  ACTIVITY DETAIL MODAL
-// ════════════════════════════════════════════════════════════════════
-
-function openActivityModal(activityId, dayName) {
-  const activity = state.activities.find(a => String(a.id) === String(activityId));
-  if (!activity) return;
-
-  const classified = classifyActivityType(activity.type);
-  const daySwap = state.weekSwaps[dayName];
-  const matchesPlan = doesActivityMatchPlan(activity.type, dayName, daySwap);
-  const analysis = matchesPlan ? analyzeCompliance(activity, dayName) : null;
-  const goals = TRAINING_GOALS[dayName];
-  const plan = SESSIONS[dayName];
-
-  const dur = activity.moving_time ? activity.moving_time / 60 : 0;
-  const hrVal = activity.icu_average_hr ?? activity.average_heartrate ?? null;
-  const maxHr = activity.icu_max_hr ?? activity.max_heartrate ?? null;
-  const dist = activity.distance ? (activity.distance / 1609.34).toFixed(1) : null;
-  const calories = activity.icu_calories ?? activity.calories ?? null;
-  const cadence = activity.icu_average_cadence ?? activity.average_cadence ?? null;
-  const zones = activity.icu_hr_zone_times || activity.icu_zone_times;
-  const elev = activity.total_elevation_gain ?? activity.icu_total_elevation_gain ?? null;
-  const pace = (dist && dur > 0) ? (dur / parseFloat(dist)).toFixed(1) : null;
-  const shortName = smartActivityName(activity);
-  const rawName = activity.name || activity.type || 'Activity';
-  const sweatOz = classified !== 'strength' && dur >= 15 ? Math.round(dur * 16.9 / 29.57) : null;
-
-  // Zone bars
-  let zoneBarHtml = '';
-  if (zones && zones.length >= 3) {
-    const totalZ = zones.reduce((a, b) => a + (b || 0), 0);
-    if (totalZ > 0) {
-      const zC = ['#6B7280', '#22C55E', '#3B82F6', '#F97316', '#EF4444'];
-      const zN = ['Z1 Recovery', 'Z2 Endurance', 'Z3 Tempo', 'Z4 Threshold', 'Z5 VO2max'];
-      zoneBarHtml = `
-        <div class="ad-section">
-          <div class="ad-section-title">Heart Rate Zones</div>
-          <div class="ad-zone-bar">${zones.slice(0, 5).map((z, i) => {
-            const pct = ((z || 0) / totalZ) * 100;
-            return pct > 1 ? `<div class="ad-zone-seg" style="width:${pct}%;background:${zC[i]};"></div>` : '';
-          }).join('')}</div>
-          <div class="ad-zone-legend">${zones.slice(0, 5).map((z, i) => {
-            const pct = Math.round(((z || 0) / totalZ) * 100);
-            const mins = Math.round((z || 0) / 60);
-            return pct >= 1 ? `<div class="ad-zone-item"><span class="ad-zone-dot" style="background:${zC[i]}"></span><span class="ad-zone-label">${zN[i].split(' ')[0]}</span><span class="ad-zone-val">${pct}% · ${mins}min</span></div>` : '';
-          }).join('')}</div>
-        </div>`;
-    }
-  } else if (hrVal && dur > 0) {
-    // Estimate zone from avg HR when Garmin zone data is missing
-    // Using standard zones based on ~190 max HR
-    const maxHrEst = maxHr || 190;
-    const z1Max = maxHrEst * 0.60, z2Max = maxHrEst * 0.70, z3Max = maxHrEst * 0.80, z4Max = maxHrEst * 0.90;
-    let zoneName, zoneColor, zoneDesc;
-    if (hrVal <= z1Max) { zoneName = 'Z1 Recovery'; zoneColor = '#6B7280'; zoneDesc = 'Very easy effort — active recovery zone'; }
-    else if (hrVal <= z2Max) { zoneName = 'Z2 Endurance'; zoneColor = '#22C55E'; zoneDesc = 'Aerobic base building — conversational pace'; }
-    else if (hrVal <= z3Max) { zoneName = 'Z3 Tempo'; zoneColor = '#3B82F6'; zoneDesc = 'Moderate effort — sustainably hard'; }
-    else if (hrVal <= z4Max) { zoneName = 'Z4 Threshold'; zoneColor = '#F97316'; zoneDesc = 'Hard effort — lactate accumulating'; }
-    else { zoneName = 'Z5 VO2max'; zoneColor = '#EF4444'; zoneDesc = 'Max effort — unsustainable'; }
-    zoneBarHtml = `
-      <div class="ad-section">
-        <div class="ad-section-title">Estimated Effort Zone</div>
-        <div class="ad-zone-bar"><div class="ad-zone-seg" style="width:100%;background:${zoneColor};"></div></div>
-        <div class="ad-zone-legend">
-          <div class="ad-zone-item"><span class="ad-zone-dot" style="background:${zoneColor}"></span><span class="ad-zone-label">${zoneName}</span></div>
-        </div>
-        <div style="font-size:11px;color:var(--text-dim);margin-top:6px;">${zoneDesc} · Based on avg HR ${Math.round(hrVal)}bpm. Detailed zone data not available from Garmin for this activity.</div>
-      </div>`;
-  }
-
-  // Analysis section
-  let analysisHtml = '';
-  if (analysis) {
-    const color = analysis.pct >= 85 ? 'var(--green)' : analysis.pct >= 60 ? 'var(--orange)' : 'var(--red)';
-    const checkRows = analysis.checks.map(c => {
-      const icon = c.info ? '<span style="color:var(--primary)">ℹ</span>' : (c.pass ? '<span style="color:var(--green)">✓</span>' : (c.critical ? '<span style="color:var(--red)">✗</span>' : '<span style="color:var(--orange)">⚠</span>'));
-      return `<div class="ad-check-row"><div class="ad-check-icon">${icon}</div><div class="ad-check-info"><div class="ad-check-label">${c.label}: <strong>${c.value}</strong></div><div class="ad-check-desc">${c.desc}</div></div></div>`;
-    }).join('');
-    analysisHtml = `
-      <div class="ad-section">
-        <div class="ad-section-title">Training Stimulus Analysis</div>
-        <div class="ad-verdict" style="border-left: 3px solid ${color};">
-          <div class="ad-verdict-score" style="color:${color}">${analysis.pct}%</div>
-          <div class="ad-verdict-text"><div class="ad-verdict-goal">${analysis.goal}</div><div class="ad-verdict-line">${analysis.verdict}</div></div>
-        </div>
-        <div class="ad-checks">${checkRows}</div>
-      </div>`;
-  } else if (!matchesPlan) {
-    analysisHtml = `
-      <div class="ad-section">
-        <div class="ad-section-title">Plan Alignment</div>
-        <div class="ad-verdict" style="border-left: 3px solid var(--orange);">
-          <div class="ad-verdict-score" style="color:var(--orange)">⚡</div>
-          <div class="ad-verdict-text"><div class="ad-verdict-goal">Planned: ${plan.title}</div><div class="ad-verdict-line">Different activity type — logged as an unplanned swap.</div></div>
-        </div>
-      </div>`;
-  }
-
-  const existing = document.getElementById('activity-modal-overlay');
-  if (existing) existing.remove();
-  const overlay = document.createElement('div');
-  overlay.id = 'activity-modal-overlay';
-  overlay.className = 'modal-overlay';
-  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
-  overlay.innerHTML = `
-    <div class="modal ad-modal">
-      <div class="modal-handle"></div>
-      <div class="ad-header">
-        <div class="ad-type-icon">${sportIcon(activity.type)}</div>
-        <div class="ad-header-info"><div class="ad-header-name">${rawName}</div><div class="ad-header-meta">${shortName} · ${activity.start_date_local ? new Date(activity.start_date_local).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : ''}</div></div>
-        ${matchesPlan ? '<div class="ad-match-badge match">On Plan</div>' : '<div class="ad-match-badge swap">Swapped</div>'}
-      </div>
-      <div class="ad-metrics">
-        ${dur ? `<div class="ad-metric"><div class="ad-metric-val">${Math.round(dur)}</div><div class="ad-metric-label">min</div></div>` : ''}
-        ${dist ? `<div class="ad-metric"><div class="ad-metric-val">${dist}</div><div class="ad-metric-label">miles</div></div>` : ''}
-        ${hrVal ? `<div class="ad-metric"><div class="ad-metric-val">${Math.round(hrVal)}</div><div class="ad-metric-label">avg bpm</div></div>` : ''}
-        ${maxHr ? `<div class="ad-metric"><div class="ad-metric-val">${Math.round(maxHr)}</div><div class="ad-metric-label">max bpm</div></div>` : ''}
-        ${elev ? `<div class="ad-metric"><div class="ad-metric-val">${Math.round(elev * 3.281)}</div><div class="ad-metric-label">ft gain</div></div>` : ''}
-        ${calories ? `<div class="ad-metric"><div class="ad-metric-val">${Math.round(calories)}</div><div class="ad-metric-label">cal</div></div>` : ''}
-        ${pace && classified === 'run' ? `<div class="ad-metric"><div class="ad-metric-val">${pace}</div><div class="ad-metric-label">min/mi</div></div>` : ''}
-        ${cadence ? `<div class="ad-metric"><div class="ad-metric-val">${classified === 'run' ? Math.round(cadence < 100 ? cadence * 2 : cadence) : Math.round(cadence)}</div><div class="ad-metric-label">${classified === 'run' ? 'spm' : 'rpm'}</div></div>` : ''}
-        ${sweatOz ? `<div class="ad-metric"><div class="ad-metric-val">~${sweatOz}</div><div class="ad-metric-label">oz sweat</div></div>` : ''}
-      </div>
-      ${zoneBarHtml}
-      ${analysisHtml}
-      <button class="modal-btn modal-btn-confirm" style="margin-top:16px;width:100%;" onclick="document.getElementById('activity-modal-overlay').remove()">Close</button>
-    </div>`;
-  document.body.appendChild(overlay);
-}
-
-function smartActivityName(activity) {
-  const raw = activity.name || '';
-  const type = (activity.type || '').toLowerCase();
-  
-  // Common Garmin auto-names that are useless: "San Luis Obispo County ...", "Morning Run", etc.
-  const isAutoName = /^(morning|afternoon|evening|lunch|night)\s/i.test(raw) ||
-                     /county|city|state|region/i.test(raw) ||
-                     raw.length > 30;
-
-  if (!isAutoName && raw.length > 0 && raw.length <= 24) return raw;
-
-  // Build a meaningful short name from activity type
-  const classified = classifyActivityType(activity.type);
-  const dur = activity.moving_time ? `${fmtMins(activity.moving_time)}min` : '';
-  
-  const typeLabels = {
-    strength: 'Strength',
-    run: 'Trail Run',
-    ride: 'MTB Ride',
-    swim: 'Swim',
-    water: 'Paddle/Surf',
-    walk: 'Walk/Hike',
-    mobility: 'Mobility',
-    other: 'Activity'
-  };
-  
-  // Refine run/ride labels
-  let label = typeLabels[classified] || 'Activity';
-  if (classified === 'run') {
-    if (type.includes('trail')) label = 'Trail Run';
-    else if (type.includes('treadmill')) label = 'Treadmill';
-    else label = 'Run';
-  }
-  if (classified === 'ride') {
-    if (type.includes('mtb') || type.includes('mountain')) label = 'MTB Ride';
-    else if (type.includes('gravel')) label = 'Gravel Ride';
-    else label = 'Ride';
-  }
-  
-  return label;
-}
-
 function renderWeekPlanner(activities = []) {
   const today = new Date();
   const todayName = dayName(today);
@@ -1858,7 +1068,7 @@ function renderWeekPlanner(activities = []) {
     const dayDate = new Date(weekStart);
     dayDate.setDate(weekStart.getDate() + idx);
     const logged = activitiesForDay(activities, dayDate);
-    const isPast = dayDate.toDateString() !== today.toDateString() && dayDate < today;
+    const isPast = dayDate < today && !isToday;
 
     const loggedHtml = logged.map(a => {
       const dist = a.distance ? `${fmtMiles(a.distance)}mi` : '';
@@ -1867,31 +1077,21 @@ function renderWeekPlanner(activities = []) {
       const hr = hrVal ? `${Math.round(hrVal)}bpm` : '';
       const stats = [dist, dur, hr].filter(Boolean).join(' · ');
       const icon = sportIcon(a.type);
-      const shortName = smartActivityName(a);
-      const matchesPlan = doesActivityMatchPlan(a.type, day, swap);
-      const matchIcon = matchesPlan 
-        ? '<span class="day-log-check match">✓</span>' 
-        : '<span class="day-log-check swap">⚡</span>';
-      // Compliance analysis for matched activities
-      const compliance = matchesPlan ? analyzeCompliance(a, day) : null;
-      const complianceHtml = renderCompliance(compliance);
-      const actId = a.id || '';
+      // Shorten Garmin auto-names like "San Luis Obispo County..." 
+      const rawName = a.name || a.type || 'Activity';
+      const shortName = rawName.length > 28 ? rawName.slice(0, 26) + '…' : rawName;
       return `
-        <div class="day-log-entry day-log-clickable" onclick="event.stopPropagation();openActivityModal('${actId}','${day}')">
+        <div class="day-log-entry">
           <span class="day-log-icon">${icon}</span>
           <span class="day-log-name">${shortName}</span>
           ${stats ? `<span class="day-log-stats">${stats}</span>` : ''}
-          ${matchIcon}
+          <span class="day-log-check">✓</span>
         </div>
-        ${complianceHtml}
       `;
     }).join('');
 
     const hasLog = logged.length > 0;
-    const anyMatch = hasLog && logged.some(a => doesActivityMatchPlan(a.type, day, swap));
-    const doneClass = hasLog 
-      ? (anyMatch ? 'has-log' : 'has-log-swap') 
-      : (isPast && intensity !== 'rest' ? 'missed' : '');
+    const doneClass = hasLog ? 'has-log' : (isPast && !isToday && intensity !== 'rest' ? 'missed' : '');
 
     return `
       <div class="week-day-row ${isToday ? 'today' : ''} ${swap ? 'modified' : ''} ${isRest ? 'rest-day' : ''} ${doneClass}">
@@ -1910,85 +1110,12 @@ function renderWeekPlanner(activities = []) {
     `;
   }).join('');
 
-  // Compute 14-day rolling adherence: looks back 14 days, counts plan-aligned vs planned sessions
-  const ROLLING_DAYS = 14;
-  let alignedCount = 0;
-  let swappedCount = 0;
-  let missedCount = 0;
-  let plannedInWindow = 0;
-  for (let i = 0; i < ROLLING_DAYS; i++) {
-    const checkDate = new Date(today);
-    checkDate.setDate(today.getDate() - i);
-    checkDate.setHours(0, 0, 0, 0);
-    if (checkDate > today) continue;
-    const checkDayName = DAYS[(checkDate.getDay() + 6) % 7]; // Convert to Mon=0..Sun=6
-    if (SESSIONS[checkDayName].intensity === 'rest') continue;
-    plannedInWindow++;
-    const dayLogged = activitiesForDay(activities, checkDate);
-    if (dayLogged.length === 0) { missedCount++; continue; }
-    // Check swap for that specific date — only current week swaps are tracked,
-    // but we can check at least for this week's swap if the date is in this week
-    const checkWeekStart = new Date(today);
-    checkWeekStart.setDate(today.getDate() - ((today.getDay() + 6) % 7));
-    checkWeekStart.setHours(0, 0, 0, 0);
-    const isThisWeek = checkDate >= checkWeekStart;
-    const checkSwap = isThisWeek ? state.weekSwaps[checkDayName] : null;
-    const anyMatch = dayLogged.some(a => doesActivityMatchPlan(a.type, checkDayName, checkSwap));
-    if (anyMatch) alignedCount++;
-    else swappedCount++;
-  }
-  const totalCompleted = alignedCount + swappedCount;
-  const adherencePct = plannedInWindow > 0 ? Math.round((alignedCount / plannedInWindow) * 100) : 0;
-  const adherenceColor = adherencePct >= 80 ? 'var(--green)' : adherencePct >= 60 ? 'var(--yellow)' : 'var(--orange)';
-  const adherenceRadius = 17;
-  const adherenceCirc = 2 * Math.PI * adherenceRadius;
-  const adherenceOffset = adherenceCirc * (1 - adherencePct / 100);
-  
-  // Detail line
-  let detailParts = [];
-  if (alignedCount > 0) detailParts.push(`${alignedCount} on plan`);
-  if (swappedCount > 0) detailParts.push(`${swappedCount} swapped`);
-  if (missedCount > 0) detailParts.push(`${missedCount} missed`);
-  const adherenceDetail = detailParts.length ? detailParts.join(' · ') : 'No sessions yet';
-
-  // Compute training streak (consecutive days with logged activity, going backward)
-  let streak = 0;
-  for (let i = 0; i < 60; i++) {
-    const checkDate = new Date(today);
-    checkDate.setDate(today.getDate() - i);
-    // Skip rest days (Sunday)
-    if (checkDate.getDay() === 0) { streak++; continue; }
-    const dayActivities = activitiesForDay(activities, checkDate);
-    if (dayActivities.length > 0) streak++;
-    else break;
-  }
-
-  // Fuel reminder for today's session
-  const todaySession = SESSIONS[todayName];
-  const isLongSession = todaySession && (todaySession.intensity === 'hard' || todaySession.intensity === 'moderate');
-  const fuelReminder = isLongSession ? `<div class="fuel-reminder">💧 ${todaySession.intensity === 'hard' ? 'Heavy session — 500mg sodium pre-load 30 min before. Protein + carbs within 60 min after.' : 'Trail/ride day — electrolytes + 60g carbs/hr if over 60 min. Practice race fueling.'}</div>` : '';
-
   return `
     <div class="week-planner">
       <div class="week-planner-header">
         <div class="week-planner-title">This Week</div>
         ${hasAnySwap ? `<button class="week-planner-reset" onclick="resetAllSwaps()">Reset all</button>` : ''}
       </div>
-      <div class="week-adherence">
-        <div class="adherence-ring">
-          <svg width="44" height="44">
-            <circle cx="22" cy="22" r="${adherenceRadius}" stroke="var(--surface-3)" stroke-width="4" fill="none"></circle>
-            <circle cx="22" cy="22" r="${adherenceRadius}" stroke="${adherenceColor}" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="${adherenceCirc}" stroke-dashoffset="${adherenceOffset}" style="transform:rotate(-90deg);transform-origin:center;"></circle>
-          </svg>
-          <div class="adherence-ring-text">${adherencePct}%</div>
-        </div>
-        <div class="adherence-info">
-          <div class="adherence-label">14-day adherence</div>
-          <div class="adherence-detail">${adherenceDetail}</div>
-        </div>
-        ${streak >= 3 ? `<div class="streak-badge">🔥 ${streak}d</div>` : ''}
-      </div>
-      ${fuelReminder}
       <div class="week-days">${rows}</div>
     </div>
   `;
@@ -1999,13 +1126,11 @@ function renderHeader() {
   const daysToRace = Math.ceil((RACE_DATE - today) / 86400000);
   const phoneIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="2" width="8" height="12" rx="1.5"/><line x1="7" y1="12" x2="9" y2="12"/></svg>';
   const desktopIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="8" rx="1"/><line x1="6" y1="14" x2="10" y2="14"/><line x1="8" y1="11" x2="8" y2="14"/></svg>';
-  const hr = today.getHours();
-  const greeting = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
   return `
     <div class="header">
       <div class="header-row">
         <div>
-          <div class="greeting">${greeting}, ${ATHLETE_NAME}</div>
+          <div class="greeting">Good morning, ${ATHLETE_NAME}</div>
           <div class="date">${fmtDate(today)}</div>
         </div>
         <div class="view-toggle">
@@ -2024,32 +1149,19 @@ function renderPerfSubdate(latest, sorted) {
   const hrv = getField(latest, 'hrv', 'hrvWeeklyAverage');
   const tsb = (ctl != null && atl != null) ? ctl - atl : null;
 
-  const today = new Date();
-  const daysToRace = Math.ceil((RACE_DATE - today) / 86400000);
-  const weeksToRace = Math.ceil(daysToRace / 7);
-
-  // Compute current training week & phase
-  const planStart = new Date('2026-05-11');
-  const daysSinceStart = Math.floor((today - planStart) / 86400000);
-  const currentWeek = Math.min(16, Math.max(1, Math.ceil(daysSinceStart / 7)));
-  const phase = currentWeek <= 8 ? 1 : currentWeek <= 13 ? 2 : 3;
-  const phaseName = phase === 1 ? 'Base & Strength' : phase === 2 ? 'Race Specificity' : 'Peak & Taper';
-
   const parts = [];
-  parts.push(`Week ${currentWeek} · Phase ${phase}: ${phaseName}`);
   if (ctl != null) {
     const delta = Math.round(ctl - 219);
     const sign = delta >= 0 ? '+' : '';
-    parts.push(`Fitness ${Math.round(ctl)} (${sign}${delta})`);
+    parts.push(`Fitness ${Math.round(ctl)} (${sign}${delta} vs baseline)`);
   }
   if (tsb != null) {
     const form = tsb > 5 ? 'Fresh' : tsb > -10 ? 'Neutral' : tsb > -20 ? 'Building' : 'Fatigued';
-    parts.push(`${form}`);
+    parts.push(`Form: ${form} (TSB ${tsb > 0 ? '+' : ''}${Math.round(tsb)})`);
   }
   if (hrv != null) {
     parts.push(`HRV ${Math.round(hrv)}ms`);
   }
-  parts.push(`${daysToRace}d to Mash`);
   const el = document.getElementById('perf-subdate');
   if (el) el.textContent = parts.length ? parts.join(' · ') : 'Loading metrics...';
 }
@@ -2114,183 +1226,640 @@ function getReadinessStatus(score) {
 }
 
 const HELP = {
-  hrv: '<strong>Heart Rate Variability</strong> — variation between heartbeats. Higher = better recovery, lower stress. Your range is 90-111ms; below 85ms is the warning zone.',
-  rhr: '<strong>Resting Heart Rate</strong> — beats per minute when at full rest. Lower trending down = improving fitness. Spikes up = stress, illness, or fatigue.',
-  sleep: '<strong>Total sleep</strong> measured by Garmin. 7-9hrs is ideal. Quality matters too — checking REM and deep sleep on your watch gives the full picture.',
-  ctl: '<strong>Chronic Training Load</strong> — your fitness, calculated as a 42-day weighted average of training stress. Your baseline is ~219, peak hit 271 in July 2024.',
-  atl: '<strong>Acute Training Load</strong> — recent fatigue from the last 7 days of training. High ATL relative to CTL means you\'re piling up fresh fatigue.',
-  tsb: '<strong>Training Stress Balance</strong> — Form = Fitness (CTL) − Fatigue (ATL). Positive = fresh and ready to perform. Negative = fatigued. 0 means perfectly balanced.',
-  acwr: '<strong>Acute:Chronic Workload Ratio</strong> — ratio of recent load to chronic baseline. 0.8-1.2 is the productive zone. Above 1.3 = injury risk territory.'
+  hrv:        '<strong>Heart Rate Variability</strong> — ms between heartbeats. Your range: 90–111ms. Below 85ms = intensity cap. Trending direction matters more than today\'s number.',
+  rhr:        '<strong>Resting Heart Rate</strong> — bpm at full rest. Trending down = aerobic adaptation. Spike of 5+ bpm = under-recovery, illness, or high life stress.',
+  sleep:      '<strong>Sleep duration</strong> — Garmin total. 7–9hrs is the performance window. Below 6hrs = drop intensity 15–20% regardless of how you feel.',
+  sleepScore: '<strong>Sleep Score</strong> — Garmin\'s composite of duration, stages, restlessness, and SpO2. 70+ is solid. Below 60 = suppressed recovery.',
+  sleepHR:    '<strong>Sleeping HR</strong> — avg HR during sleep. Lower is better. Elevated sleeping HR = body working hard to recover. Alcohol and heat spike it.',
+  ctl:        '<strong>Fitness (CTL)</strong> — 42-day weighted load average. Your baseline: 219. Peak: 271 (July 2024). Build toward 260+ for Mash prep.',
+  atl:        '<strong>Fatigue (ATL)</strong> — 7-day load. High relative to CTL = fresh fatigue accumulating. Watch the ratio, not the absolute number.',
+  tsb:        '<strong>Form (TSB)</strong> — Fitness minus Fatigue. Positive = fresh. Negative but building = productive. Below −25 = overreach territory.',
+  acwr:       '<strong>Load Ratio (ACWR)</strong> — recent load ÷ chronic baseline. 0.8–1.2 = productive zone. Above 1.3 = injury risk. Your hard cap: 1.3×.',
+  rampRate:   '<strong>Ramp Rate</strong> — week-over-week CTL change. Safe range: +3 to +7 per week. Above +8 = load spike, watch for overreach in 7–10 days.',
+  vo2max:     '<strong>VO2 Max</strong> — Garmin\'s aerobic capacity estimate. Trending up = engine growing. Your target: hold or improve through Mash build.',
+  stress:     '<strong>Daily Stress</strong> — Garmin\'s all-day stress score (0–100). Combines HRV fluctuation, activity, and rest periods. Above 60 consistently = recovery suppressed.',
+  steps:      '<strong>Daily Steps</strong> — non-training movement. 7,000–10,000 keeps aerobic base active on rest days without adding training load.',
+  recoveryDebt: '<strong>Recovery Debt</strong> — consecutive days where HRV stayed below your 85ms threshold. 1 day = normal fluctuation. 3+ days = structural fatigue.',
+  subjectiveAlign: '<strong>Subjective / Objective Alignment</strong> — compares how you said you feel vs what your data shows. Mismatches are diagnostically important.'
 };
 
 function renderHealthSnapshot(latest, history, idSuffix='') {
-  const hrv = getField(latest, 'hrv', 'hrvWeeklyAverage');
-  const sleep = fmtHrs(getField(latest, 'sleepSecs'));
-  const rhr = getField(latest, 'restingHR');
-  const ctl = getField(latest, 'ctl');
-  const atl = getField(latest, 'atl');
-  const tsb = (ctl != null && atl != null) ? (ctl - atl) : null;
-  const acwr = (ctl && atl) ? (atl/ctl) : null;
+  // ── Pull all available wellness fields ────────────────────────────────────
+  const hrv        = getField(latest, 'hrv', 'hrvWeeklyAverage');
+  const rhr        = getField(latest, 'restingHR');
+  const sleepSecs  = getField(latest, 'sleepSecs');
+  const sleep      = sleepSecs ? fmtHrs(sleepSecs) : null;
   const sleepScore = getField(latest, 'sleepScore');
-  const baseReadiness = computeReadiness(latest, history);
+  const sleepHR    = getField(latest, 'avgSleepingHR');
+  const ctl        = getField(latest, 'ctl');
+  const atl        = getField(latest, 'atl');
+  const tsb        = (ctl != null && atl != null) ? (ctl - atl) : null;
+  const acwr       = (ctl && atl && ctl > 0) ? (atl / ctl) : null;
+  const rampRate   = getField(latest, 'rampRate');
+  const vo2max     = getField(latest, 'vo2max');
+  const stress     = getField(latest, 'avgStressLevel');
+  const steps      = getField(latest, 'steps');
+  const spO2       = getField(latest, 'spO2');
+
+  const baseReadiness    = computeReadiness(latest, history);
   const adjustedReadiness = applyFeelToReadiness(baseReadiness, state.feel);
   const status = getReadinessStatus(adjustedReadiness);
-  const ringRadius = 32;
-  const ringCircumference = 2 * Math.PI * ringRadius;
-  const ringOffset = adjustedReadiness != null ? ringCircumference * (1 - adjustedReadiness/100) : ringCircumference;
 
-  const trend = (key, latestVal) => {
-    if (latestVal == null) return null;
-    const recent = history.slice(-8, -1).map(d => getField(d, key)).filter(v => v != null);
-    if (recent.length < 3) return null;
-    const avg = recent.reduce((a,b) => a+b, 0) / recent.length;
-    const pct = ((latestVal - avg) / avg) * 100;
-    return { pct, dir: pct > 2 ? 'up' : pct < -2 ? 'down' : 'flat' };
-  };
-  const hrvTrend = trend('hrv', hrv) || trend('hrvWeeklyAverage', hrv);
-  const rhrTrend = trend('restingHR', rhr);
-  const trendArrow = (t, inverse=false) => {
-    if (!t) return '';
-    const arrow = t.dir === 'up' ? '↑' : t.dir === 'down' ? '↓' : '→';
-    let cls;
-    if (t.dir === 'flat') cls = 'trend-flat';
-    else if (inverse) cls = t.dir === 'up' ? 'trend-down' : 'trend-up';
-    else cls = t.dir === 'up' ? 'trend-up' : 'trend-down';
-    return `<div class="snap-metric-trend ${cls}">${arrow} ${Math.abs(Math.round(t.pct))}% vs avg</div>`;
-  };
+  // ── Derived metrics ───────────────────────────────────────────────────────
+  // 7-day HRV sparkline + trend
+  const hrv7 = history.slice(-7).map(d => getField(d, 'hrv', 'hrvWeeklyAverage')).filter(v => v != null);
+  const hrv14pre = history.slice(-14, -7).map(d => getField(d, 'hrv', 'hrvWeeklyAverage')).filter(v => v != null);
+  const hrvTrendVal = (hrv7.length && hrv14pre.length)
+    ? (hrv7.reduce((a,b)=>a+b,0)/hrv7.length) - (hrv14pre.reduce((a,b)=>a+b,0)/hrv14pre.length)
+    : null;
 
-  let formStatus = '';
-  if (tsb != null) {
-    if (tsb > 5) formStatus = 'Fresh';
-    else if (tsb > -10) formStatus = 'Neutral';
-    else if (tsb > -20) formStatus = 'Productive';
-    else formStatus = 'Fatigued';
+  // RHR trend
+  const rhr7 = history.slice(-7).map(d => getField(d, 'restingHR')).filter(v => v != null);
+  const rhr14 = history.slice(-14,-7).map(d => getField(d, 'restingHR')).filter(v => v != null);
+  const rhrTrendVal = (rhr7.length && rhr14.length)
+    ? (rhr7.reduce((a,b)=>a+b,0)/rhr7.length) - (rhr14.reduce((a,b)=>a+b,0)/rhr14.length)
+    : null;
+
+  // Recovery debt: consecutive days HRV < 85ms threshold
+  const sortedHistory = [...history].sort((a,b) => (a.id||'').localeCompare(b.id||''));
+  let recoveryDebt = 0;
+  for (let i = sortedHistory.length - 1; i >= 0; i--) {
+    const h = getField(sortedHistory[i], 'hrv', 'hrvWeeklyAverage');
+    if (h == null) break;
+    if (h < 85) recoveryDebt++;
+    else break;
   }
 
-  const nowStr = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-  const feelNote = state.feel ? `Adjusted for "${FEEL_OPTIONS.find(o=>o.id===state.feel).label}" check-in` : '';
+  // 7-day sleep avg
+  const sleep7 = history.slice(-7).map(d => getField(d, 'sleepSecs')).filter(v => v != null);
+  const sleepAvg7 = sleep7.length ? (sleep7.reduce((a,b)=>a+b,0)/sleep7.length/3600).toFixed(1) : null;
 
-  const m = (key, label, value, unit, trendStr, meta) => `
-    <div class="snap-metric" onclick="toggleHelp('${key}${idSuffix}')">
-      <div class="snap-metric-top">
-        <span class="snap-metric-label">${label}</span>
-        <span class="snap-metric-help">?</span>
+  // Subjective vs objective alignment
+  let alignLabel = '', alignColor = 'var(--text-dim)', alignNote = '';
+  if (state.feel && adjustedReadiness != null) {
+    const feelGood = state.feel === 'fresh' || state.feel === 'normal';
+    const dataGood = adjustedReadiness >= 60;
+    if (feelGood && dataGood)    { alignLabel = 'Aligned ✓';   alignColor = 'var(--green)';  alignNote = 'Feel and data agree — trust the plan.'; }
+    else if (!feelGood && !dataGood) { alignLabel = 'Aligned ✓'; alignColor = 'var(--orange)'; alignNote = 'Both signal recovery day. Listen.'; }
+    else if (feelGood && !dataGood)  { alignLabel = 'Mismatch ⚡'; alignColor = 'var(--orange)'; alignNote = 'You feel OK but data says pull back. Trust data.'; }
+    else                             { alignLabel = 'Mismatch ⚡'; alignColor = 'var(--yellow)'; alignNote = 'You feel rough but data is OK. Warm up before deciding.'; }
+  }
+
+  // CTL 30-day sparkline
+  const ctl30 = history.slice(-30).map(d => getField(d, 'ctl')).filter(v => v != null);
+
+  // Ramp rate status
+  const rampColor = rampRate == null ? 'var(--text-dim)'
+    : Math.abs(rampRate) > 8 ? 'var(--red)'
+    : Math.abs(rampRate) > 6 ? 'var(--orange)'
+    : 'var(--green)';
+  const rampLabel = rampRate == null ? '—'
+    : Math.abs(rampRate) > 8 ? 'Too steep'
+    : Math.abs(rampRate) > 6 ? 'Watch closely'
+    : rampRate > 0 ? 'Building safely' : 'Tapering';
+
+  // ── Inline sparkline helper ────────────────────────────────────────────────
+  function spark(values, color, w=80, h=28) {
+    if (!values || values.length < 2) return '';
+    const min = Math.min(...values), max = Math.max(...values), range = max - min || 1;
+    const pts = values.map((v,i) => {
+      const x = (i/(values.length-1))*w;
+      const y = h - ((v-min)/range)*(h-4) - 2;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block">
+      <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="${parseFloat(pts.split(' ').at(-1).split(',')[0])}" cy="${parseFloat(pts.split(' ').at(-1).split(',')[1])}" r="2.5" fill="${color}"/>
+    </svg>`;
+  }
+
+  // ── Metric tile helper ─────────────────────────────────────────────────────
+  const tile = (key, label, value, unit='', meta='', color='var(--text)', sparkHtml='') => `
+    <div class="rec-tile" onclick="toggleHelp('${key}${idSuffix}')">
+      <div class="rec-tile-label">${label} <span class="snap-metric-help">?</span></div>
+      <div class="rec-tile-row">
+        <div>
+          <div class="rec-tile-value" style="color:${color}">${value ?? '—'}<span class="rec-tile-unit">${value != null ? unit : ''}</span></div>
+          ${meta ? `<div class="rec-tile-meta">${meta}</div>` : ''}
+        </div>
+        ${sparkHtml ? `<div class="rec-tile-spark">${sparkHtml}</div>` : ''}
       </div>
-      ${value == null ? `<div class="snap-metric-na">—</div>` : `<div class="snap-metric-value">${value}<span class="snap-metric-unit">${unit}</span></div>`}
-      ${trendStr || (meta ? `<div class="snap-metric-meta">${meta}</div>` : '')}
-      <div class="help-drawer" id="help-${key}${idSuffix}">${HELP[key]}</div>
-    </div>
-  `;
+      <div class="help-drawer" id="help-${key}${idSuffix}">${HELP[key] || ''}</div>
+    </div>`;
+
+  // ── Bar helper for sleep stages ────────────────────────────────────────────
+  const scoreBar = (val, max, color) => {
+    const pct = val != null ? Math.min((val/max)*100, 100) : 0;
+    return `<div class="rec-bar-track"><div class="rec-bar-fill" style="width:${pct}%;background:${color}"></div></div>`;
+  };
+
+  // ── Readiness ring ─────────────────────────────────────────────────────────
+  const readPct = adjustedReadiness != null ? adjustedReadiness / 100 : 0;
+  const ringHtml = ringGaugeSvg(
+    adjustedReadiness != null ? String(adjustedReadiness) : '—', '',
+    readPct, status.color, 76
+  );
+
+  const nowStr = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  const feelNote = state.feel ? `Adjusted for "${FEEL_OPTIONS.find(o=>o.id===state.feel)?.label}" check-in` : '';
+
+  // Trend arrows
+  const up = (v, inv=false) => {
+    if (v == null) return '';
+    const dir = v > 1 ? 'up' : v < -1 ? 'down' : 'flat';
+    if (dir === 'flat') return `<span class="trend-flat">→ stable</span>`;
+    const good = inv ? dir === 'down' : dir === 'up';
+    return `<span class="${good ? 'trend-up' : 'trend-down'}">${dir === 'up' ? '↑' : '↓'} ${Math.abs(v).toFixed(1)} vs prior wk</span>`;
+  };
 
   return `
     <div class="snapshot">
       <div class="snapshot-header">
-        <div class="snapshot-title">Health Snapshot</div>
+        <div class="snapshot-title">Recovery</div>
         <div class="snapshot-time">${nowStr}</div>
       </div>
+
+      <!-- READINESS BLOCK -->
       <div class="readiness-block">
-        <div class="readiness-ring">
-          <svg width="76" height="76">
-            <circle class="readiness-ring-bg" cx="38" cy="38" r="${ringRadius}"></circle>
-            <circle class="readiness-ring-fill" cx="38" cy="38" r="${ringRadius}" stroke="${status.color}" stroke-dasharray="${ringCircumference}" stroke-dashoffset="${ringOffset}"></circle>
-          </svg>
-          <div class="readiness-ring-text">${adjustedReadiness != null ? adjustedReadiness : '—'}</div>
-        </div>
+        ${ringHtml}
         <div class="readiness-info">
-          <div class="readiness-label">Readiness</div>
-          <div class="readiness-status" style="color: ${status.color}">${status.label}</div>
+          <div class="readiness-label">Today's Readiness</div>
+          <div class="readiness-status" style="color:${status.color}">${status.label}</div>
           <div class="readiness-msg">${status.msg}</div>
-          ${feelNote ? `<div class="readiness-msg" style="margin-top: 4px; font-size: 11px; color: var(--primary);">${feelNote}</div>` : ''}
+          ${feelNote ? `<div class="readiness-msg" style="margin-top:4px;font-size:11px;color:var(--primary);">${feelNote}</div>` : ''}
         </div>
       </div>
-      <div class="snap-grid">
-        ${m('hrv', 'HRV', hrv ? Math.round(hrv) : null, 'ms', trendArrow(hrvTrend))}
-        ${m('rhr', 'Resting HR', rhr, 'bpm', trendArrow(rhrTrend, true))}
-        ${m('sleep', 'Sleep', sleep, 'hrs', null, sleepScore ? `Score: ${sleepScore}` : '')}
-        ${m('ctl', 'Fitness', ctl != null ? Math.round(ctl) : null, '', null, 'Baseline: 219')}
-        ${m('atl', 'Fatigue', atl != null ? Math.round(atl) : null, '', null, '7-day load')}
-        ${m('tsb', 'Form', tsb != null ? (tsb > 0 ? '+' : '') + Math.round(tsb) : null, '', null, formStatus)}
-        ${m('acwr', 'Load Ratio', acwr ? acwr.toFixed(2) : null, 'x', null, 'Cap: 1.3')}
+
+      <!-- SECTION: HRV & CARDIAC -->
+      <div class="rec-section-label">HRV &amp; Cardiac</div>
+      <div class="rec-grid-2">
+        ${tile('hrv', 'HRV Today', hrv ? Math.round(hrv) : null, ' ms',
+          `<div class="rec-tile-sub">${up(hrvTrendVal)}</div>`,
+          hrv == null ? 'var(--text-dim)' : hrv < 85 ? 'var(--red)' : hrv < 92 ? 'var(--yellow)' : 'var(--green)',
+          spark(hrv7, hrv < 85 ? 'var(--red)' : 'var(--green)')
+        )}
+        ${tile('rhr', 'Resting HR', rhr, ' bpm',
+          `<div class="rec-tile-sub">${up(rhrTrendVal, true)}</div>`,
+          rhr == null ? 'var(--text-dim)' : rhr > 55 ? 'var(--orange)' : 'var(--text)',
+          spark(rhr7, 'var(--primary)')
+        )}
       </div>
-    </div>
-  `;
+      <div class="rec-grid-2" style="margin-top:8px">
+        <div class="rec-tile">
+          <div class="rec-tile-label">HRV Recovery Debt</div>
+          <div class="rec-tile-value" style="color:${recoveryDebt >= 3 ? 'var(--red)' : recoveryDebt >= 1 ? 'var(--orange)' : 'var(--green)'}">
+            ${recoveryDebt} <span class="rec-tile-unit">day${recoveryDebt !== 1 ? 's' : ''}</span>
+          </div>
+          <div class="rec-tile-meta">${recoveryDebt === 0 ? 'HRV above threshold — clear' : recoveryDebt === 1 ? 'One low day — monitor' : recoveryDebt < 3 ? 'Accumulating — ease up' : 'Structural fatigue — rest required'}</div>
+          <div class="help-drawer" id="help-recoveryDebt${idSuffix}">${HELP.recoveryDebt}</div>
+        </div>
+        ${spO2 != null ? tile('spO2', 'Blood O₂ (SpO₂)', spO2.toFixed(1), '%', '',
+          spO2 < 95 ? 'var(--red)' : spO2 < 97 ? 'var(--yellow)' : 'var(--green)') : `<div class="rec-tile rec-tile-empty"><div class="rec-tile-label">Blood O₂</div><div class="rec-tile-na">Not synced</div></div>`}
+      </div>
+
+      <!-- SECTION: SLEEP -->
+      <div class="rec-section-label">Sleep</div>
+      <div class="rec-sleep-row">
+        <div class="rec-sleep-main">
+          <div class="rec-tile-label">Last Night</div>
+          <div class="rec-tile-value" style="color:${sleep == null ? 'var(--text-dim)' : parseFloat(sleep) < 6 ? 'var(--red)' : parseFloat(sleep) >= 7.5 ? 'var(--green)' : 'var(--text)'}">
+            ${sleep ?? '—'}<span class="rec-tile-unit">${sleep ? ' hrs' : ''}</span>
+          </div>
+          ${sleepScore != null ? `
+            <div class="rec-tile-meta" style="margin-top:6px">Score ${sleepScore}/100</div>
+            ${scoreBar(sleepScore, 100, sleepScore >= 70 ? 'var(--green)' : sleepScore >= 50 ? 'var(--yellow)' : 'var(--red)')}` : ''}
+          ${sleepHR != null ? `<div class="rec-tile-meta" style="margin-top:5px">Sleeping HR: ${Math.round(sleepHR)} bpm</div>` : ''}
+        </div>
+        <div class="rec-sleep-spark">
+          <div class="rec-tile-label">7-Day Avg</div>
+          <div class="rec-tile-value" style="font-size:16px;color:${sleepAvg7 == null ? 'var(--text-dim)' : parseFloat(sleepAvg7) < 6.5 ? 'var(--orange)' : 'var(--green)'}">
+            ${sleepAvg7 ?? '—'}<span class="rec-tile-unit">${sleepAvg7 ? ' hrs' : ''}</span>
+          </div>
+          ${spark(sleep7.map(s=>s/3600), 'var(--purple)', 80, 28)}
+        </div>
+      </div>
+
+      <!-- SECTION: TRAINING LOAD -->
+      <div class="rec-section-label">Training Load</div>
+      <div class="rec-grid-3">
+        ${tile('ctl', 'Fitness (CTL)', ctl ? Math.round(ctl) : null, '', 'Baseline: 219',
+          ctl == null ? 'var(--text-dim)' : ctl >= 219 ? 'var(--green)' : 'var(--orange)',
+          spark(ctl30, 'var(--primary)', 56, 24)
+        )}
+        ${tile('tsb', 'Form (TSB)', tsb != null ? (tsb > 0 ? '+' : '') + Math.round(tsb) : null, '',
+          tsb == null ? '' : tsb > 5 ? 'Fresh' : tsb > -10 ? 'Neutral' : tsb > -20 ? 'Productive' : 'Fatigued',
+          tsb == null ? 'var(--text-dim)' : tsb > 5 ? 'var(--green)' : tsb > -10 ? 'var(--primary)' : tsb > -20 ? 'var(--orange)' : 'var(--red)'
+        )}
+        ${tile('acwr', 'Load Ratio', acwr ? acwr.toFixed(2) : null, 'x',
+          acwr == null ? '' : acwr > 1.3 ? '⚠ Above cap' : acwr >= 0.8 ? 'Optimal zone' : 'Deload',
+          acwr == null ? 'var(--text-dim)' : acwr > 1.3 ? 'var(--red)' : acwr >= 0.8 ? 'var(--green)' : 'var(--text-dim)'
+        )}
+      </div>
+      <div class="rec-grid-2" style="margin-top:8px">
+        ${rampRate != null ? tile('rampRate', 'Weekly Ramp Rate', (rampRate > 0 ? '+' : '') + rampRate.toFixed(1), ' CTL/wk', rampLabel, rampColor) : `<div class="rec-tile rec-tile-empty"><div class="rec-tile-label">Ramp Rate</div><div class="rec-tile-na">No data</div></div>`}
+        ${vo2max != null ? tile('vo2max', 'VO₂ Max', vo2max.toFixed(1), ' ml/kg/min', 'Garmin estimate', 'var(--text)') : `<div class="rec-tile rec-tile-empty"><div class="rec-tile-label">VO₂ Max</div><div class="rec-tile-na">Not synced</div></div>`}
+      </div>
+
+      <!-- SECTION: STRESS & LIFESTYLE -->
+      <div class="rec-section-label">Stress &amp; Lifestyle</div>
+      <div class="rec-grid-2">
+        ${stress != null ? `
+        <div class="rec-tile">
+          <div class="rec-tile-label">All-Day Stress <span class="snap-metric-help">?</span></div>
+          <div class="rec-tile-value" style="color:${stress > 60 ? 'var(--red)' : stress > 40 ? 'var(--orange)' : 'var(--green)'}">${Math.round(stress)}<span class="rec-tile-unit">/100</span></div>
+          ${scoreBar(stress, 100, stress > 60 ? 'var(--red)' : stress > 40 ? 'var(--yellow)' : 'var(--green)')}
+          <div class="rec-tile-meta">${stress > 60 ? 'High — recovery suppressed' : stress > 40 ? 'Moderate — manageable' : 'Low — good recovery window'}</div>
+          <div class="help-drawer" id="help-stress${idSuffix}">${HELP.stress}</div>
+        </div>` : `<div class="rec-tile rec-tile-empty"><div class="rec-tile-label">All-Day Stress</div><div class="rec-tile-na">Not synced</div></div>`}
+        ${steps != null ? `
+        <div class="rec-tile">
+          <div class="rec-tile-label">Steps <span class="snap-metric-help">?</span></div>
+          <div class="rec-tile-value" style="color:${steps < 5000 ? 'var(--text-muted)' : steps >= 8000 ? 'var(--green)' : 'var(--text)'}">${steps >= 1000 ? (steps/1000).toFixed(1)+'k' : steps}</div>
+          ${scoreBar(steps, 12000, steps >= 8000 ? 'var(--green)' : 'var(--yellow)')}
+          <div class="rec-tile-meta">${steps >= 10000 ? 'Excellent movement' : steps >= 7000 ? 'On target' : 'Low — walk on rest days'}</div>
+          <div class="help-drawer" id="help-steps${idSuffix}">${HELP.steps}</div>
+        </div>` : `<div class="rec-tile rec-tile-empty"><div class="rec-tile-label">Daily Steps</div><div class="rec-tile-na">Not synced</div></div>`}
+      </div>
+
+      <!-- SECTION: SUBJECTIVE ALIGNMENT -->
+      ${state.feel && alignLabel ? `
+      <div class="rec-section-label">Subjective vs Objective</div>
+      <div class="rec-align-block" onclick="toggleHelp('subjectiveAlign${idSuffix}')">
+        <div class="rec-align-status" style="color:${alignColor}">${alignLabel}</div>
+        <div class="rec-align-note">${alignNote}</div>
+        <div class="help-drawer" id="help-subjectiveAlign${idSuffix}">${HELP.subjectiveAlign}</div>
+      </div>` : ''}
+
+    </div>`;
 }
 
+// ── Coach's Read helpers ──────────────────────────────────────────────────────
+
+// ══════════════════════════════════════════════════════════════════
+//  SHARED GAUGE / RING SVG FACTORY
+//  Two modes:
+//    'ring'  — full circle (used in Health Snapshot readiness block)
+//    'arc'   — half-circle opening upward (used in Coach's Read row)
+//
+//  Both embed number + unit as SVG <text> — zero DOM positioning hacks.
+//  Stroke weight and corner style are identical in both modes.
+// ══════════════════════════════════════════════════════════════════
+function makeGaugeSvg({ mode='arc', value, unit='', pct, color, size, delay='0s' }) {
+  const STROKE = 5;          // uniform stroke weight everywhere
+  const font   = "Inter,-apple-system,sans-serif";
+
+  if (mode === 'ring') {
+    // ── Full-circle ring ──────────────────────────────────────────
+    // size = diameter. Centre at (size/2, size/2).
+    const S   = size || 76;
+    const cx  = S / 2, cy = S / 2;
+    const R   = (S / 2) - STROKE - 1;           // fits inside SVG
+    const C   = 2 * Math.PI * R;
+    const off = pct != null ? C * (1 - Math.min(Math.max(pct,0),1)) : C;
+    // Rotate start to top (-90°) using transform on the fill circle
+    const numSize  = S < 60 ? 15 : 20;
+    const unitSize = S < 60 ? 9  : 11;
+    const numY     = cy + numSize * 0.36;        // optical vertical centre
+    const unitY    = cy + numSize * 0.36 + unitSize + 2;
+    const showUnit = unit && S >= 70;
+    return `<svg class="readiness-ring" width="${S}" height="${S}" viewBox="0 0 ${S} ${S}">
+      <circle cx="${cx}" cy="${cy}" r="${R}"
+        fill="none" stroke="var(--border)" stroke-width="${STROKE}" stroke-linecap="round"/>
+      <circle cx="${cx}" cy="${cy}" r="${R}"
+        fill="none" stroke="${color}" stroke-width="${STROKE}" stroke-linecap="round"
+        stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${off.toFixed(2)}"
+        transform="rotate(-90 ${cx} ${cy})"
+        style="transition:stroke-dashoffset 0.6s cubic-bezier(0.4,0,0.2,1);"/>
+      <text x="${cx}" y="${numY}" text-anchor="middle"
+        font-family="${font}" font-size="${numSize}" font-weight="800"
+        letter-spacing="-0.5" fill="${color}">${value}</text>
+      ${showUnit ? `<text x="${cx}" y="${unitY}" text-anchor="middle"
+        font-family="${font}" font-size="${unitSize}" font-weight="500"
+        fill="var(--text-dim)">${unit}</text>` : ''}
+    </svg>`;
+  }
+
+  // ── Half-arc (opens upward) ───────────────────────────────────
+  // Canvas 80×58. Arc centre cx=40,cy=52. Radius=34.
+  // Track spans from left (180°) to right (0°) along bottom.
+  const S  = 80, H = 58;
+  const cx = 40, cy = 52, R = 34;
+  const tx1 = cx - R, ty = cy;   // left end
+  const tx2 = cx + R;             // right end
+  const clamp = Math.min(Math.max(pct || 0, 0), 1);
+  // Fill sweeps left-to-right (clockwise on top of arc)
+  const endAngle = Math.PI - Math.PI * clamp;  // 180° → 0°
+  const fx = cx + R * Math.cos(endAngle);
+  const fy = cy + R * Math.sin(endAngle);
+  const largeArc = clamp > 0.5 ? 1 : 0;
+  const arcLen   = (Math.PI * R * clamp).toFixed(1);
+  const totalLen = (Math.PI * R).toFixed(1);
+
+  const activePath = clamp > 0.02
+    ? `<path d="M ${tx1} ${ty} A${R} ${R} 0 ${largeArc} 1 ${fx.toFixed(1)} ${fy.toFixed(1)}"
+         fill="none" stroke="${color}" stroke-width="${STROKE}" stroke-linecap="round"
+         stroke-dasharray="${arcLen}" stroke-dashoffset="${arcLen}"
+         style="animation:arcDraw 0.6s cubic-bezier(0.4,0,0.2,1) ${delay} forwards;"/>`
+    : '';
+
+  const numY  = 44;   // number baseline — sits in arc opening
+  const unitY = 55;   // unit sits at bottom
+
+  return `<svg class="cr-gauge-svg" width="${S}" height="${H}" viewBox="0 0 ${S} ${H}">
+    <path d="M ${tx1} ${ty} A${R} ${R} 0 1 1 ${tx2} ${ty}"
+      fill="none" stroke="var(--border)" stroke-width="${STROKE}" stroke-linecap="round"/>
+    ${activePath}
+    <text x="40" y="${numY}" text-anchor="middle"
+      font-family="${font}" font-size="22" font-weight="800"
+      letter-spacing="-1" fill="${color}">${value}</text>
+    <text x="40" y="${unitY}" text-anchor="middle"
+      font-family="${font}" font-size="10" font-weight="500"
+      fill="var(--text-dim)">${unit}</text>
+  </svg>`;
+}
+
+// Backwards-compat shims
+function crArcSvg(numText, unitText, pct, color, delay='0s') {
+  return makeGaugeSvg({ mode:'arc', value:numText, unit:unitText, pct, color, delay });
+}
+function ringGaugeSvg(value, unit, pct, color, size=76) {
+  return makeGaugeSvg({ mode:'ring', value, unit, pct, color, size });
+}
+
+
+function crSignalDot(level) {
+  // level: 'green' | 'yellow' | 'orange' | 'red' | 'blue' | 'gray'
+  return `<div class="cr-signal-dot ${level}"></div>`;
+}
+
+function crSignalRow(dotColor, title, sub, valueHtml) {
+  return `
+    <div class="cr-signal">
+      ${crSignalDot(dotColor)}
+      <div class="cr-signal-content">
+        <div class="cr-signal-title">${title}</div>
+        ${sub ? `<div class="cr-signal-sub">${sub}</div>` : ''}
+      </div>
+      ${valueHtml ? `<div class="cr-signal-value" style="color:${dotColor==='green'?'var(--green)':dotColor==='red'?'var(--red)':dotColor==='orange'?'var(--orange)':dotColor==='yellow'?'var(--yellow)':'var(--text-muted)'}">${valueHtml}</div>` : ''}
+    </div>`;
+}
+
+function crSparkline(values, color, w=44, h=20) {
+  if (!values || values.length < 2) return '';
+  const min = Math.min(...values), max = Math.max(...values);
+  const range = max - min || 1;
+  const pts = values.map((v, i) => {
+    const x = (i / (values.length - 1)) * w;
+    const y = h - ((v - min) / range) * (h - 2) - 1;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
+function crTodayDirective(readiness, hrv, feel) {
+  // Returns { label, color, sub } — the single most important instruction for today
+  if (feel === 'beat') return { label: 'Rest Day', color: 'var(--red)', sub: 'You marked yourself beat. Non-negotiable.' };
+  if (hrv != null && hrv < 40) return { label: 'Rest Day', color: 'var(--red)', sub: `HRV ${Math.round(hrv)}ms — below 40ms floor.` };
+  if (hrv != null && hrv < 60) return { label: 'Zone 2 Only', color: 'var(--orange)', sub: `HRV ${Math.round(hrv)}ms — low. No intensity today.` };
+  if (feel === 'sore') return { label: 'Active Recovery', color: 'var(--orange)', sub: 'Soreness logged — session modified.' };
+  if (readiness != null && readiness < 40) return { label: 'Rest or Z2 Only', color: 'var(--red)', sub: `Readiness ${readiness}/100 — body needs recovery.` };
+  if (readiness != null && readiness < 60) return { label: 'Reduce 10–15%', color: 'var(--orange)', sub: `Readiness ${readiness}/100 — cap intensity.` };
+  if (hrv != null && hrv < 85) return { label: 'Reduce Intensity', color: 'var(--yellow)', sub: `HRV ${Math.round(hrv)}ms — below 85ms threshold.` };
+  if (readiness != null && readiness >= 80) return { label: 'Full Send', color: 'var(--green)', sub: `Readiness ${readiness}/100 — green light.` };
+  return { label: 'Execute as Planned', color: 'var(--text-muted)', sub: readiness != null ? `Readiness ${readiness}/100` : 'Data syncing…' };
+}
+
+// ── Main render ────────────────────────────────────────────────────────────────
+
 function renderCoachCard(latest, history, activities) {
-  const summary = buildSummary(latest, history, activities);
-  const insights = [];
+  const ctl  = getField(latest, 'ctl');
+  const atl  = getField(latest, 'atl');
+  const tsb  = (ctl != null && atl != null) ? ctl - atl : null;
+  const hrv  = getField(latest, 'hrv', 'hrvWeeklyAverage');
+  const sleep = getField(latest, 'sleepSecs');
+  const rhr  = getField(latest, 'restingHeartRate');
+  const acwr = (ctl && atl && ctl > 0) ? atl / ctl : null;
 
-  const ctl = getField(latest, 'ctl');
-  const atl = getField(latest, 'atl');
-  const hrv = getField(latest, 'hrv', 'hrvWeeklyAverage');
+  const baseReadiness    = computeReadiness(latest, history);
+  const adjustedReadiness = applyFeelToReadiness(baseReadiness, state.feel);
+  const directive = crTodayDirective(adjustedReadiness, hrv, state.feel);
 
+  // HRV sparkline (14d)
+  const hrvHistory = history.slice(-14).map(d => getField(d, 'hrv', 'hrvWeeklyAverage')).filter(v => v != null);
+  const hrvTrend7  = (() => {
+    const r = history.slice(-7).map(d => getField(d, 'hrv', 'hrvWeeklyAverage')).filter(v => v != null);
+    const p = history.slice(-14,-7).map(d => getField(d, 'hrv', 'hrvWeeklyAverage')).filter(v => v != null);
+    if (!r.length || !p.length) return null;
+    return (r.reduce((a,b)=>a+b,0)/r.length) - (p.reduce((a,b)=>a+b,0)/p.length);
+  })();
+
+  // Load trend
+  const loadPct = (() => {
+    const r = history.slice(-7).map(d => getField(d, 'atl')).filter(v => v != null);
+    const p = history.slice(-14,-7).map(d => getField(d, 'atl')).filter(v => v != null);
+    if (!r.length || !p.length) return null;
+    const ra = r.reduce((a,b)=>a+b,0)/r.length;
+    const pa = p.reduce((a,b)=>a+b,0)/p.length;
+    return Math.round(((ra - pa) / pa) * 100);
+  })();
+
+  // ── GAUGE ROW ─────────────────────────────────────────────────────────────
+  // Cell 1: Readiness
+  const readPct = adjustedReadiness != null ? adjustedReadiness / 100 : 0;
+  const readColor = adjustedReadiness == null ? 'var(--text-dim)'
+    : adjustedReadiness >= 80 ? 'var(--green)'
+    : adjustedReadiness >= 60 ? 'var(--yellow)'
+    : adjustedReadiness >= 40 ? 'var(--orange)'
+    : 'var(--red)';
+  const readLabel = adjustedReadiness == null ? '—'
+    : adjustedReadiness >= 80 ? 'Go Hard'
+    : adjustedReadiness >= 60 ? 'Moderate'
+    : adjustedReadiness >= 40 ? 'Zone 2'
+    : 'Rest';
+
+  // Cell 2: HRV
+  // Map HRV to arc: 40ms=0, 111ms=1 (Clayton's range)
+  const hrvPct = hrv != null ? Math.min(Math.max((hrv - 40) / 71, 0), 1) : 0;
+  const hrvColor = hrv == null ? 'var(--text-dim)'
+    : hrv >= 90 ? 'var(--green)'
+    : hrv >= 80 ? 'var(--yellow)'
+    : hrv >= 60 ? 'var(--orange)'
+    : 'var(--red)';
+  const hrvLabel = hrv == null ? '—'
+    : hrv >= 90 ? 'Strong'
+    : hrv >= 80 ? 'Normal'
+    : hrv >= 60 ? 'Stressed'
+    : 'Low';
+
+  // Cell 3: Form (TSB mapped: -30=0, +20=1)
+  const tsbPct = tsb != null ? Math.min(Math.max((tsb + 30) / 50, 0), 1) : 0;
+  const tsbColor = tsb == null ? 'var(--text-dim)'
+    : tsb > 5  ? 'var(--green)'
+    : tsb > -10 ? 'var(--primary)'
+    : tsb > -20 ? 'var(--orange)'
+    : 'var(--red)';
+  const tsbLabel = tsb == null ? '—'
+    : tsb > 5  ? 'Fresh'
+    : tsb > -10 ? 'Neutral'
+    : tsb > -20 ? 'Building'
+    : 'Fatigued';
+
+  const readNum  = adjustedReadiness != null ? String(adjustedReadiness) : '—';
+  const hrvNum   = hrv != null ? String(Math.round(hrv)) : '—';
+  const tsbNum   = tsb != null ? (tsb > 0 ? '+' : '') + String(Math.round(tsb)) : '—';
+
+  const gaugeRow = `
+    <div class="cr-gauge-row">
+      <div class="cr-gauge-cell">
+        <div class="cr-gauge-label">Readiness</div>
+        ${crArcSvg(readNum, '/ 100', readPct, readColor, '0.1s')}
+        <div class="cr-gauge-status" style="color:${readColor}">${readLabel}</div>
+      </div>
+      <div class="cr-gauge-cell">
+        <div class="cr-gauge-label">HRV</div>
+        ${crArcSvg(hrvNum, 'ms', hrvPct, hrvColor, '0.25s')}
+        <div class="cr-gauge-status" style="color:${hrvColor}">${hrvLabel}</div>
+      </div>
+      <div class="cr-gauge-cell">
+        <div class="cr-gauge-label">Form</div>
+        ${crArcSvg(tsbNum, 'TSB', tsbPct, tsbColor, '0.4s')}
+        <div class="cr-gauge-status" style="color:${tsbColor}">${tsbLabel}</div>
+      </div>
+    </div>`;
+
+  // ── SIGNAL ROWS ───────────────────────────────────────────────────────────
+  const signals = [];
+
+  // Today's directive — always first
+  signals.push(crSignalRow(
+    directive.color === 'var(--green)' ? 'green'
+    : directive.color === 'var(--red)' ? 'red'
+    : directive.color === 'var(--orange)' ? 'orange'
+    : directive.color === 'var(--yellow)' ? 'yellow' : 'gray',
+    `Today: <span style="color:${directive.color};font-weight:700">${directive.label}</span>`,
+    directive.sub,
+    null
+  ));
+
+  // Fitness (CTL) vs baseline
   if (ctl != null) {
     const delta = Math.round(ctl - 219);
     const sign = delta >= 0 ? '+' : '';
-    const color = delta >= 5 ? 'var(--green-bg)' : delta <= -10 ? 'var(--red-bg)' : 'var(--surface-3)';
-    const icon = delta >= 0
-      ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>'
-      : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>';
-    insights.push({ icon, bg: color, text: `Fitness (CTL) <strong>${Math.round(ctl)}</strong> — <strong>${sign}${delta} vs baseline</strong>. Peak was 271.` });
-  }
-  if (ctl && atl && ctl > 0) {
-    const acwr = atl / ctl;
-    if (acwr > 1.3) insights.push({ icon: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', bg: 'var(--red-bg)', text: `<strong>ACWR ${acwr.toFixed(2)}</strong> — above 1.3 cap. Back off today.` });
-    else if (acwr >= 0.8 && acwr <= 1.2) insights.push({ icon: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>', bg: 'var(--green-bg)', text: `<strong>ACWR ${acwr.toFixed(2)}</strong> — optimal zone. Build.` });
-  }
-  const recentHrv = history.slice(-7).map(d => getField(d, 'hrv', 'hrvWeeklyAverage')).filter(v => v != null);
-  const prevHrv = history.slice(-14, -7).map(d => getField(d, 'hrv', 'hrvWeeklyAverage')).filter(v => v != null);
-  if (recentHrv.length && prevHrv.length) {
-    const r = recentHrv.reduce((a,b)=>a+b,0)/recentHrv.length;
-    const p = prevHrv.reduce((a,b)=>a+b,0)/prevHrv.length;
-    const diff = Math.round(r - p);
-    if (Math.abs(diff) >= 3) {
-      const up = diff > 0;
-      insights.push({ icon: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>', bg: up ? 'var(--green-bg)' : 'var(--orange-bg)', text: `HRV <strong>${up ? 'up' : 'down'} ${Math.abs(diff)}ms</strong> vs last week — recovery ${up ? 'improving' : 'under stress'}.` });
-    }
-  }
-  const recentLoad = history.slice(-7).map(d => getField(d, 'atl')).filter(v => v != null);
-  const prevLoad = history.slice(-14, -7).map(d => getField(d, 'atl')).filter(v => v != null);
-  if (recentLoad.length && prevLoad.length) {
-    const r = recentLoad.reduce((a,b)=>a+b,0)/recentLoad.length;
-    const p = prevLoad.reduce((a,b)=>a+b,0)/prevLoad.length;
-    const pct = Math.round(((r - p) / p) * 100);
-    if (Math.abs(pct) >= 5) {
-      const up = pct > 0;
-      insights.push({ icon: up ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>', bg: up ? 'var(--orange-bg)' : 'var(--green-bg)', text: `Weekly load <strong>${up ? 'up' : 'down'} ${Math.abs(pct)}%</strong> vs prior week — ${up ? 'watch ACWR' : 'maintain consistency'}.` });
-    }
-  }
-  const recentSleep = history.slice(-7).map(d => getField(d, 'sleepSecs')).filter(v => v != null);
-  if (recentSleep.length >= 4) {
-    const avg = recentSleep.reduce((a,b)=>a+b,0)/recentSleep.length / 3600;
-    if (avg < 6.5) insights.push({ icon: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>', bg: 'var(--red-bg)', text: `Sleep avg <strong>${avg.toFixed(1)}hrs</strong> — recovery suppressed.` });
-    else if (avg >= 7.5) insights.push({ icon: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>', bg: 'var(--green-bg)', text: `Sleep avg <strong>${avg.toFixed(1)}hrs</strong> — solid recovery week.` });
+    const dot = delta >= 5 ? 'green' : delta <= -15 ? 'orange' : 'blue';
+    const ctlHistory = history.slice(-14).map(d => getField(d, 'ctl')).filter(v => v != null);
+    const spark = crSparkline(ctlHistory, 'var(--primary)');
+    signals.push(crSignalRow(
+      dot,
+      `Fitness (CTL) ${Math.round(ctl)}`,
+      `${sign}${delta} vs 219 baseline · peak 271`,
+      `<span class="cr-spark-chip">${spark}</span>`
+    ));
   }
 
-  const insightRows = insights.length
-    ? insights.slice(0, 5).map(i => `
-        <div class="insight-row" style="padding: 7px 0;">
-          <div class="insight-icon" style="background: ${i.bg}; width: 26px; height: 26px; border-radius: 6px;">${i.icon}</div>
-          <div class="insight-text" style="font-size: 12px;">${i.text}</div>
-        </div>`).join('')
-    : '';
+  // ACWR
+  if (acwr != null) {
+    const dot = acwr > 1.3 ? 'red' : acwr > 1.2 ? 'orange' : acwr >= 0.8 ? 'green' : 'gray';
+    const sub = acwr > 1.3 ? 'Above 1.3 cap — pull back now'
+      : acwr > 1.2 ? 'Approaching cap — monitor'
+      : acwr >= 0.8 ? 'Optimal build zone'
+      : 'Low — safe to push';
+    signals.push(crSignalRow(dot, `Load Ratio (ACWR) ${acwr.toFixed(2)}`, sub, loadPct != null ? `${loadPct > 0 ? '+' : ''}${loadPct}% vs wk` : null));
+  }
 
-  const divider = insights.length ? `<div style="height: 1px; background: var(--border); margin: 12px 0;"></div>` : '';
+  // HRV trend
+  if (hrvTrend7 != null && Math.abs(hrvTrend7) >= 2) {
+    const up = hrvTrend7 > 0;
+    const dot = up ? 'green' : 'orange';
+    const spark = crSparkline(hrvHistory, up ? 'var(--green)' : 'var(--orange)');
+    signals.push(crSignalRow(
+      dot,
+      `HRV ${up ? '↑ Improving' : '↓ Under Stress'}`,
+      `${up ? '+' : ''}${Math.round(hrvTrend7)}ms vs last week — recovery ${up ? 'trending better' : 'accumulating load'}`,
+      `<span class="cr-spark-chip">${spark}</span>`
+    ));
+  }
+
+  // Sleep
+  if (sleep != null) {
+    const hrs = sleep / 3600;
+    const dot = hrs < 6 ? 'red' : hrs >= 7.5 ? 'green' : 'gray';
+    const sub = hrs < 6 ? 'Drop intensity 15–20% today'
+      : hrs >= 7.5 ? 'Solid foundation for training'
+      : 'Adequate — execute as planned';
+    signals.push(crSignalRow(dot, `Sleep ${hrs.toFixed(1)} hrs`, sub, null));
+  }
+
+  // Cramp / sweat warning on long efforts
+  const { session } = getSessionForToday();
+  if (session && (session.title.includes('MTB') || session.title.includes('Trail') || session.title.includes('Paddle'))) {
+    signals.push(crSignalRow('blue', 'Hydration Protocol', '500mg sodium pre-load · 60g carb/hr · ~1,520ml sweat/90min', null));
+  }
+
+  // Race countdown
+  const today2 = new Date();
+  const daysLeft = Math.ceil((RACE_DATE - today2) / 86400000);
+  if (daysLeft > 0) {
+    const dot = daysLeft <= 14 ? 'orange' : 'gray';
+    signals.push(crSignalRow(dot, `${daysLeft} days to Montecito Mash`, daysLeft <= 14 ? 'Race week protocols apply' : 'Phase 1: Base & Strength', null));
+  }
+
+  // No data fallback
+  if (adjustedReadiness == null && hrv == null && sleep == null && ctl == null) {
+    signals.push(crSignalRow('gray', 'No wellness data', 'Garmin sync not detected — check Intervals.icu settings', null));
+  }
+
+  const signalRows = signals.map(s => s).join('');
+
+  // ── NARRATIVE (condensed, 1-2 sentences) ─────────────────────────────────
+  const narrative = buildSummaryShort(latest, history);
 
   return `
-    <div class="ai-summary" style="margin-bottom: 12px;">
-      <div class="ai-summary-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
+    <div class="ai-summary">
+      <div class="ai-summary-header">
+        <div class="ai-summary-header-left">
           <div class="ai-summary-icon">C</div>
           <div class="ai-summary-title">Coach's Read</div>
         </div>
         <button class="coach-button-inline" id="coach-btn" onclick="generateSession()">⚡ Ask Claude</button>
       </div>
-      <div class="ai-summary-text">${summary}</div>
-      ${divider}
-      ${insightRows}
-    </div>
-  `;
+      ${gaugeRow}
+      ${narrative ? `<div class="cr-narrative">${narrative}</div>` : ''}
+      <div class="cr-signals">${signalRows}</div>
+    </div>`;
+}
+
+// Short narrative — 1-2 punchy sentences replacing the wall of prose
+function buildSummaryShort(latest, history) {
+  const { session, override } = getSessionForToday();
+  const day = dayName(new Date());
+  const ctl = getField(latest, 'ctl');
+  const atl = getField(latest, 'atl');
+  const tsb = (ctl != null && atl != null) ? ctl - atl : null;
+  const hrv = getField(latest, 'hrv', 'hrvWeeklyAverage');
+  const baseReadiness = computeReadiness(latest, history);
+  const adjustedReadiness = applyFeelToReadiness(baseReadiness, state.feel);
+
+  let parts = [];
+
+  // Session line
+  if (override) {
+    parts.push(`<strong>${day}</strong> — ${session.title}. <span class="highlight-warn">Original ${session.title} swapped based on check-in.</span>`);
+  } else {
+    parts.push(`<strong>${day}</strong> — ${session.title}.`);
+  }
+
+  // Single most useful coaching note
+  if (hrv != null && hrv < 85) {
+    parts.push(`HRV below threshold — auto-reduce intensity, keep HR under 150bpm on all work sets.`);
+  } else if (tsb != null && tsb < -20) {
+    parts.push(`Fatigue is accumulating — execute the session but leave a rep in the tank on every set.`);
+  } else if (tsb != null && tsb > 5) {
+    parts.push(`Fresh legs going in — this is a quality day, no sandbagging.`);
+  } else if (adjustedReadiness != null && adjustedReadiness >= 80) {
+    parts.push(`Body's ready. Lock in the process metrics — cadence at 170spm, HR cap 150bpm.`);
+  }
+
+  return parts.join(' ');
 }
 
 function renderAlerts(latest) {
@@ -2351,44 +1920,38 @@ function buildSummary(latest, history, activities) {
 
   if (adjustedReadiness == null && hrv == null && sleep == null) parts.push(`<em style="color: var(--text-dim);">Wellness data not syncing from Garmin — check Intervals settings.</em>`);
 
-  // Phase context
-  const planStart = new Date('2026-05-11');
-  const daysSinceStart = Math.floor((today - planStart) / 86400000);
-  const currentWeek = Math.min(16, Math.max(1, Math.ceil(daysSinceStart / 7)));
-  const phase = currentWeek <= 8 ? 1 : currentWeek <= 13 ? 2 : 3;
-  const phaseNames = { 1: 'Base & Strength', 2: 'Race Specificity', 3: 'Peak & Taper' };
-
   const days = Math.ceil((RACE_DATE - today) / 86400000);
   if (days <= 14) parts.push(`<span class="highlight-warn">${days} days to the Mash — race week mode.</span>`);
-  else if (days <= 60) parts.push(`${days} days to the Mash. Week ${currentWeek} of 16 — Phase ${phase}: ${phaseNames[phase]}.`);
-  else parts.push(`${days} days to the Mash. Phase ${phase}: ${phaseNames[phase]} (Week ${currentWeek}).`);
-
-  // Consistency callout — reference the boom-bust pattern
-  const recentActivities7d = activities.filter(a => {
-    const d = new Date(a.start_date_local);
-    return (today - d) < 7 * 86400000;
-  });
-  if (recentActivities7d.length <= 2 && days > 30) {
-    parts.push(`<span class="highlight-warn">Only ${recentActivities7d.length} sessions logged this week — consistency is your biggest liability. Break the boom-bust cycle.</span>`);
-  } else if (recentActivities7d.length >= 5) {
-    parts.push(`<span class="highlight-good">${recentActivities7d.length} sessions this week — consistency locked in.</span>`);
-  }
-
-  // 7-day rolling HR discipline check for runs — the biggest coaching issue
-  const recentRuns = recentActivities7d.filter(a => classifyActivityType(a.type) === 'run');
-  if (recentRuns.length > 0) {
-    const runsOverCap = recentRuns.filter(a => {
-      const hr = a.icu_average_hr ?? a.average_heartrate;
-      return hr && hr > 155;
-    });
-    if (runsOverCap.length > 0) {
-      parts.push(`<span class="highlight-warn">${runsOverCap.length} of ${recentRuns.length} runs exceeded 155bpm avg — you still default to 90%+ max HR. This is the habit that loses the Mash.</span>`);
-    } else if (recentRuns.length >= 2) {
-      parts.push(`<span class="highlight-good">All runs under HR cap this week — discipline is building.</span>`);
-    }
-  }
+  else if (days <= 60) parts.push(`${days} days to the Mash — entering peaking phase soon.`);
 
   return parts.join(' ');
+}
+
+function toggleProto(id) {
+  const toggle = document.getElementById('proto-toggle-' + id);
+  const body   = document.getElementById('proto-body-' + id);
+  if (!toggle || !body) return;
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  toggle.classList.toggle('open', !isOpen);
+}
+
+function protoBlock(id, label, items, emoji) {
+  if (!items || !items.length) return '';
+  const chevron = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="proto-toggle-chevron"><polyline points="6 9 12 15 18 9"/></svg>`;
+  const listHtml = items.map(it => `<span>• ${it}</span>`).join('');
+  return `
+    <div id="proto-toggle-${id}" class="proto-toggle" onclick="toggleProto('${id}')">
+      <div class="proto-toggle-label">
+        ${emoji ? `<span>${emoji}</span>` : ''}
+        ${label}
+        <span class="proto-toggle-count">${items.length}</span>
+      </div>
+      ${chevron}
+    </div>
+    <div id="proto-body-${id}" class="proto-body">
+      <div class="proto-body-inner">${listHtml}</div>
+    </div>`;
 }
 
 function renderSession() {
@@ -2401,9 +1964,9 @@ function renderSession() {
     const id = `${day}-${override ? 'rec' : 'plan'}-${i}`;
     const checked = state.checkedExercises[id];
     const items = [];
-    if (ex.sets) items.push(`<span class="prescription-item"><span class="prescription-key">Sets</span> <span class="prescription-val">${ex.sets}</span></span>`);
-    if (ex.reps) items.push(`<span class="prescription-item"><span class="prescription-key">Reps</span> <span class="prescription-val">${ex.reps}</span></span>`);
-    if (ex.weight) items.push(`<span class="prescription-item"><span class="prescription-key">Load</span> <span class="prescription-val">${ex.weight}</span></span>`);
+    if (ex.sets)              items.push(`<span class="prescription-item"><span class="prescription-key">Sets</span> <span class="prescription-val">${ex.sets}</span></span>`);
+    if (ex.reps)              items.push(`<span class="prescription-item"><span class="prescription-key">Reps</span> <span class="prescription-val">${ex.reps}</span></span>`);
+    if (ex.weight)            items.push(`<span class="prescription-item"><span class="prescription-key">Load</span> <span class="prescription-val">${ex.weight}</span></span>`);
     if (ex.rest && ex.rest !== '—') items.push(`<span class="prescription-item"><span class="prescription-key">Rest</span> <span class="prescription-val">${ex.rest}</span></span>`);
     return `
       <div class="exercise ${checked ? 'checked' : ''}" id="ex-${id}">
@@ -2413,14 +1976,13 @@ function renderSession() {
           <div class="exercise-prescription">${items.join('')}</div>
           ${ex.notes ? `<div class="exercise-note">${ex.notes}</div>` : ''}
         </div>
-      </div>
-    `;
+      </div>`;
   }).join('');
 
-  const warmupBlock = session.warmup.length ? `<div class="protocol-block"><div class="protocol-title">Warm-up</div><div class="protocol-list">${session.warmup.map(w => `<span>• ${w}</span>`).join('')}</div></div>` : '';
-  const cooldownBlock = session.cooldown.length ? `<div class="protocol-block"><div class="protocol-title">Cool-down & Mobility</div><div class="protocol-list">${session.cooldown.map(c => `<span>• ${c}</span>`).join('')}</div></div>` : '';
-  const fuelingBlock = session.fueling ? `<div class="protocol-block"><div class="protocol-title">Fueling</div><div class="protocol-list" style="font-size: 13px;">${session.fueling}</div></div>` : '';
   const overrideBanner = override ? `<div class="session-override-banner">↻ Original plan was ${plannedTitle} — adjusted for your check-in</div>` : '';
+
+  // Fueling as an array so protoBlock can count items
+  const fuelingItems = session.fueling ? [session.fueling] : [];
 
   return `
     <div class="session-card">
@@ -2429,15 +1991,17 @@ function renderSession() {
       <span class="session-pill ${pillClass}">${pillLabel}</span>
       <div class="session-title">${session.title}</div>
       <div class="session-detail">${session.summary}</div>
-      ${warmupBlock}
+
+      ${protoBlock('warmup-today', 'Warm-up', session.warmup, '🔥')}
+
       <div class="session-section">
         <div class="session-section-title">Main Work · ${session.exercises.length} ${session.exercises.length === 1 ? 'movement' : 'movements'}</div>
         ${exerciseRows}
       </div>
-      ${cooldownBlock}
-      ${fuelingBlock}
-    </div>
-  `;
+
+      ${protoBlock('cooldown-today', 'Cool-down & Mobility', session.cooldown, '🧊')}
+      ${protoBlock('fueling-today', 'Fueling Protocol', fuelingItems, '⚡')}
+    </div>`;
 }
 
 // Generic line chart
@@ -2466,237 +2030,7 @@ function renderChart(history, key, title, color, days=14, height=80) {
   `;
 }
 
-// ════════════════════════════════════════════════════════════════════
-//  PROGRESSION CARD — multi-metric weekly trend tracker
-// ════════════════════════════════════════════════════════════════════
-
-function computeWeeklyMetrics(activities, weeksBack = 8) {
-  // Group activities into 7-day rolling buckets, ending at today
-  const today = new Date();
-  today.setHours(23, 59, 59, 999);
-  const weeks = [];
-
-  for (let w = weeksBack - 1; w >= 0; w--) {
-    const weekEnd = new Date(today);
-    weekEnd.setDate(today.getDate() - w * 7);
-    const weekStart = new Date(weekEnd);
-    weekStart.setDate(weekEnd.getDate() - 6);
-    weekStart.setHours(0, 0, 0, 0);
-
-    const weekActs = activities.filter(a => {
-      const d = new Date(a.start_date_local);
-      return d >= weekStart && d <= weekEnd;
-    });
-
-    // Aerobic efficiency — pace at sub-150bpm for runs
-    const easyRuns = weekActs.filter(a => {
-      const cl = classifyActivityType(a.type);
-      const hr = a.icu_average_hr ?? a.average_heartrate;
-      return cl === 'run' && hr && hr <= 152 && a.moving_time > 20*60 && a.distance > 1000;
-    });
-    let aeroEff = null;
-    if (easyRuns.length > 0) {
-      const paces = easyRuns.map(a => (a.moving_time / 60) / (a.distance / 1609.34));
-      aeroEff = paces.reduce((x, y) => x + y, 0) / paces.length;
-    }
-
-    // Avg cadence for runs (single-leg normalized)
-    const runsCadence = weekActs.filter(a => {
-      const cl = classifyActivityType(a.type);
-      const cad = a.icu_average_cadence ?? a.average_cadence;
-      return cl === 'run' && cad;
-    });
-    let avgCadence = null;
-    if (runsCadence.length > 0) {
-      const cads = runsCadence.map(a => {
-        const c = a.icu_average_cadence ?? a.average_cadence;
-        return c < 100 ? c * 2 : c;
-      });
-      avgCadence = cads.reduce((x, y) => x + y, 0) / cads.length;
-    }
-
-    // Weekly volume (hours of training)
-    const totalSec = weekActs.reduce((sum, a) => sum + (a.moving_time || 0), 0);
-    const weeklyHrs = totalSec / 3600;
-
-    // Avg compliance score for plan-aligned sessions
-    const compliances = [];
-    weekActs.forEach(a => {
-      const dn = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date(a.start_date_local).getDay()];
-      if (doesActivityMatchPlan(a.type, dn)) {
-        const ana = analyzeCompliance(a, dn);
-        if (ana) compliances.push(ana.pct);
-      }
-    });
-    const avgCompliance = compliances.length > 0 ? compliances.reduce((x,y) => x+y, 0) / compliances.length : null;
-
-    // Session count
-    const sessionCount = weekActs.length;
-
-    weeks.push({ start: weekStart, end: weekEnd, aeroEff, avgCadence, weeklyHrs, avgCompliance, sessionCount });
-  }
-  return weeks;
-}
-
-function renderSparkline(values, width = 100, height = 30, color = 'var(--primary)') {
-  const valid = values.map((v, i) => ({ v, i })).filter(d => d.v != null);
-  if (valid.length < 2) return `<div style="height:${height}px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text-dim);">Not enough data</div>`;
-  const min = Math.min(...valid.map(d => d.v));
-  const max = Math.max(...valid.map(d => d.v));
-  const range = max - min || 1;
-  const pad = 2;
-  const w = width, h = height;
-  const stepX = (w - pad*2) / (values.length - 1);
-  const yFor = v => pad + (h - pad*2) * (1 - (v - min) / range);
-
-  // Build path with gaps for null values
-  let path = '', area = '', firstX = null, lastX = null;
-  let pen = false;
-  values.forEach((v, i) => {
-    const x = pad + i * stepX;
-    if (v == null) { pen = false; return; }
-    const y = yFor(v);
-    if (!pen) {
-      path += ` M ${x.toFixed(1)},${y.toFixed(1)}`;
-      if (firstX == null) firstX = x;
-      pen = true;
-    } else {
-      path += ` L ${x.toFixed(1)},${y.toFixed(1)}`;
-    }
-    lastX = x;
-  });
-  if (firstX != null && lastX != null) {
-    area = `M ${firstX.toFixed(1)},${(h-pad).toFixed(1)} `;
-    let drewFirst = false;
-    values.forEach((v, i) => {
-      const x = pad + i * stepX;
-      if (v == null) return;
-      const y = yFor(v);
-      area += `${drewFirst ? 'L' : 'L'} ${x.toFixed(1)},${y.toFixed(1)} `;
-      drewFirst = true;
-    });
-    area += `L ${lastX.toFixed(1)},${(h-pad).toFixed(1)} Z`;
-  }
-
-  // Highlight dot on last point
-  const lastValid = [...valid].reverse()[0];
-  const lastDotX = pad + lastValid.i * stepX;
-  const lastDotY = yFor(lastValid.v);
-
-  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="width:100%;height:${h}px;display:block;">
-    <path d="${area}" fill="${color}" opacity="0.12"/>
-    <path d="${path}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="${lastDotX.toFixed(1)}" cy="${lastDotY.toFixed(1)}" r="2.5" fill="${color}"/>
-  </svg>`;
-}
-
-function trendDirection(values, betterIsHigher = true) {
-  const valid = values.filter(v => v != null);
-  if (valid.length < 3) return { dir: 'flat', pct: 0 };
-  // Compare last 3 weeks avg vs prior 3 weeks avg
-  const recent = valid.slice(-3);
-  const prior = valid.slice(-6, -3);
-  if (prior.length === 0) return { dir: 'flat', pct: 0 };
-  const rAvg = recent.reduce((a,b) => a+b, 0) / recent.length;
-  const pAvg = prior.reduce((a,b) => a+b, 0) / prior.length;
-  const pct = ((rAvg - pAvg) / pAvg) * 100;
-  if (Math.abs(pct) < 2) return { dir: 'flat', pct: 0 };
-  const goingUp = pct > 0;
-  const improving = betterIsHigher ? goingUp : !goingUp;
-  return { dir: improving ? 'up' : 'down', pct: Math.abs(Math.round(pct)) };
-}
-
-function renderProgression(activities) {
-  const weeks = computeWeeklyMetrics(activities, 8);
-  if (weeks.length < 2) {
-    return `<div class="card"><div class="card-label">Progression</div><div style="color:var(--text-dim);font-size:13px;text-align:center;padding:30px 0;">Not enough data — need 2+ weeks</div></div>`;
-  }
-
-  const aeroEffs = weeks.map(w => w.aeroEff);
-  const cadences = weeks.map(w => w.avgCadence);
-  const volumes = weeks.map(w => w.weeklyHrs);
-  const compliances = weeks.map(w => w.avgCompliance);
-
-  // Aerobic efficiency — lower min/mi is better, so betterIsHigher = false
-  const aeroTrend = trendDirection(aeroEffs, false);
-  const cadTrend = trendDirection(cadences, true);
-  const volTrend = trendDirection(volumes, true);
-  const compTrend = trendDirection(compliances, true);
-
-  const lastAero = [...aeroEffs].reverse().find(v => v != null);
-  const lastCad = [...cadences].reverse().find(v => v != null);
-  const lastVol = volumes[volumes.length - 1];
-  const lastComp = [...compliances].reverse().find(v => v != null);
-
-  const arrowFor = t => {
-    if (t.dir === 'up') return `<span class="prog-arrow up">↗ +${t.pct}%</span>`;
-    if (t.dir === 'down') return `<span class="prog-arrow down">↘ -${t.pct}%</span>`;
-    return `<span class="prog-arrow flat">→ stable</span>`;
-  };
-
-  const rows = [
-    {
-      label: 'Aerobic efficiency',
-      sub: 'Pace at sub-150bpm — running faster at same HR',
-      value: lastAero ? `${lastAero.toFixed(1)} min/mi` : '—',
-      values: aeroEffs,
-      trend: aeroTrend,
-      color: '#22C55E',
-    },
-    {
-      label: 'Avg cadence',
-      sub: 'Steps per minute — target 170+',
-      value: lastCad ? `${Math.round(lastCad)} spm` : '—',
-      values: cadences,
-      trend: cadTrend,
-      color: '#A78BFA',
-    },
-    {
-      label: 'Weekly volume',
-      sub: 'Total training hours — consistency over intensity',
-      value: lastVol > 0 ? `${lastVol.toFixed(1)} hrs` : '0 hrs',
-      values: volumes,
-      trend: volTrend,
-      color: '#3B82F6',
-    },
-    {
-      label: 'Session quality',
-      sub: 'Avg stimulus score on plan-aligned sessions',
-      value: lastComp ? `${Math.round(lastComp)}%` : '—',
-      values: compliances,
-      trend: compTrend,
-      color: '#F97316',
-    },
-  ];
-
-  const rowsHtml = rows.map(r => `
-    <div class="prog-row">
-      <div class="prog-header-line">
-        <div class="prog-label-block">
-          <div class="prog-label">${r.label}</div>
-          <div class="prog-sub">${r.sub}</div>
-        </div>
-        <div class="prog-value-block">
-          <div class="prog-value">${r.value}</div>
-          ${arrowFor(r.trend)}
-        </div>
-      </div>
-      <div class="prog-spark">${renderSparkline(r.values, 280, 28, r.color)}</div>
-    </div>
-  `).join('');
-
-  return `
-    <div class="card progression-card">
-      <div class="card-header">
-        <div class="card-title">Progression</div>
-        <div class="card-meta">Last 8 weeks</div>
-      </div>
-      <div class="prog-rows">${rowsHtml}</div>
-    </div>
-  `;
-}
-
-
+// Multi-line CTL/ATL/TSB chart for desktop
 function renderLoadFullChart(history, days=60) {
   const data = history.slice(-days).map(d => ({ date: d.id, ctl: getField(d, 'ctl'), atl: getField(d, 'atl') })).filter(d => d.ctl != null && d.atl != null);
   if (data.length < 2) return '<div class="chart-card"><div class="card-label">Training Load</div><div style="color:var(--text-dim);font-size:13px;text-align:center;padding:30px 0;">Not enough load data yet</div></div>';
@@ -2830,7 +2164,7 @@ function renderInsights(history, activities) {
 // Zone distribution from recent activities
 function renderZoneDonut(activities) {
   const zoneSecs = [0, 0, 0, 0, 0];
-  activities.slice(-30).forEach(a => {
+  activities.sort((a, b) => (b.start_date_local || "").localeCompare(a.start_date_local || "")).slice(0, 30).forEach(a => {
     if (a.icu_zone_times) {
       a.icu_zone_times.forEach((t, i) => { if (i < 5) zoneSecs[i] += t || 0; });
     } else if (a.icu_hr_zone_times) {
@@ -2956,7 +2290,7 @@ function renderSparkline(activity) {
 
 function renderActivities(activities, limit=7) {
   if (!activities.length) return '<div class="card"><div class="card-label">Recent Activities</div><div style="color:var(--text-dim);font-size:13px;padding:10px 0;">No activities yet</div></div>';
-  const recent = activities.slice(-limit).reverse();
+  const recent = [...activities].sort((a, b) => (b.start_date_local || "").localeCompare(a.start_date_local || "")).slice(0, limit);
   const inner = recent.map(a => {
     const icon = sportIcon(a.type);
     const dist = a.distance ? `${fmtMiles(a.distance)} mi` : '';
@@ -3000,7 +2334,7 @@ function buildClaudePrompt(latest, history, activities) {
     `Stress: ${getField(latest, 'avgStressLevel') ?? 'not synced'}`
   ].join('\n');
 
-  const recent = activities.slice(-7).reverse().map(a => {
+  const recent = [...activities].sort((a, b) => (b.start_date_local || "").localeCompare(a.start_date_local || "")).slice(0, 7).map(a => {
     const dist = a.distance ? `${fmtMiles(a.distance)} mi` : '';
     const dur = a.moving_time ? `${fmtMins(a.moving_time)} min` : '';
     const hr = (a.icu_average_hr ?? a.average_heartrate) ? `${Math.round(a.icu_average_hr ?? a.average_heartrate)} bpm` : '';
@@ -3098,13 +2432,11 @@ function renderPhone(latest, sorted) {
       ${renderWeeklyVolume(state.activities)}
     </div>
     ${renderWeekPlanner(state.activities)}
-    ${renderProgression(state.activities)}
     ${renderSession()}
     <div class="footer">
       <a href="#" onclick="clearCredentials();return false;">Reset</a> ·
       <a href="https://intervals.icu" target="_blank">Intervals.icu</a> ·
-      ${state.stale ? `<span style="color:var(--orange);">⚠ Cached data${state.cacheTime ? ' from ' + state.cacheTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : ''}</span>` : `Updated ${new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`}
-      ${state.stale ? ` · <a href="#" onclick="fetchData();return false;" style="color:var(--primary);">Retry</a>` : ''}
+      Updated ${new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
     </div>
     <button class="coach-button-fixed" id="coach-btn-fixed" onclick="generateSession('coach-btn-fixed')">⚡ Get AI Coach Response</button>
   `;
@@ -3139,9 +2471,6 @@ function renderDesktop(latest, sorted) {
       <!-- FULL WIDTH: Training Load -->
       <div class="col-12">${renderLoadFullChart(sorted, 60)}</div>
 
-      <!-- FULL WIDTH: Progression -->
-      <div class="col-12">${renderProgression(state.activities)}</div>
-
       <!-- FULL WIDTH: Recent Activities -->
       <div class="col-12">
         <div class="card">
@@ -3157,17 +2486,12 @@ function renderDesktop(latest, sorted) {
     <div class="footer">
       <a href="#" onclick="clearCredentials();return false;">Reset</a> ·
       <a href="https://intervals.icu" target="_blank">Intervals.icu</a> ·
-      ${state.stale ? `<span style="color:var(--orange);">⚠ Cached data${state.cacheTime ? ' from ' + state.cacheTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : ''}</span> · <a href="#" onclick="fetchData();return false;" style="color:var(--primary);">Retry</a>` : `Updated ${new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`}
+      Updated ${new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
     </div>
   `;
 }
 
 fetchData();
-
-// Auto-refresh every 15 minutes to keep data current
-setInterval(() => {
-  if (state.athleteId && state.apiKey) fetchData();
-}, 15 * 60 * 1000);
 </script>
 </body>
 </html>
