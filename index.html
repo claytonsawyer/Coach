@@ -257,28 +257,48 @@ body.desktop-view .coach-button-fixed { display: none; }
 /* Both the Health Snapshot ring and Coach's Read arcs use SVG-native text
    so positioning is always pixel-perfect regardless of font rendering.    */
 
-/* Gauge row (Coach's Read) */
+/* Metric row (Coach's Read) — vertical bar tiles */
 .cr-gauge-row { display: flex; border-bottom: 1px solid var(--border); }
 .cr-gauge-cell {
   flex: 1; display: flex; flex-direction: column; align-items: center;
-  justify-content: flex-start; padding: 14px 4px 12px; min-width: 0;
+  justify-content: flex-start; padding: 14px 6px 14px; min-width: 0;
 }
 .cr-gauge-cell + .cr-gauge-cell { border-left: 1px solid var(--border); }
-.cr-gauge-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin-bottom: 6px; white-space: nowrap; }
-/* gauge SVGs are self-contained — number lives inside as <text> */
-.cr-gauge-svg  { display: block; }
-.cr-gauge-status { font-size: 10px; font-weight: 700; margin-top: 5px; text-align: center; white-space: nowrap; }
-
-/* Gauge entrance animation */
-@keyframes arcDraw {
-  from { stroke-dashoffset: var(--arc-len); }
-  to   { stroke-dashoffset: 0; }
+.cr-gauge-label {
+  font-size: 9px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--text-dim); margin-bottom: 10px; white-space: nowrap;
 }
-.cr-arc-animated {
-  stroke-dasharray: var(--arc-len);
-  stroke-dashoffset: var(--arc-len);
-  animation: arcDraw 0.7s cubic-bezier(0.4,0,0.2,1) forwards;
-  animation-delay: var(--arc-delay, 0s);
+
+/* The metric: number + unit on the left, vertical bar on the right */
+.cr-metric { display: flex; align-items: center; gap: 10px; }
+.cr-metric-readout { display: flex; flex-direction: column; align-items: flex-start; }
+.cr-metric-value {
+  font-size: 26px; font-weight: 800; letter-spacing: -0.04em; line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.cr-metric-unit { font-size: 9.5px; font-weight: 600; color: var(--text-dim); margin-top: 3px; }
+
+/* Vertical track + fill */
+.cr-bar-track {
+  width: 7px; height: 46px; border-radius: 4px;
+  background: var(--surface-3); position: relative; overflow: hidden;
+  flex-shrink: 0;
+}
+.cr-bar-fill {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  border-radius: 4px;
+  height: 0;
+  transition: height 0.7s cubic-bezier(0.4,0,0.2,1);
+}
+/* mid-point tick for the Form bar (TSB neutral marker) */
+.cr-bar-tick {
+  position: absolute; left: -2px; right: -2px; height: 1.5px;
+  background: var(--text-dim); opacity: 0.5;
+}
+
+.cr-gauge-status {
+  font-size: 10px; font-weight: 700; margin-top: 10px;
+  text-align: center; white-space: nowrap;
 }
 
 /* Narrative */
@@ -494,8 +514,10 @@ body.desktop-view .coach-button-fixed { display: none; }
 .today-pill { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--primary); background: var(--primary-bg); padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
 .modified-tag { font-size: 9px; font-weight: 700; color: var(--orange); opacity: 0.8; }
 .week-day-main { display: flex; align-items: center; gap: 10px; width: 100%; cursor: pointer; }
-.day-log-entries { margin-top: 7px; padding-top: 7px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 3px; pointer-events: none; }
+.day-log-entries { margin-top: 7px; padding-top: 7px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 3px; }
 .day-log-entry { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+.day-log-entry-tap { cursor: pointer; padding: 3px 4px; border-radius: 6px; margin: -3px -4px; transition: background 0.15s; }
+.day-log-entry-tap:hover { background: rgba(79,142,247,0.08); }
 .day-log-icon { display: flex; align-items: center; color: var(--green); flex-shrink: 0; margin-top: 1px; }
 .day-log-icon svg { width: 12px; height: 12px; }
 .day-log-name { font-size: 11px; font-weight: 600; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 1; min-width: 0; max-width: 160px; }
@@ -528,6 +550,80 @@ body.desktop-view .coach-button-fixed { display: none; }
 .modal-btn-cancel { background: var(--surface-2); color: var(--text-muted); border: 1px solid var(--border); }
 .modal-btn-confirm { background: var(--text); color: var(--bg); }
 .modal-btn-confirm:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ════════════════════════════════════════════════════════
+   ACTIVITY INSIGHTS MODAL
+   ════════════════════════════════════════════════════════ */
+.ai-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 300;
+  display: flex; align-items: flex-end; justify-content: center;
+  animation: fadeIn 0.15s;
+}
+.ai-modal {
+  background: var(--surface); border-top: 1px solid var(--border);
+  border-radius: 22px 22px 0 0; width: 100%; max-width: 560px;
+  max-height: 88vh; overflow-y: auto;
+  animation: slideUp 0.22s cubic-bezier(0.34,1.3,0.64,1);
+  padding: 0 0 env(safe-area-inset-bottom);
+}
+.ai-modal-header {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 20px 20px 16px; border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; background: var(--surface); z-index: 1;
+  border-radius: 22px 22px 0 0;
+}
+.ai-modal-handle { width: 36px; height: 4px; background: var(--border-strong); border-radius: 2px; position: absolute; top: 12px; left: 50%; transform: translateX(-50%); }
+.ai-modal-icon { width: 42px; height: 42px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border-strong); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 4px; }
+.ai-modal-title { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; color: var(--text); line-height: 1.2; margin-bottom: 3px; }
+.ai-modal-meta { font-size: 12px; color: var(--text-dim); display: flex; gap: 10px; flex-wrap: wrap; }
+.ai-modal-meta span { display: inline-flex; align-items: center; gap: 4px; }
+.ai-modal-close { margin-left: auto; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim); width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; font-size: 16px; line-height: 1; margin-top: 4px; }
+.ai-modal-close:hover { background: var(--surface-3); color: var(--text); }
+
+.ai-modal-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+  background: var(--border); border-bottom: 1px solid var(--border);
+}
+.ai-modal-stat {
+  background: var(--surface); padding: 14px 16px; text-align: center;
+}
+.ai-modal-stat-val { font-size: 22px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; color: var(--text); }
+.ai-modal-stat-unit { font-size: 11px; color: var(--text-dim); font-weight: 500; margin-left: 1px; }
+.ai-modal-stat-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin-top: 4px; }
+
+.ai-modal-body { padding: 18px 20px 24px; }
+
+.ai-insight-loading {
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  padding: 32px 20px; color: var(--text-muted); font-size: 13px; text-align: center;
+}
+.ai-insight-loading .spinner { width: 22px; height: 22px; }
+
+.ai-insight-block {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px; margin-bottom: 12px;
+}
+.ai-insight-block-label {
+  font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--text-dim); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+}
+.ai-insight-block-label span { font-size: 14px; }
+.ai-insight-block-text { font-size: 13.5px; line-height: 1.65; color: var(--text-muted); }
+.ai-insight-block-text strong { color: var(--text); font-weight: 600; }
+.ai-insight-block-text .hi-good { color: var(--green); font-weight: 600; }
+.ai-insight-block-text .hi-warn { color: var(--orange); font-weight: 600; }
+.ai-insight-block-text .hi-bad  { color: var(--red); font-weight: 600; }
+
+.ai-insight-error {
+  background: var(--red-bg); border: 1px solid rgba(248,113,113,0.2);
+  border-radius: 12px; padding: 16px; font-size: 13px; color: var(--red); line-height: 1.5;
+}
+
+/* Make activity rows clickable */
+.activity { cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+.activity:hover { background: var(--surface-3); border-color: var(--border-strong); }
+.activity:active { background: var(--surface-2); }
+.activity-tap-hint { font-size: 10px; color: var(--primary); font-weight: 600; margin-top: 2px; display: flex; align-items: center; gap: 3px; }
 
 /* ════════════════════════════════════════════════════════
    PHONE MINI DATA GRID
@@ -739,13 +835,73 @@ const getField = (obj, ...keys) => {
   return null;
 };
 
+// CTL/ATL/rampRate fill in after overnight sync — today's wellness record
+// often has a partial or zero value. Walk back to the most recent record
+// that actually has a sensible value so the dashboard never shows "Fitness 9".
+function latestValid(history, key, minPlausible = null) {
+  if (!history || !history.length) return null;
+  const sorted = [...history].sort((a, b) => (a.id || '').localeCompare(b.id || ''));
+  for (let i = sorted.length - 1; i >= 0; i--) {
+    const v = getField(sorted[i], key);
+    if (v == null) continue;
+    if (minPlausible != null && v < minPlausible) continue;
+    return v;
+  }
+  return null;
+}
+
+// Pull a coherent fitness snapshot. The most recent wellness record can have
+// a partial/zero CTL because Intervals.icu hasn't finished its overnight
+// recalculation. Strategy: take the median CTL across recent valid records,
+// then accept the latest record whose CTL is within a sane band of that
+// median (i.e. not an obvious partial-sync artifact).
+function fitnessSnapshot(history) {
+  const empty = { ctl: null, atl: null, tsb: null, acwr: null };
+  if (!history || !history.length) return empty;
+  const sorted = [...history].sort((a, b) => (a.id || '').localeCompare(b.id || ''));
+
+  // Collect records that have both CTL and ATL
+  const valid = sorted.filter(d => getField(d, 'ctl') != null && getField(d, 'atl') != null);
+  if (!valid.length) return empty;
+
+  // Median CTL of the most recent 30 valid records — a stable reference
+  const recentCtls = valid.slice(-30).map(d => getField(d, 'ctl')).sort((a, b) => a - b);
+  const medianCtl = recentCtls[Math.floor(recentCtls.length / 2)];
+
+  // Accept the latest record whose CTL is at least 60% of the median.
+  // This rejects partial-sync zeros/single-digits without a hard threshold.
+  const floor = medianCtl != null ? medianCtl * 0.6 : 0;
+  for (let i = valid.length - 1; i >= 0; i--) {
+    const ctl = getField(valid[i], 'ctl');
+    const atl = getField(valid[i], 'atl');
+    if (ctl >= floor) {
+      return { ctl, atl, tsb: ctl - atl, acwr: ctl > 0 ? atl / ctl : null };
+    }
+  }
+  // Fallback — use the most recent valid record regardless
+  const last = valid[valid.length - 1];
+  const ctl = getField(last, 'ctl'), atl = getField(last, 'atl');
+  return { ctl, atl, tsb: ctl - atl, acwr: ctl > 0 ? atl / ctl : null };
+}
+
+// Strip partial-sync outliers from a raw CTL value series (for sparklines).
+function cleanCtlSeries(values) {
+  const v = values.filter(x => x != null);
+  if (!v.length) return v;
+  const sorted = [...v].sort((a, b) => a - b);
+  const med = sorted[Math.floor(sorted.length / 2)];
+  return v.filter(x => x >= med * 0.6);
+}
+
+
 function computeReadiness(latest, history) {
   if (!latest) return null;
   const hrv = getField(latest, 'hrv', 'hrvWeeklyAverage');
   const rhr = getField(latest, 'restingHR');
   const sleepSecs = getField(latest, 'sleepSecs');
-  const ctl = getField(latest, 'ctl');
-  const atl = getField(latest, 'atl');
+  const fit = fitnessSnapshot(history);
+  const ctl = fit.ctl;
+  const atl = fit.atl;
 
   if (hrv == null && sleepSecs == null) return null;
 
@@ -1081,11 +1237,11 @@ function renderWeekPlanner(activities = []) {
       const rawName = a.name || a.type || 'Activity';
       const shortName = rawName.length > 28 ? rawName.slice(0, 26) + '…' : rawName;
       return `
-        <div class="day-log-entry">
+        <div class="day-log-entry day-log-entry-tap" onclick="event.stopPropagation(); openActivityInsights('${a.id}')">
           <span class="day-log-icon">${icon}</span>
           <span class="day-log-name">${shortName}</span>
           ${stats ? `<span class="day-log-stats">${stats}</span>` : ''}
-          <span class="day-log-check">✓</span>
+          <span class="day-log-check">✓ <span style="color:var(--primary);font-size:9px;font-weight:700;">INSIGHTS</span></span>
         </div>
       `;
     }).join('');
@@ -1144,10 +1300,8 @@ function renderHeader() {
 }
 
 function renderPerfSubdate(latest, sorted) {
-  const ctl = getField(latest, 'ctl');
-  const atl = getField(latest, 'atl');
+  const { ctl, atl, tsb } = fitnessSnapshot(sorted);
   const hrv = getField(latest, 'hrv', 'hrvWeeklyAverage');
-  const tsb = (ctl != null && atl != null) ? ctl - atl : null;
 
   const parts = [];
   if (ctl != null) {
@@ -1251,11 +1405,12 @@ function renderHealthSnapshot(latest, history, idSuffix='') {
   const sleep      = sleepSecs ? fmtHrs(sleepSecs) : null;
   const sleepScore = getField(latest, 'sleepScore');
   const sleepHR    = getField(latest, 'avgSleepingHR');
-  const ctl        = getField(latest, 'ctl');
-  const atl        = getField(latest, 'atl');
-  const tsb        = (ctl != null && atl != null) ? (ctl - atl) : null;
-  const acwr       = (ctl && atl && ctl > 0) ? (atl / ctl) : null;
-  const rampRate   = getField(latest, 'rampRate');
+  const ctlSnap    = fitnessSnapshot(history);
+  const ctl        = ctlSnap.ctl;
+  const atl        = ctlSnap.atl;
+  const tsb        = ctlSnap.tsb;
+  const acwr       = ctlSnap.acwr;
+  const rampRate   = latestValid(history, 'rampRate');
   const vo2max     = getField(latest, 'vo2max');
   const stress     = getField(latest, 'avgStressLevel');
   const steps      = getField(latest, 'steps');
@@ -1306,7 +1461,7 @@ function renderHealthSnapshot(latest, history, idSuffix='') {
   }
 
   // CTL 30-day sparkline
-  const ctl30 = history.slice(-30).map(d => getField(d, 'ctl')).filter(v => v != null);
+  const ctl30 = cleanCtlSeries(history.slice(-30).map(d => getField(d, 'ctl')));
 
   // Ramp rate status
   const rampColor = rampRate == null ? 'var(--text-dim)'
@@ -1540,20 +1695,19 @@ function makeGaugeSvg({ mode='arc', value, unit='', pct, color, size, delay='0s'
   }
 
   // ── Half-arc (opens upward) ───────────────────────────────────
-  // Canvas 80×58. Arc centre cx=40,cy=52. Radius=34.
-  // Track spans from left (180°) to right (0°) along bottom.
-  const S  = 80, H = 58;
-  const cx = 40, cy = 52, R = 34;
+  // Canvas 84×62. Arc centre cx=42, cy=50. Radius=33.
+  // Track spans bottom-left (180°) to bottom-right (0°).
+  const S  = 84, H = 62;
+  const cx = 42, cy = 50, R = 33;
   const tx1 = cx - R, ty = cy;   // left end
   const tx2 = cx + R;             // right end
   const clamp = Math.min(Math.max(pct || 0, 0), 1);
-  // Fill sweeps left-to-right (clockwise on top of arc)
+  // Fill sweeps left-to-right along the top of the arc
   const endAngle = Math.PI - Math.PI * clamp;  // 180° → 0°
   const fx = cx + R * Math.cos(endAngle);
   const fy = cy + R * Math.sin(endAngle);
   const largeArc = clamp > 0.5 ? 1 : 0;
   const arcLen   = (Math.PI * R * clamp).toFixed(1);
-  const totalLen = (Math.PI * R).toFixed(1);
 
   const activePath = clamp > 0.02
     ? `<path d="M ${tx1} ${ty} A${R} ${R} 0 ${largeArc} 1 ${fx.toFixed(1)} ${fy.toFixed(1)}"
@@ -1562,19 +1716,22 @@ function makeGaugeSvg({ mode='arc', value, unit='', pct, color, size, delay='0s'
          style="animation:arcDraw 0.6s cubic-bezier(0.4,0,0.2,1) ${delay} forwards;"/>`
     : '';
 
-  const numY  = 44;   // number baseline — sits in arc opening
-  const unitY = 55;   // unit sits at bottom
+  // Number sits visually centred inside the arc opening; unit sits just below.
+  const numStr  = String(value);
+  const numSize = numStr.length >= 4 ? 18 : numStr.length === 3 ? 21 : 23;
+  const numY  = 40;   // optical centre of the arc bowl
+  const unitY = 56;   // clear gap below the number
 
   return `<svg class="cr-gauge-svg" width="${S}" height="${H}" viewBox="0 0 ${S} ${H}">
     <path d="M ${tx1} ${ty} A${R} ${R} 0 1 1 ${tx2} ${ty}"
       fill="none" stroke="var(--border)" stroke-width="${STROKE}" stroke-linecap="round"/>
     ${activePath}
-    <text x="40" y="${numY}" text-anchor="middle"
-      font-family="${font}" font-size="22" font-weight="800"
-      letter-spacing="-1" fill="${color}">${value}</text>
-    <text x="40" y="${unitY}" text-anchor="middle"
-      font-family="${font}" font-size="10" font-weight="500"
-      fill="var(--text-dim)">${unit}</text>
+    <text x="${cx}" y="${numY}" text-anchor="middle" dominant-baseline="middle"
+      font-family="${font}" font-size="${numSize}" font-weight="800"
+      letter-spacing="-0.5" fill="${color}">${value}</text>
+    <text x="${cx}" y="${unitY}" text-anchor="middle" dominant-baseline="middle"
+      font-family="${font}" font-size="9.5" font-weight="600"
+      letter-spacing="0.02em" fill="var(--text-dim)">${unit}</text>
   </svg>`;
 }
 
@@ -1584,6 +1741,32 @@ function crArcSvg(numText, unitText, pct, color, delay='0s') {
 }
 function ringGaugeSvg(value, unit, pct, color, size=76) {
   return makeGaugeSvg({ mode:'ring', value, unit, pct, color, size });
+}
+
+// Vertical-bar metric tile for the Coach's Read row.
+// Robust: pure HTML/CSS, handles missing data and negative values cleanly.
+//   value   — display string (e.g. "44", "107", "-9", "—")
+//   unit    — small label under the number ("/ 100", "ms", "TSB")
+//   pct     — 0..1 fill fraction (null = empty track)
+//   color   — fill + number colour
+//   tick    — optional 0..1 position for a reference marker (used by Form)
+function crMetricBar(value, unit, pct, color, tick=null) {
+  const clamped = pct == null ? 0 : Math.min(Math.max(pct, 0), 1);
+  const fillPct = (clamped * 100).toFixed(1);
+  const tickHtml = tick != null
+    ? `<div class="cr-bar-tick" style="bottom:${(Math.min(Math.max(tick,0),1)*100).toFixed(1)}%"></div>`
+    : '';
+  return `
+    <div class="cr-metric">
+      <div class="cr-metric-readout">
+        <div class="cr-metric-value" style="color:${color}">${value}</div>
+        <div class="cr-metric-unit">${unit}</div>
+      </div>
+      <div class="cr-bar-track">
+        ${tickHtml}
+        <div class="cr-bar-fill" style="background:${color};height:${pct == null ? 0 : fillPct}%"></div>
+      </div>
+    </div>`;
 }
 
 
@@ -1616,13 +1799,19 @@ function crSparkline(values, color, w=44, h=20) {
   return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 }
 
-function crTodayDirective(readiness, hrv, feel) {
+function crTodayDirective(readiness, hrv, feel, acwr) {
   // Returns { label, color, sub } — the single most important instruction for today
   if (feel === 'beat') return { label: 'Rest Day', color: 'var(--red)', sub: 'You marked yourself beat. Non-negotiable.' };
   if (hrv != null && hrv < 40) return { label: 'Rest Day', color: 'var(--red)', sub: `HRV ${Math.round(hrv)}ms — below 40ms floor.` };
   if (hrv != null && hrv < 60) return { label: 'Zone 2 Only', color: 'var(--orange)', sub: `HRV ${Math.round(hrv)}ms — low. No intensity today.` };
   if (feel === 'sore') return { label: 'Active Recovery', color: 'var(--orange)', sub: 'Soreness logged — session modified.' };
-  if (readiness != null && readiness < 40) return { label: 'Rest or Z2 Only', color: 'var(--red)', sub: `Readiness ${readiness}/100 — body needs recovery.` };
+  // Low readiness — explain the driver: high load vs poor recovery look different
+  if (readiness != null && readiness < 40) {
+    if (acwr != null && acwr > 1.3 && hrv != null && hrv >= 90) {
+      return { label: 'Pull Back Load', color: 'var(--orange)', sub: `HRV strong (${Math.round(hrv)}ms) but ACWR ${acwr.toFixed(2)} is over cap — this is a load problem, not a recovery one. Easy days until ACWR drops under 1.3.` };
+    }
+    return { label: 'Rest or Z2 Only', color: 'var(--red)', sub: `Readiness ${readiness}/100 — body needs recovery.` };
+  }
   if (readiness != null && readiness < 60) return { label: 'Reduce 10–15%', color: 'var(--orange)', sub: `Readiness ${readiness}/100 — cap intensity.` };
   if (hrv != null && hrv < 85) return { label: 'Reduce Intensity', color: 'var(--yellow)', sub: `HRV ${Math.round(hrv)}ms — below 85ms threshold.` };
   if (readiness != null && readiness >= 80) return { label: 'Full Send', color: 'var(--green)', sub: `Readiness ${readiness}/100 — green light.` };
@@ -1632,17 +1821,14 @@ function crTodayDirective(readiness, hrv, feel) {
 // ── Main render ────────────────────────────────────────────────────────────────
 
 function renderCoachCard(latest, history, activities) {
-  const ctl  = getField(latest, 'ctl');
-  const atl  = getField(latest, 'atl');
-  const tsb  = (ctl != null && atl != null) ? ctl - atl : null;
+  const { ctl, atl, tsb, acwr } = fitnessSnapshot(history);
   const hrv  = getField(latest, 'hrv', 'hrvWeeklyAverage');
   const sleep = getField(latest, 'sleepSecs');
-  const rhr  = getField(latest, 'restingHeartRate');
-  const acwr = (ctl && atl && ctl > 0) ? atl / ctl : null;
+  const rhr  = getField(latest, 'restingHR');
 
   const baseReadiness    = computeReadiness(latest, history);
   const adjustedReadiness = applyFeelToReadiness(baseReadiness, state.feel);
-  const directive = crTodayDirective(adjustedReadiness, hrv, state.feel);
+  const directive = crTodayDirective(adjustedReadiness, hrv, state.feel, acwr);
 
   // HRV sparkline (14d)
   const hrvHistory = history.slice(-14).map(d => getField(d, 'hrv', 'hrvWeeklyAverage')).filter(v => v != null);
@@ -1712,17 +1898,17 @@ function renderCoachCard(latest, history, activities) {
     <div class="cr-gauge-row">
       <div class="cr-gauge-cell">
         <div class="cr-gauge-label">Readiness</div>
-        ${crArcSvg(readNum, '/ 100', readPct, readColor, '0.1s')}
+        ${crMetricBar(readNum, '/ 100', adjustedReadiness != null ? readPct : null, readColor)}
         <div class="cr-gauge-status" style="color:${readColor}">${readLabel}</div>
       </div>
       <div class="cr-gauge-cell">
         <div class="cr-gauge-label">HRV</div>
-        ${crArcSvg(hrvNum, 'ms', hrvPct, hrvColor, '0.25s')}
+        ${crMetricBar(hrvNum, 'ms', hrv != null ? hrvPct : null, hrvColor)}
         <div class="cr-gauge-status" style="color:${hrvColor}">${hrvLabel}</div>
       </div>
       <div class="cr-gauge-cell">
         <div class="cr-gauge-label">Form</div>
-        ${crArcSvg(tsbNum, 'TSB', tsbPct, tsbColor, '0.4s')}
+        ${crMetricBar(tsbNum, 'TSB', tsb != null ? tsbPct : null, tsbColor, 0.6)}
         <div class="cr-gauge-status" style="color:${tsbColor}">${tsbLabel}</div>
       </div>
     </div>`;
@@ -1741,12 +1927,50 @@ function renderCoachCard(latest, history, activities) {
     null
   ));
 
+  // ── TODAY'S LOGGED WORK — what Clayton actually did vs recommendation ──────
+  const todayActs = activitiesForDay(activities || [], new Date());
+  let todayCostTotal = 0;
+  if (todayActs.length) {
+    todayCostTotal = todayActs.reduce((sum, act) => sum + activityRecoveryCost(act), 0);
+    const tcl = costLabel(Math.min(100, todayCostTotal));
+    const actNames = todayActs.map(act => {
+      const m = act.moving_time ? Math.round(act.moving_time / 60) : 0;
+      const nm = (act.type || 'Session');
+      return `${nm}${m ? ` ${m}min` : ''}`;
+    }).join(' + ');
+
+    // Did the logged work contradict the recommendation?
+    const wasRestRecommended = (adjustedReadiness != null && adjustedReadiness < 40)
+      || state.feel === 'beat'
+      || (hrv != null && hrv < 85 && adjustedReadiness != null && adjustedReadiness < 55);
+
+    let dot, title, sub;
+    if (wasRestRecommended && todayCostTotal >= 35) {
+      dot = 'orange';
+      title = `Logged today: <span style="color:var(--orange);font-weight:700">${actNames}</span>`;
+      sub = `You trained on a low-readiness day — that's a real recovery cost (${Math.min(100,todayCostTotal)}/100). Not a mistake, but bank extra sleep tonight and make tomorrow genuinely easy. Re-check HRV in the morning.`;
+    } else if (wasRestRecommended && todayCostTotal < 35) {
+      dot = 'green';
+      title = `Logged today: <span style="color:var(--green);font-weight:700">${actNames}</span>`;
+      sub = `Light enough (${Math.min(100,todayCostTotal)}/100 cost) that it won't undo recovery — smart way to move on a low day without digging the hole deeper.`;
+    } else if (todayCostTotal >= 60) {
+      dot = 'orange';
+      title = `Logged today: ${actNames}`;
+      sub = `Heavy day — ${Math.min(100,todayCostTotal)}/100 recovery cost. Expect HRV to dip tomorrow; protect the next session.`;
+    } else {
+      dot = 'green';
+      title = `Logged today: ${actNames}`;
+      sub = `${tcl.word} recovery cost (${Math.min(100,todayCostTotal)}/100). Tap any activity below for the full breakdown.`;
+    }
+    signals.push(crSignalRow(dot, title, sub, null));
+  }
+
   // Fitness (CTL) vs baseline
   if (ctl != null) {
     const delta = Math.round(ctl - 219);
     const sign = delta >= 0 ? '+' : '';
     const dot = delta >= 5 ? 'green' : delta <= -15 ? 'orange' : 'blue';
-    const ctlHistory = history.slice(-14).map(d => getField(d, 'ctl')).filter(v => v != null);
+    const ctlHistory = cleanCtlSeries(history.slice(-14).map(d => getField(d, 'ctl')));
     const spark = crSparkline(ctlHistory, 'var(--primary)');
     signals.push(crSignalRow(
       dot,
@@ -1759,10 +1983,12 @@ function renderCoachCard(latest, history, activities) {
   // ACWR
   if (acwr != null) {
     const dot = acwr > 1.3 ? 'red' : acwr > 1.2 ? 'orange' : acwr >= 0.8 ? 'green' : 'gray';
-    const sub = acwr > 1.3 ? 'Above 1.3 cap — pull back now'
-      : acwr > 1.2 ? 'Approaching cap — monitor'
-      : acwr >= 0.8 ? 'Optimal build zone'
-      : 'Low — safe to push';
+    let sub;
+    if (acwr > 1.5) sub = `Well over the 1.3 cap — injury-risk territory. Hold easy/Z2 only until this drops back under 1.3.`;
+    else if (acwr > 1.3) sub = 'Above 1.3 cap — back off intensity for a few days to bring it down';
+    else if (acwr > 1.2) sub = 'Approaching cap — monitor, avoid stacking hard days';
+    else if (acwr >= 0.8) sub = 'Optimal build zone';
+    else sub = 'Low — safe to push';
     signals.push(crSignalRow(dot, `Load Ratio (ACWR) ${acwr.toFixed(2)}`, sub, loadPct != null ? `${loadPct > 0 ? '+' : ''}${loadPct}% vs wk` : null));
   }
 
@@ -1832,23 +2058,49 @@ function renderCoachCard(latest, history, activities) {
 function buildSummaryShort(latest, history) {
   const { session, override } = getSessionForToday();
   const day = dayName(new Date());
-  const ctl = getField(latest, 'ctl');
-  const atl = getField(latest, 'atl');
-  const tsb = (ctl != null && atl != null) ? ctl - atl : null;
+  const { tsb } = fitnessSnapshot(history);
   const hrv = getField(latest, 'hrv', 'hrvWeeklyAverage');
   const baseReadiness = computeReadiness(latest, history);
   const adjustedReadiness = applyFeelToReadiness(baseReadiness, state.feel);
 
+  // What did Clayton actually log today?
+  const todayActs = activitiesForDay(state.activities || [], new Date());
+  const todayCost = todayActs.reduce((s, act) => s + activityRecoveryCost(act), 0);
+  const lowReadinessDay = (adjustedReadiness != null && adjustedReadiness < 40)
+    || state.feel === 'beat'
+    || (hrv != null && hrv < 85 && adjustedReadiness != null && adjustedReadiness < 55);
+
   let parts = [];
 
-  // Session line
+  // If work is already logged today, the narrative reports on it rather than prescribing
+  if (todayActs.length) {
+    const summary = todayActs.map(act => {
+      const m = act.moving_time ? Math.round(act.moving_time / 60) : 0;
+      return `${act.type || 'session'}${m ? ` (${m}min)` : ''}`;
+    }).join(' + ');
+
+    if (lowReadinessDay && todayCost >= 35) {
+      parts.push(`<strong>${day}</strong> — recovery flagged low, but you logged <strong>${summary}</strong>.`);
+      parts.push(`That's real load on a depleted day. <span class="highlight-warn">Prioritize sleep tonight and keep tomorrow easy</span> — re-check HRV before deciding on the next hard session.`);
+    } else if (lowReadinessDay) {
+      parts.push(`<strong>${day}</strong> — readiness was low and you kept today's <strong>${summary}</strong> light. <span class="highlight-good">Good call</span> — movement without digging the hole deeper.`);
+    } else if (todayCost >= 60) {
+      parts.push(`<strong>${day}</strong> — logged <strong>${summary}</strong>, a heavy day.`);
+      parts.push(`Expect HRV to dip tomorrow; make the next session genuinely controlled.`);
+    } else {
+      parts.push(`<strong>${day}</strong> — logged <strong>${summary}</strong>. ${session.title} was on the plan.`);
+      parts.push(`Manageable load — you're clear to train as planned tomorrow.`);
+    }
+    return parts.join(' ');
+  }
+
+  // Nothing logged yet — prescribe as before
   if (override) {
     parts.push(`<strong>${day}</strong> — ${session.title}. <span class="highlight-warn">Original ${session.title} swapped based on check-in.</span>`);
   } else {
     parts.push(`<strong>${day}</strong> — ${session.title}.`);
   }
 
-  // Single most useful coaching note
   if (hrv != null && hrv < 85) {
     parts.push(`HRV below threshold — auto-reduce intensity, keep HR under 150bpm on all work sets.`);
   } else if (tsb != null && tsb < -20) {
@@ -1879,9 +2131,7 @@ function buildSummary(latest, history, activities) {
   const adjustedReadiness = applyFeelToReadiness(baseReadiness, state.feel);
   const hrv = getField(latest, 'hrv', 'hrvWeeklyAverage');
   const sleep = getField(latest, 'sleepSecs');
-  const ctl = getField(latest, 'ctl');
-  const atl = getField(latest, 'atl');
-  const tsb = (ctl != null && atl != null) ? ctl - atl : null;
+  const { ctl, atl, tsb } = fitnessSnapshot(history);
 
   const recentHrv = history.slice(-7).map(d => getField(d, 'hrv', 'hrvWeeklyAverage')).filter(v => v != null);
   const olderHrv = history.slice(-14, -7).map(d => getField(d, 'hrv', 'hrvWeeklyAverage')).filter(v => v != null);
@@ -2032,7 +2282,15 @@ function renderChart(history, key, title, color, days=14, height=80) {
 
 // Multi-line CTL/ATL/TSB chart for desktop
 function renderLoadFullChart(history, days=60) {
-  const data = history.slice(-days).map(d => ({ date: d.id, ctl: getField(d, 'ctl'), atl: getField(d, 'atl') })).filter(d => d.ctl != null && d.atl != null);
+  let data = history.slice(-days)
+    .map(d => ({ date: d.id, ctl: getField(d, 'ctl'), atl: getField(d, 'atl') }))
+    .filter(d => d.ctl != null && d.atl != null);
+  // Drop partial-sync outliers: any CTL under 60% of the series median
+  if (data.length) {
+    const sortedCtl = data.map(d => d.ctl).sort((a, b) => a - b);
+    const med = sortedCtl[Math.floor(sortedCtl.length / 2)];
+    data = data.filter(d => d.ctl >= med * 0.6);
+  }
   if (data.length < 2) return '<div class="chart-card"><div class="card-label">Training Load</div><div style="color:var(--text-dim);font-size:13px;text-align:center;padding:30px 0;">Not enough load data yet</div></div>';
   const w = 800, h = 220, pad = 30;
   const allVals = data.flatMap(d => [d.ctl, d.atl]);
@@ -2082,24 +2340,19 @@ function renderInsights(history, activities) {
   const insights = [];
 
   // Fitness trend — CTL vs baseline
-  const latest = history[history.length - 1];
-  if (latest) {
-    const ctl = getField(latest, 'ctl');
-    const atl = getField(latest, 'atl');
-    if (ctl != null) {
-      const delta = Math.round(ctl - 219);
-      const sign = delta >= 0 ? '+' : '';
-      const color = delta >= 5 ? 'var(--green-bg)' : delta <= -10 ? 'var(--red-bg)' : 'var(--surface-2)';
-      const icon = delta >= 0
-        ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>'
-        : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>';
-      insights.push({ icon, bg: color, text: `Fitness (CTL) at <strong>${Math.round(ctl)}</strong> — <strong>${sign}${delta} vs 219 baseline</strong>. Peak: 271.` });
-    }
-    if (ctl && atl && ctl > 0) {
-      const acwr = atl / ctl;
-      if (acwr > 1.3) insights.push({ icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', bg: 'var(--red-bg)', text: `<strong>ACWR ${acwr.toFixed(2)}</strong> — above 1.3 cap. Back off today.` });
-      else if (acwr >= 0.8 && acwr <= 1.2) insights.push({ icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>', bg: 'var(--green-bg)', text: `<strong>ACWR ${acwr.toFixed(2)}</strong> — optimal training zone. Build.` });
-    }
+  const { ctl, atl, acwr } = fitnessSnapshot(history);
+  if (ctl != null) {
+    const delta = Math.round(ctl - 219);
+    const sign = delta >= 0 ? '+' : '';
+    const color = delta >= 5 ? 'var(--green-bg)' : delta <= -10 ? 'var(--red-bg)' : 'var(--surface-2)';
+    const icon = delta >= 0
+      ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>'
+      : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>';
+    insights.push({ icon, bg: color, text: `Fitness (CTL) at <strong>${Math.round(ctl)}</strong> — <strong>${sign}${delta} vs 219 baseline</strong>. Peak: 271.` });
+  }
+  if (acwr != null) {
+    if (acwr > 1.3) insights.push({ icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', bg: 'var(--red-bg)', text: `<strong>ACWR ${acwr.toFixed(2)}</strong> — above 1.3 cap. Back off today.` });
+    else if (acwr >= 0.8 && acwr <= 1.2) insights.push({ icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>', bg: 'var(--green-bg)', text: `<strong>ACWR ${acwr.toFixed(2)}</strong> — optimal training zone. Build.` });
   }
 
   // HRV trend — 7d vs previous 7d
@@ -2300,18 +2553,269 @@ function renderActivities(activities, limit=7) {
     const date = a.start_date_local ? fmtShort(a.start_date_local.split('T')[0]) : '';
     const stats = [dist, dur, hr].filter(Boolean).join(' · ');
     return `
-      <div class="activity">
+      <div class="activity" onclick="openActivityInsights('${a.id}')" title="Tap for AI insights">
         <div class="activity-icon">${icon}</div>
         <div class="activity-info">
           <div class="activity-name">${a.name || a.type || 'Activity'}</div>
           <div class="activity-stats">${stats}</div>
-          <div class="activity-date">${date}</div>
+          <div class="activity-date">${date} <span class="activity-tap-hint">· AI insights →</span></div>
         </div>
         ${renderSparkline(a)}
       </div>
     `;
   }).join('');
   return inner;
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  ACTIVITY INSIGHTS MODAL — local rules engine (no API needed)
+// ════════════════════════════════════════════════════════════════════
+
+// Estimate a "recovery cost" 0-100 for an activity based on duration,
+// HR intensity, elevation and sport. Used by Coach's Read + insights.
+function activityRecoveryCost(a) {
+  const mins = (a.moving_time || 0) / 60;
+  if (mins <= 0) return 0;
+  const hr = a.icu_average_hr ?? a.average_heartrate ?? null;
+  const type = (a.type || '').toLowerCase();
+
+  // Duration component — longer = more cost, diminishing past 2hrs
+  let cost = Math.min(45, mins * 0.45);
+
+  // Intensity multiplier from HR (Clayton runs hot — 140-150 is endurance, 160+ is hard)
+  let intensityMult = 1.0;
+  if (hr != null) {
+    if (hr >= 165) intensityMult = 1.85;
+    else if (hr >= 155) intensityMult = 1.5;
+    else if (hr >= 148) intensityMult = 1.2;
+    else if (hr >= 135) intensityMult = 1.0;
+    else intensityMult = 0.65;
+  }
+  cost *= intensityMult;
+
+  // Elevation adds eccentric load (descents) — relevant to lower-body resilience
+  const elevFt = (a.total_elevation_gain || 0) * 3.281;
+  cost += Math.min(20, elevFt / 80);
+
+  // Sport weighting — running is highest impact, paddle/swim lowest
+  if (type.includes('run')) cost *= 1.15;
+  else if (type.includes('ride') || type.includes('mtb') || type.includes('bike')) cost *= 1.0;
+  else if (type.includes('paddle') || type.includes('surf') || type.includes('swim')) cost *= 0.7;
+  else if (type.includes('weight') || type.includes('strength')) cost *= 1.1;
+
+  return Math.round(Math.max(0, Math.min(100, cost)));
+}
+
+function costLabel(cost) {
+  if (cost >= 60) return { word: 'High', cls: 'hi-bad' };
+  if (cost >= 35) return { word: 'Moderate', cls: 'hi-warn' };
+  if (cost >= 15) return { word: 'Low-moderate', cls: 'hi-warn' };
+  return { word: 'Low', cls: 'hi-good' };
+}
+
+function openActivityInsights(activityId) {
+  const a = state.activities.find(x => String(x.id) === String(activityId));
+  if (!a) return;
+
+  const type = a.type || 'Activity';
+  const t = type.toLowerCase();
+  const isRun = t.includes('run');
+  const isBike = t.includes('ride') || t.includes('mtb') || t.includes('cycl') || t.includes('bike');
+  const isPaddle = t.includes('paddle') || t.includes('surf') || t.includes('row');
+  const isSwim = t.includes('swim');
+  const isStrength = t.includes('weight') || t.includes('strength');
+
+  const mins = a.moving_time ? a.moving_time / 60 : 0;
+  const miles = a.distance ? a.distance / 1609.34 : 0;
+  const hrVal = a.icu_average_hr ?? a.average_heartrate ?? null;
+  const maxHr = a.max_heartrate || null;
+  const elevFt = a.total_elevation_gain ? a.total_elevation_gain * 3.281 : 0;
+  const paceMin = (mins && miles) ? mins / miles : null;
+  const mphSpeed = a.average_speed ? a.average_speed * 2.237 : null;
+  const power = a.average_watts || null;
+  // Garmin run cadence is often one-foot; double it for spm
+  const cadenceSpm = a.average_cadence ? Math.round(a.average_cadence * (isRun ? 2 : 1)) : null;
+  const calories = a.calories ?? a.kilojoules ?? null;
+  const hrZones = a.icu_zone_times || a.icu_hr_zone_times || null;
+  const date = a.start_date_local ? fmtDate(a.start_date_local.split('T')[0]) : '';
+  const dist = miles ? `${miles.toFixed(1)} mi` : null;
+  const dur = mins ? `${Math.round(mins)} min` : null;
+
+  // ── STAT TILES ──────────────────────────────────────────────
+  let stats = [];
+  if (miles) stats.push({ val: miles.toFixed(1), unit: 'mi', label: 'Distance' });
+  if (mins) stats.push({ val: Math.round(mins), unit: 'min', label: 'Duration' });
+  if (isRun && paceMin) stats.push({ val: paceMin.toFixed(1), unit: 'min/mi', label: 'Avg Pace' });
+  else if (isBike && mphSpeed) stats.push({ val: mphSpeed.toFixed(1), unit: 'mph', label: 'Avg Speed' });
+  else if (hrVal) stats.push({ val: Math.round(hrVal), unit: 'bpm', label: 'Avg HR' });
+  if (stats.length < 3 && hrVal) stats.push({ val: Math.round(hrVal), unit: 'bpm', label: 'Avg HR' });
+  if (stats.length < 3 && elevFt > 50) stats.push({ val: Math.round(elevFt), unit: 'ft', label: 'Elevation' });
+  if (stats.length < 3 && power) stats.push({ val: Math.round(power), unit: 'W', label: 'Avg Power' });
+  if (stats.length < 3 && calories) stats.push({ val: Math.round(calories), unit: 'kcal', label: 'Calories' });
+  stats = stats.slice(0, 3);
+  const statTiles = stats.map(s => `
+    <div class="ai-modal-stat">
+      <div class="ai-modal-stat-val">${s.val}<span class="ai-modal-stat-unit">${s.unit}</span></div>
+      <div class="ai-modal-stat-label">${s.label}</div>
+    </div>`).join('');
+
+  // ── RULES ENGINE ────────────────────────────────────────────
+  const cost = activityRecoveryCost(a);
+  const cl = costLabel(cost);
+
+  // 1. PERFORMANCE READ — one-line summary
+  let perfRead;
+  if (hrVal != null) {
+    if (isRun && hrVal > 152) {
+      perfRead = `You ran <strong>${miles.toFixed(1)}mi</strong> at <span class="hi-warn">${Math.round(hrVal)}bpm avg</span> — above your 140-150 endurance cap. This was a tempo effort, not a base-builder.`;
+    } else if (isRun && hrVal >= 140 && hrVal <= 152) {
+      perfRead = `Disciplined run — <strong>${miles.toFixed(1)}mi</strong> at <span class="hi-good">${Math.round(hrVal)}bpm avg</span>, right in your aerobic window. This is exactly the work that builds the Mash engine.`;
+    } else if (isRun) {
+      perfRead = `Easy run — <strong>${miles.toFixed(1)}mi</strong> at <span class="hi-good">${Math.round(hrVal)}bpm avg</span>. Pure recovery pace, minimal stress.`;
+    } else if (isPaddle || isSwim) {
+      perfRead = `<strong>${Math.round(mins)}min</strong> paddle/water session at ${Math.round(hrVal)}bpm avg. Paddle isn't your weakness — this is low-cost aerobic volume that spares the legs.`;
+    } else if (isBike) {
+      perfRead = `<strong>${miles ? miles.toFixed(1)+'mi' : Math.round(mins)+'min'}</strong> ride at ${Math.round(hrVal)}bpm avg${elevFt > 300 ? ` with ${Math.round(elevFt)}ft climbing` : ''}. ${hrVal > 150 ? 'Solid intensity.' : 'Steady aerobic work.'}`;
+    } else {
+      perfRead = `<strong>${Math.round(mins)}min</strong> ${type} session at ${Math.round(hrVal)}bpm avg.`;
+    }
+  } else {
+    perfRead = `<strong>${Math.round(mins)}min</strong> ${type} session${dist ? ` covering ${dist}` : ''}.`;
+  }
+
+  // 2. KEY SIGNALS — bullets
+  const signals = [];
+
+  // HR zone discipline
+  if (hrVal != null && isRun) {
+    if (hrVal > 152) {
+      signals.push(`<span class="hi-warn">HR ran hot</span> — ${Math.round(hrVal)}bpm avg vs your 140-150 endurance target. You naturally drift to 90%+; this is the discipline gap to close before October.`);
+    } else if (hrVal >= 140 && hrVal <= 152) {
+      signals.push(`<span class="hi-good">HR control on point</span> — held ${Math.round(hrVal)}bpm, dead center of your aerobic band. Repeatable efforts like this raise your Hill Score.`);
+    }
+  }
+  if (maxHr && hrVal && (maxHr - hrVal) > 35) {
+    signals.push(`Big HR spread (avg ${Math.round(hrVal)} → max ${Math.round(maxHr)}bpm) — climbs or surges drove it. Watch that those spikes don't become the whole session.`);
+  }
+
+  // Cadence — Clayton's known collapse point
+  if (cadenceSpm != null && isRun) {
+    if (cadenceSpm >= 170) {
+      signals.push(`<span class="hi-good">Cadence ${cadenceSpm}spm</span> — at or above your 170 target. Keep this turnover honest on climbs, where you tend to collapse to ~152.`);
+    } else if (cadenceSpm >= 158) {
+      signals.push(`<span class="hi-warn">Cadence ${cadenceSpm}spm</span> — below your 170 goal. Run a metronome; short quick steps protect your lower body and fight the climb collapse.`);
+    } else {
+      signals.push(`<span class="hi-bad">Cadence ${cadenceSpm}spm</span> — well under target. This is overstriding territory — high impact per step, exactly the lower-body load you're trying to build resilience against.`);
+    }
+  }
+
+  // Elevation / climbing load
+  if (elevFt > 800) {
+    signals.push(`<strong>${Math.round(elevFt)}ft of climbing</strong> — meaningful eccentric load on the descents. Good for lower-body resilience, but it adds to recovery cost.`);
+  } else if (elevFt > 300 && isRun) {
+    signals.push(`${Math.round(elevFt)}ft elevation — moderate climbing stimulus. Useful for the trail-run leg of the Mash.`);
+  }
+
+  // Pace / power context
+  if (isRun && paceMin) {
+    signals.push(`Avg pace <strong>${paceMin.toFixed(1)} min/mi</strong>${hrVal && hrVal <= 150 ? ' — note this as your current aerobic pace; watch it get faster at the same HR as fitness builds.' : '.'}`);
+  }
+  if (isBike && power) {
+    signals.push(`Avg power <strong>${Math.round(power)}W</strong> over ${Math.round(mins)}min — log this; sustained climbing power is what stops the bike-leg cramps.`);
+  }
+
+  // HR zone distribution
+  if (hrZones && hrZones.length >= 5) {
+    const total = hrZones.reduce((x, y) => x + (y || 0), 0);
+    if (total > 0) {
+      const z45 = ((hrZones[3] || 0) + (hrZones[4] || 0)) / total;
+      const z12 = ((hrZones[0] || 0) + (hrZones[1] || 0)) / total;
+      if (z45 > 0.35) {
+        signals.push(`<span class="hi-warn">${Math.round(z45 * 100)}% in Z4-Z5</span> — this was a hard day. Make sure tomorrow is genuinely easy.`);
+      } else if (z12 > 0.7) {
+        signals.push(`<span class="hi-good">${Math.round(z12 * 100)}% in Z1-Z2</span> — clean aerobic session, low systemic stress.`);
+      }
+    }
+  }
+
+  if (!signals.length) {
+    signals.push(`Solid ${Math.round(mins)}min of ${isPaddle ? 'water time' : 'aerobic work'}. Nothing in the data to flag — log it and move on.`);
+  }
+
+  // 3. WHAT TO TAKE FORWARD
+  let forward;
+  if (isRun && hrVal != null && hrVal > 152) {
+    forward = `Next trail run: strap the HR monitor on and <strong>walk the climbs</strong> if that's what it takes to stay under 150. The Mash is won by who didn't blow up — train the discipline now.`;
+  } else if (isRun && cadenceSpm != null && cadenceSpm < 170) {
+    forward = `Set a metronome to <strong>170spm</strong> for your next run and hold it especially on uphills. Quick feet, shorter stride — that's your single biggest run efficiency lever.`;
+  } else if (isRun) {
+    forward = `This is the template — repeat it. More controlled aerobic miles at this HR is exactly the aerobic-efficiency work the Mash demands.`;
+  } else if (isBike && elevFt > 500) {
+    forward = `On your next long MTB, stay seated and spin the climbs at higher cadence rather than grinding — that's the habit that prevents the bike-leg cramps from last year.`;
+  } else if (isBike) {
+    forward = `Build the duration of these rides toward 2+ hours and practice the race fuel — 500mg sodium pre-load, 60g carbs/hr.`;
+  } else if (isPaddle || isSwim) {
+    forward = `Paddle is a strength, not a weakness — use sessions like this as low-leg-cost aerobic volume on days your legs need a break from running and lifting.`;
+  } else {
+    forward = `Log how this felt against the numbers — feel beats data when they disagree.`;
+  }
+
+  // 4. RECOVERY COST
+  let recovery;
+  const sweatNote = mins > 45
+    ? ` At ~1520ml/90min sweat rate you lost roughly <strong>${Math.round((mins / 90) * 1520)}ml</strong> — replace it with electrolytes, not just water.`
+    : '';
+  recovery = `Recovery cost: <span class="${cl.cls}">${cl.word}</span> (${cost}/100). ${
+    cost >= 60 ? 'Treat tomorrow as easy or mobility — back-to-back hard days is the boom-bust pattern you\'re trying to break.' :
+    cost >= 35 ? 'Moderate hit — fine to train tomorrow, but keep it controlled.' :
+    'Low drain — this barely dents recovery. You can stack another quality session.'
+  }${sweatNote}`;
+
+  // ── ASSEMBLE ────────────────────────────────────────────────
+  const blocks = [
+    { icon: '📊', label: 'Performance Read', body: perfRead },
+    { icon: '⚡', label: 'Key Signals', body: signals.map(s => `<div style="margin-bottom:7px;">• ${s}</div>`).join('') },
+    { icon: '🎯', label: 'What to Take Forward', body: forward },
+    { icon: '💧', label: 'Recovery Cost', body: recovery }
+  ];
+  const blocksHtml = blocks.map(b => `
+    <div class="ai-insight-block">
+      <div class="ai-insight-block-label"><span>${b.icon}</span>${b.label}</div>
+      <div class="ai-insight-block-text">${b.body}</div>
+    </div>`).join('');
+
+  // ── RENDER MODAL ────────────────────────────────────────────
+  const overlay = document.createElement('div');
+  overlay.className = 'ai-modal-overlay';
+  overlay.id = 'activity-insights-overlay';
+  overlay.innerHTML = `
+    <div class="ai-modal" id="activity-insights-modal">
+      <div class="ai-modal-header">
+        <div class="ai-modal-handle"></div>
+        <div class="ai-modal-icon">${sportIcon(type)}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="ai-modal-title">${a.name || type}</div>
+          <div class="ai-modal-meta">
+            <span>${date}</span>
+            ${dist ? `<span>· ${dist}</span>` : ''}
+            ${dur ? `<span>· ${dur}</span>` : ''}
+          </div>
+        </div>
+        <div class="ai-modal-close" onclick="closeActivityInsights()">✕</div>
+      </div>
+      ${stats.length ? `<div class="ai-modal-stats">${statTiles}</div>` : ''}
+      <div class="ai-modal-body">${blocksHtml}</div>
+    </div>`;
+
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeActivityInsights(); });
+  document.body.appendChild(overlay);
+  document.body.style.overflow = 'hidden';
+}
+
+function closeActivityInsights() {
+  const overlay = document.getElementById('activity-insights-overlay');
+  if (overlay) overlay.remove();
+  document.body.style.overflow = '';
 }
 
 function buildClaudePrompt(latest, history, activities) {
@@ -2321,6 +2825,7 @@ function buildClaudePrompt(latest, history, activities) {
   const baseReadiness = computeReadiness(latest, history);
   const adjustedReadiness = applyFeelToReadiness(baseReadiness, state.feel);
   const feelLine = state.feel ? `Self-reported state: ${FEEL_OPTIONS.find(o => o.id === state.feel).label} (${FEEL_OPTIONS.find(o => o.id === state.feel).desc})` : 'Self-reported state: not provided';
+  const fit = fitnessSnapshot(history);
 
   const data = [
     `Computed Readiness: ${adjustedReadiness ?? 'unable to compute'}/100${state.feel ? ' (adjusted for self-report)' : ''}`,
@@ -2329,8 +2834,9 @@ function buildClaudePrompt(latest, history, activities) {
     `Resting HR: ${getField(latest, 'restingHR') ?? 'not synced'} bpm`,
     `Sleep: ${fmtHrs(getField(latest, 'sleepSecs')) ?? 'not synced'} hrs`,
     `Sleep Score: ${getField(latest, 'sleepScore') ?? 'not synced'}`,
-    `CTL (fitness): ${getField(latest, 'ctl') ?? 'not synced'}`,
-    `ATL (fatigue): ${getField(latest, 'atl') ?? 'not synced'}`,
+    `CTL (fitness): ${fit.ctl != null ? Math.round(fit.ctl) : 'not synced'}`,
+    `ATL (fatigue): ${fit.atl != null ? Math.round(fit.atl) : 'not synced'}`,
+    `TSB (form): ${fit.tsb != null ? Math.round(fit.tsb) : 'not synced'}`,
     `Stress: ${getField(latest, 'avgStressLevel') ?? 'not synced'}`
   ].join('\n');
 
@@ -2433,6 +2939,14 @@ function renderPhone(latest, sorted) {
     </div>
     ${renderWeekPlanner(state.activities)}
     ${renderSession()}
+    ${state.activities.length ? `
+    <div class="card" style="margin-bottom: 14px;">
+      <div class="card-header">
+        <div class="card-title">Recent Activities</div>
+        <div class="card-meta">Tap for AI insights</div>
+      </div>
+      ${renderActivities(state.activities, 7)}
+    </div>` : ''}
     <div class="footer">
       <a href="#" onclick="clearCredentials();return false;">Reset</a> ·
       <a href="https://intervals.icu" target="_blank">Intervals.icu</a> ·
