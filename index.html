@@ -715,12 +715,12 @@ SPORT: Catalina Classic 7:01:00 first crossing. 1:31 half marathon minimal train
 HOME GYM: Pull-up bar, cable stack, bench, DBs 5-80lb, barbell+plates, trap bar, tricep bar, bands.
 RACE: Montecito Mash Oct 17 2026 (7mi paddle + 10mi trail run + 15mi MTB). Cramped on bike last year.
 LIFE: Baby due October 2026. High stress. Sleep 7.2hrs avg. When baby comes drop to 3-day plan.
-GARMIN: CTL ~219 baseline, peak 271. Boom-bust pattern. HRV 90-111ms range. Hill score 30 — climbing deficit.
-PHYSIOLOGY: Cadence 173 flat → 152 steep (target 170+). Heavy sweater 1520ml/90min — drives cramps. Naturally runs 90%+ HR (must discipline 140-150 for endurance). Paddle is NOT a weakness.
+FITNESS: CTL tracked via Intervals.icu (hrTSS-based, single-digit scale — only HR-tracked sessions count, so surf/MTB/dirt-bike volume is under-captured). HRV 90-111ms range. Hill score 30 — climbing deficit. Historically boom-bust.
+PHYSIOLOGY: Cadence 173 flat → 152 steep (target 170+). Heavy sweater 1520ml/90min — drives cramps. Naturally runs 90%+ HR (must discipline 140-150 for endurance). Paddle is NOT a weakness. LTHR ~178, max HR ~193-207.
 WEAKNESSES: Aerobic efficiency, lower body resilience, fueling/sweat, climb cadence, training consistency, mobility.
 PLAN: M Lower A | T Upper A push/paddle | W Z2+mobility | Th trail run | F Upper B pull/biceps | Sa long MTB | Su OFF
 PREFERENCES: Incline-first chest. High bicep frequency. No sugarcoating.
-ACWR rule: never exceed 1.3x CTL (~219). Cramp protocol: 500mg sodium pre-load, 60g carbs/hr.`;
+ACWR rule: never exceed 1.3x chronic load. Cramp protocol: 500mg sodium pre-load, 60g carbs/hr.`;
 
 const FEEL_OPTIONS = [
   { id: 'fresh', icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>', label: 'Fresh', desc: 'Ready to push, no soreness, sleep was solid' },
@@ -792,6 +792,29 @@ const state = {
   swapModalDay: null
 };
 
+// ── CTL CALIBRATION ──────────────────────────────────────────────────
+// Clayton's CTL from Intervals.icu runs in the single digits (the old
+// "219" figure was an artifact from a different metric). These are
+// sensible defaults; calibrateCtl() refines them from real data on load.
+const CTL_CONFIG = { baseline: 9, peak: 11 };
+
+// Recompute baseline (median of last 90 valid days) and peak (max of
+// last 180) from the actual wellness history so the dashboard always
+// reflects current reality rather than a hardcoded guess.
+function calibrateCtl(history) {
+  if (!history || !history.length) return;
+  const ctls = history
+    .map(d => getField(d, 'ctl'))
+    .filter(v => v != null && v > 0);
+  if (ctls.length < 10) return;
+  const recent = ctls.slice(-90).sort((a, b) => a - b);
+  const median = recent[Math.floor(recent.length / 2)];
+  const peak = Math.max(...ctls.slice(-180));
+  CTL_CONFIG.baseline = Math.round(median * 10) / 10;
+  CTL_CONFIG.peak = Math.round(peak * 10) / 10;
+}
+
+
 const savedFeelDate = localStorage.getItem('feel_date');
 if (savedFeelDate === todayKey) state.feel = localStorage.getItem('feel_today');
 
@@ -836,69 +859,59 @@ const getField = (obj, ...keys) => {
 };
 
 // CTL/ATL/rampRate fill in after overnight sync — today's wellness record
-// often has a partial or zero value. Walk back to the most recent record
-// that actually has a sensible value so the dashboard never shows "Fitness 9".
-function latestValid(history, key, minPlausible = null) {
+// can be missing values. Walk back to the most recent record that has a
+// real value for the requested field.
+function latestValid(history, key) {
   if (!history || !history.length) return null;
   const sorted = [...history].sort((a, b) => (a.id || '').localeCompare(b.id || ''));
   for (let i = sorted.length - 1; i >= 0; i--) {
     const v = getField(sorted[i], key);
-    if (v == null) continue;
-    if (minPlausible != null && v < minPlausible) continue;
-    return v;
+    if (v != null) return v;
   }
   return null;
 }
 
-// Pull a coherent fitness snapshot. The most recent wellness record can have
-// a partial/zero CTL because Intervals.icu hasn't finished its overnight
-// recalculation. Strategy: take the median CTL across recent valid records,
-// then accept the latest record whose CTL is within a sane band of that
-// median (i.e. not an obvious partial-sync artifact).
+// Pull a coherent fitness snapshot. CTL/ATL come from the most recent
+// record that actually HAS them — today's record may not be filled in
+// yet. No magnitude filtering: Clayton's real CTL is single digits and
+// every value Intervals returns is legitimate.
 function fitnessSnapshot(history) {
   const empty = { ctl: null, atl: null, tsb: null, acwr: null };
   if (!history || !history.length) return empty;
   const sorted = [...history].sort((a, b) => (a.id || '').localeCompare(b.id || ''));
-
-  // Collect records that have both CTL and ATL
-  const valid = sorted.filter(d => getField(d, 'ctl') != null && getField(d, 'atl') != null);
-  if (!valid.length) return empty;
-
-  // Median CTL of the most recent 30 valid records — a stable reference
-  const recentCtls = valid.slice(-30).map(d => getField(d, 'ctl')).sort((a, b) => a - b);
-  const medianCtl = recentCtls[Math.floor(recentCtls.length / 2)];
-
-  // Accept the latest record whose CTL is at least 60% of the median.
-  // This rejects partial-sync zeros/single-digits without a hard threshold.
-  const floor = medianCtl != null ? medianCtl * 0.6 : 0;
-  for (let i = valid.length - 1; i >= 0; i--) {
-    const ctl = getField(valid[i], 'ctl');
-    const atl = getField(valid[i], 'atl');
-    if (ctl >= floor) {
+  for (let i = sorted.length - 1; i >= 0; i--) {
+    const ctl = getField(sorted[i], 'ctl');
+    const atl = getField(sorted[i], 'atl');
+    if (ctl != null && atl != null) {
       return { ctl, atl, tsb: ctl - atl, acwr: ctl > 0 ? atl / ctl : null };
     }
   }
-  // Fallback — use the most recent valid record regardless
-  const last = valid[valid.length - 1];
-  const ctl = getField(last, 'ctl'), atl = getField(last, 'atl');
-  return { ctl, atl, tsb: ctl - atl, acwr: ctl > 0 ? atl / ctl : null };
+  return empty;
 }
 
-// Strip partial-sync outliers from a raw CTL value series (for sparklines).
+// HRV / RHR / sleep are measured overnight and may be absent on today's
+// record even when CTL is present. Pull each from its latest valid day.
+function wellnessSnapshot(history) {
+  return {
+    hrv:   latestValid(history, 'hrv') ?? latestValid(history, 'hrvWeeklyAverage'),
+    rhr:   latestValid(history, 'restingHR'),
+    sleep: latestValid(history, 'sleepSecs'),
+    sleepScore: latestValid(history, 'sleepScore')
+  };
+}
+
+// Clean a raw value series for sparklines — just drop nulls, no magnitude filter.
 function cleanCtlSeries(values) {
-  const v = values.filter(x => x != null);
-  if (!v.length) return v;
-  const sorted = [...v].sort((a, b) => a - b);
-  const med = sorted[Math.floor(sorted.length / 2)];
-  return v.filter(x => x >= med * 0.6);
+  return values.filter(x => x != null);
 }
 
 
 function computeReadiness(latest, history) {
   if (!latest) return null;
-  const hrv = getField(latest, 'hrv', 'hrvWeeklyAverage');
-  const rhr = getField(latest, 'restingHR');
-  const sleepSecs = getField(latest, 'sleepSecs');
+  const w = wellnessSnapshot(history);
+  const hrv = w.hrv;
+  const rhr = w.rhr;
+  const sleepSecs = w.sleep;
   const fit = fitnessSnapshot(history);
   const ctl = fit.ctl;
   const atl = fit.atl;
@@ -957,20 +970,45 @@ function applyFeelToReadiness(score, feel) {
 async function fetchData() {
   if (!state.athleteId || !state.apiKey) { state.error = "credentials"; render(); return; }
   const today = new Date();
-  const monthAgo = new Date(today.getTime() - 90 * 86400000);
+  const monthAgo = new Date(today.getTime() - 180 * 86400000);
   const fmt = d => d.toISOString().split('T')[0];
   const auth = 'Basic ' + btoa('API_KEY:' + state.apiKey);
 
   try {
     const wRes = await fetch(`https://intervals.icu/api/v1/athlete/${state.athleteId}/wellness?oldest=${fmt(monthAgo)}&newest=${fmt(today)}`, { headers: { Authorization: auth } });
-    if (!wRes.ok) throw new Error(`Intervals API ${wRes.status}`);
+    if (!wRes.ok) throw new Error(`Intervals API ${wRes.status} — check athlete ID and API key in settings`);
     state.wellness = await wRes.json();
+
+    // Expose raw data on window for debugging — open console and type:
+    // debugRaw() — shows latest wellness record keys and values
+    // debugCtl() — shows CTL/ATL across all records
+    window.debugRaw = () => {
+      const sorted = [...state.wellness].sort((a,b)=>(a.id||'').localeCompare(b.id||''));
+      const latest = sorted[sorted.length-1];
+      console.group('Latest wellness record (' + (latest?.id||'none') + ')');
+      if (latest) Object.entries(latest).forEach(([k,v]) => { if (v!=null) console.log(k,'→',v); });
+      console.groupEnd();
+      console.log('Total wellness records:', sorted.length, '| First:', sorted[0]?.id, '| Last:', sorted[sorted.length-1]?.id);
+    };
+    window.debugCtl = () => {
+      const sorted = [...state.wellness].sort((a,b)=>(a.id||'').localeCompare(b.id||''));
+      console.table(sorted.map(d=>({date:d.id, ctl:d.ctl, atl:d.atl, hrv:d.hrv??d.hrvWeeklyAverage, rhr:d.restingHR})).filter(d=>d.ctl||d.hrv));
+    };
+    window.debugSnap = () => console.log('fitnessSnapshot:', JSON.stringify(fitnessSnapshot(state.wellness)));
+
+    console.log(`✅ Wellness loaded: ${state.wellness.length} records. Run debugRaw(), debugCtl(), or debugSnap() to inspect.`);
+    calibrateCtl(state.wellness);
+    console.log(`📊 CTL calibrated — baseline: ${CTL_CONFIG.baseline}, peak: ${CTL_CONFIG.peak}`);
+
     const aRes = await fetch(`https://intervals.icu/api/v1/athlete/${state.athleteId}/activities?oldest=${fmt(monthAgo)}&newest=${fmt(today)}`, { headers: { Authorization: auth } });
     if (aRes.ok) state.activities = await aRes.json();
+    console.log(`✅ Activities loaded: ${state.activities?.length||0} records.`);
+
     state.loaded = true;
     state.error = null;
     render();
   } catch (e) {
+    console.error('❌ fetchData error:', e.message);
     state.error = e.message;
     render();
   }
@@ -1305,7 +1343,7 @@ function renderPerfSubdate(latest, sorted) {
 
   const parts = [];
   if (ctl != null) {
-    const delta = Math.round(ctl - 219);
+    const delta = Math.round((ctl - CTL_CONFIG.baseline) * 10) / 10;
     const sign = delta >= 0 ? '+' : '';
     parts.push(`Fitness ${Math.round(ctl)} (${sign}${delta} vs baseline)`);
   }
@@ -1385,7 +1423,7 @@ const HELP = {
   sleep:      '<strong>Sleep duration</strong> — Garmin total. 7–9hrs is the performance window. Below 6hrs = drop intensity 15–20% regardless of how you feel.',
   sleepScore: '<strong>Sleep Score</strong> — Garmin\'s composite of duration, stages, restlessness, and SpO2. 70+ is solid. Below 60 = suppressed recovery.',
   sleepHR:    '<strong>Sleeping HR</strong> — avg HR during sleep. Lower is better. Elevated sleeping HR = body working hard to recover. Alcohol and heat spike it.',
-  ctl:        '<strong>Fitness (CTL)</strong> — 42-day weighted load average. Your baseline: 219. Peak: 271 (July 2024). Build toward 260+ for Mash prep.',
+  ctl:        '<strong>Fitness (CTL)</strong> — 42-day weighted average of training load (hrTSS). Calibrated to your recent Intervals.icu history. Note: only HR-tracked activities contribute, so surf/MTB/dirt-bike volume is not fully captured here.',
   atl:        '<strong>Fatigue (ATL)</strong> — 7-day load. High relative to CTL = fresh fatigue accumulating. Watch the ratio, not the absolute number.',
   tsb:        '<strong>Form (TSB)</strong> — Fitness minus Fatigue. Positive = fresh. Negative but building = productive. Below −25 = overreach territory.',
   acwr:       '<strong>Load Ratio (ACWR)</strong> — recent load ÷ chronic baseline. 0.8–1.2 = productive zone. Above 1.3 = injury risk. Your hard cap: 1.3×.',
@@ -1475,16 +1513,18 @@ function renderHealthSnapshot(latest, history, idSuffix='') {
 
   // ── Inline sparkline helper ────────────────────────────────────────────────
   function spark(values, color, w=80, h=28) {
-    if (!values || values.length < 2) return '';
-    const min = Math.min(...values), max = Math.max(...values), range = max - min || 1;
-    const pts = values.map((v,i) => {
-      const x = (i/(values.length-1))*w;
+    const nums = (values || []).filter(v => typeof v === 'number' && isFinite(v));
+    if (nums.length < 2) return '';
+    const min = Math.min(...nums), max = Math.max(...nums), range = max - min || 1;
+    const pts = nums.map((v,i) => {
+      const x = (i/(nums.length-1))*w;
       const y = h - ((v-min)/range)*(h-4) - 2;
       return `${x.toFixed(1)},${y.toFixed(1)}`;
     }).join(' ');
+    const last = pts.split(' ').at(-1).split(',');
     return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block">
       <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="${parseFloat(pts.split(' ').at(-1).split(',')[0])}" cy="${parseFloat(pts.split(' ').at(-1).split(',')[1])}" r="2.5" fill="${color}"/>
+      <circle cx="${parseFloat(last[0])}" cy="${parseFloat(last[1])}" r="2.5" fill="${color}"/>
     </svg>`;
   }
 
@@ -1597,8 +1637,8 @@ function renderHealthSnapshot(latest, history, idSuffix='') {
       <!-- SECTION: TRAINING LOAD -->
       <div class="rec-section-label">Training Load</div>
       <div class="rec-grid-3">
-        ${tile('ctl', 'Fitness (CTL)', ctl ? Math.round(ctl) : null, '', 'Baseline: 219',
-          ctl == null ? 'var(--text-dim)' : ctl >= 219 ? 'var(--green)' : 'var(--orange)',
+        ${tile('ctl', 'Fitness (CTL)', ctl != null ? ctl.toFixed(1) : null, '', `Baseline: ${CTL_CONFIG.baseline}`,
+          ctl == null ? 'var(--text-dim)' : ctl >= CTL_CONFIG.baseline ? 'var(--green)' : 'var(--orange)',
           spark(ctl30, 'var(--primary)', 56, 24)
         )}
         ${tile('tsb', 'Form (TSB)', tsb != null ? (tsb > 0 ? '+' : '') + Math.round(tsb) : null, '',
@@ -1788,11 +1828,12 @@ function crSignalRow(dotColor, title, sub, valueHtml) {
 }
 
 function crSparkline(values, color, w=44, h=20) {
-  if (!values || values.length < 2) return '';
-  const min = Math.min(...values), max = Math.max(...values);
+  const nums = (values || []).filter(v => typeof v === 'number' && isFinite(v));
+  if (nums.length < 2) return '';
+  const min = Math.min(...nums), max = Math.max(...nums);
   const range = max - min || 1;
-  const pts = values.map((v, i) => {
-    const x = (i / (values.length - 1)) * w;
+  const pts = nums.map((v, i) => {
+    const x = (i / (nums.length - 1)) * w;
     const y = h - ((v - min) / range) * (h - 2) - 1;
     return `${x.toFixed(1)},${y.toFixed(1)}`;
   }).join(' ');
@@ -1967,7 +2008,7 @@ function renderCoachCard(latest, history, activities) {
 
   // Fitness (CTL) vs baseline
   if (ctl != null) {
-    const delta = Math.round(ctl - 219);
+    const delta = Math.round((ctl - CTL_CONFIG.baseline) * 10) / 10;
     const sign = delta >= 0 ? '+' : '';
     const dot = delta >= 5 ? 'green' : delta <= -15 ? 'orange' : 'blue';
     const ctlHistory = cleanCtlSeries(history.slice(-14).map(d => getField(d, 'ctl')));
@@ -1975,7 +2016,7 @@ function renderCoachCard(latest, history, activities) {
     signals.push(crSignalRow(
       dot,
       `Fitness (CTL) ${Math.round(ctl)}`,
-      `${sign}${delta} vs 219 baseline · peak 271`,
+      `${sign}${delta} vs ${CTL_CONFIG.baseline} baseline · peak ${CTL_CONFIG.peak}`,
       `<span class="cr-spark-chip">${spark}</span>`
     ));
   }
@@ -2282,15 +2323,9 @@ function renderChart(history, key, title, color, days=14, height=80) {
 
 // Multi-line CTL/ATL/TSB chart for desktop
 function renderLoadFullChart(history, days=60) {
-  let data = history.slice(-days)
+  const data = history.slice(-days)
     .map(d => ({ date: d.id, ctl: getField(d, 'ctl'), atl: getField(d, 'atl') }))
-    .filter(d => d.ctl != null && d.atl != null);
-  // Drop partial-sync outliers: any CTL under 60% of the series median
-  if (data.length) {
-    const sortedCtl = data.map(d => d.ctl).sort((a, b) => a - b);
-    const med = sortedCtl[Math.floor(sortedCtl.length / 2)];
-    data = data.filter(d => d.ctl >= med * 0.6);
-  }
+    .filter(d => typeof d.ctl === 'number' && typeof d.atl === 'number' && isFinite(d.ctl) && isFinite(d.atl));
   if (data.length < 2) return '<div class="chart-card"><div class="card-label">Training Load</div><div style="color:var(--text-dim);font-size:13px;text-align:center;padding:30px 0;">Not enough load data yet</div></div>';
   const w = 800, h = 220, pad = 30;
   const allVals = data.flatMap(d => [d.ctl, d.atl]);
@@ -2342,13 +2377,13 @@ function renderInsights(history, activities) {
   // Fitness trend — CTL vs baseline
   const { ctl, atl, acwr } = fitnessSnapshot(history);
   if (ctl != null) {
-    const delta = Math.round(ctl - 219);
+    const delta = Math.round((ctl - CTL_CONFIG.baseline) * 10) / 10;
     const sign = delta >= 0 ? '+' : '';
     const color = delta >= 5 ? 'var(--green-bg)' : delta <= -10 ? 'var(--red-bg)' : 'var(--surface-2)';
     const icon = delta >= 0
       ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>'
       : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>';
-    insights.push({ icon, bg: color, text: `Fitness (CTL) at <strong>${Math.round(ctl)}</strong> — <strong>${sign}${delta} vs 219 baseline</strong>. Peak: 271.` });
+    insights.push({ icon, bg: color, text: `Fitness (CTL) at <strong>${ctl.toFixed(1)}</strong> — <strong>${sign}${delta} vs ${CTL_CONFIG.baseline} baseline</strong>. Peak: ${CTL_CONFIG.peak}.` });
   }
   if (acwr != null) {
     if (acwr > 1.3) insights.push({ icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', bg: 'var(--red-bg)', text: `<strong>ACWR ${acwr.toFixed(2)}</strong> — above 1.3 cap. Back off today.` });
@@ -2881,7 +2916,7 @@ Tight and direct. No fluff.`;
 
 async function generateSession(btnId='coach-btn') {
   const sorted = [...state.wellness].sort((a,b) => (a.id || '').localeCompare(b.id || ''));
-  const latest = sorted[sorted.length - 1] || {};
+  const latest = getBackfilledLatest(sorted);
   const prompt = buildClaudePrompt(latest, sorted, state.activities);
   try {
     await navigator.clipboard.writeText(prompt);
@@ -2904,6 +2939,24 @@ async function generateSession(btnId='coach-btn') {
 // ════════════════════════════════════════════════════════════════════
 //  TOP-LEVEL RENDER
 // ════════════════════════════════════════════════════════════════════
+// Build a "latest" wellness object with overnight-measured fields (HRV,
+// RHR, sleep) and CTL/ATL backfilled from their most recent valid day —
+// today's raw record is frequently incomplete.
+function getBackfilledLatest(sorted) {
+  const rawLatest = sorted[sorted.length - 1] || {};
+  const w = wellnessSnapshot(sorted);
+  const fit = fitnessSnapshot(sorted);
+  return {
+    ...rawLatest,
+    hrv:        rawLatest.hrv ?? rawLatest.hrvWeeklyAverage ?? w.hrv,
+    restingHR:  rawLatest.restingHR ?? w.rhr,
+    sleepSecs:  rawLatest.sleepSecs ?? w.sleep,
+    sleepScore: rawLatest.sleepScore ?? w.sleepScore,
+    ctl:        rawLatest.ctl ?? fit.ctl,
+    atl:        rawLatest.atl ?? fit.atl
+  };
+}
+
 function render() {
   const app = $('#app');
 
@@ -2915,7 +2968,7 @@ function render() {
   if (!state.loaded) { app.innerHTML = '<div class="loading"><span class="spinner"></span>Loading dashboard...</div>'; return; }
 
   const sorted = [...state.wellness].sort((a,b) => (a.id || '').localeCompare(b.id || ''));
-  const latest = sorted[sorted.length - 1] || {};
+  const latest = getBackfilledLatest(sorted);
 
   if (state.view === 'desktop') {
     renderDesktop(latest, sorted);
