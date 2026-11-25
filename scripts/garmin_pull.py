@@ -264,6 +264,15 @@ def build(g):
         r["hrvLow"] = num(first(it, "baseline.balancedLow"), 0)
         r["hrvHigh"] = num(first(it, "baseline.balancedUpper"), 0)
 
+    log("Weight...")
+    for it in fetch_ranged(g, "weight", "/weight-service/weight/range/{a}/{b}",
+                           since, today, 90, ["dailyWeightSummaries"]):
+        d = first(it, "summaryDate", "calendarDate", "date")
+        grams = first(it, "latestWeight.weight", "weight")
+        if not d or not grams:
+            continue
+        day(str(d)[:10])["wt"] = round(float(grams) / 1000, 2)   # kg
+
     zones = None
     try:
         zones = g.get("/biometric-service/heartRateZones/v2")
@@ -283,7 +292,8 @@ def build(g):
     }
     log(f"Got {len(acts)} activities, {len(day_rows)} days "
         f"({sum(1 for r in day_rows if 'sleepS' in r)} nights of sleep, "
-        f"{sum(1 for r in day_rows if r.get('hrv'))} nights of HRV) "
+        f"{sum(1 for r in day_rows if r.get('hrv'))} nights of HRV, "
+        f"{sum(1 for r in day_rows if r.get('wt'))} weigh-ins) "
         f"covering {since}..{today} in {g.calls} calls.")
     return payload
 

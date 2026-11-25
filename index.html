@@ -894,6 +894,35 @@ body.desktop-view .num-grid { grid-template-columns: repeat(6, 1fr); }
 .d-cols .m-wrap { padding: 0; }
 @media (max-width: 1100px) { .d-cols { grid-template-columns: 1fr 1fr; } body.desktop-view .num-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 760px) { .d-heroes, .d-cols { grid-template-columns: 1fr; } }
+
+.m-warn { font-size: 12.5px; line-height: 1.45; color: var(--text); background: rgba(234,179,8,.08); border: 1px solid rgba(234,179,8,.35); border-radius: 12px; padding: 10px 12px; margin-bottom: 12px; }
+.m-warn a { color: var(--accent); }
+.lift-sug { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+.lift-sug.up { color: var(--accent); }
+.lift-log { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px; }
+.lift-log input { width: 46px; background: var(--surface-2); border: 1px solid var(--border-strong); border-radius: 8px; color: var(--text); font: inherit; font-size: 16px; padding: 6px 4px; text-align: center; }
+.lift-log label { display: inline-flex; align-items: center; gap: 4px; margin-right: 6px; }
+.lift-log label input { width: 62px; }
+.lift-log input::placeholder { color: #3F3F46; }
+.lift-did { background: var(--primary-bg); border: 1px solid rgba(184,240,60,.35); color: var(--accent); border-radius: 8px; font: inherit; font-size: 12px; font-weight: 700; padding: 7px 10px; cursor: pointer; }
+.lift-log span, .lift-x { font-size: 11px; color: var(--text-dim); }
+.exercise.hinge { border-left: 2px solid var(--accent); padding-left: 8px; }
+.hinge-tag { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: #0A0A0A; background: var(--accent); border-radius: 4px; padding: 1px 5px; margin-right: 6px; vertical-align: 1px; }
+.m-review-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 4px 0 10px; }
+.m-review-grid div { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 9px 10px; }
+.m-review-grid b { display: block; font-size: 20px; font-weight: 800; }
+.m-review-grid span { font-size: 11px; color: var(--text-dim); }
+.str-row { display: grid; grid-template-columns: 1fr 80px 78px; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--border); cursor: pointer; }
+.str-spark { width: 80px; height: 24px; }
+.str-v { text-align: right; } .str-v b { display: block; font-size: 18px; font-weight: 800; } .str-v span { font-size: 11px; color: var(--text-dim); }
+.ladder { display: grid; gap: 6px; margin-top: 4px; }
+.ladder div { display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--text-dim); }
+.ladder span { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--border-strong); display: grid; place-items: center; font-size: 11px; font-weight: 800; }
+.ladder .done { color: var(--text-muted); } .ladder .done span { background: var(--green); border-color: var(--green); color: #0A0A0A; }
+.ladder .now { color: var(--text); font-weight: 700; } .ladder .now span { border-color: var(--accent); color: var(--accent); }
+.chk-q { font-size: 13px; color: var(--text); margin: 12px 0 6px; }
+.chk-table td, .chk-table th { text-align: center; font-size: 12px; }
+.chk-table td:first-child { text-align: left; font-size: 12.5px; }
 </style>
 </head>
 <body class="phone-view">
@@ -1208,9 +1237,16 @@ async function fetchData() {
     state.error = null;
     render();
     setTimeout(() => loadRunMechanics(), 1500);
+    state.ivError = null;
+    if (state.backDraft.pain == null) { const e = backEntryFor(todayIso); if (e) { state.backDraft = e; state.backSaved = true; render(); } }
+    flushPending().then(() => render());
   } catch (e) {
-    console.error('❌ fetchData error:', e.message);
-    state.error = e.message;
+    console.error('fetchData error:', e.message);
+    state.ivError = e.message;
+    state.wellness = state.wellness || [];
+    state.activities = state.activities || [];
+    state.loaded = true;
+    state.error = null;
     render();
   }
 }
@@ -3055,88 +3091,7 @@ function closeActivityInsights() {
   document.body.style.overflow = '';
 }
 
-function buildClaudePrompt(latest, history, activities) {
-  const today = new Date();
-  const day = dayName(today);
-  const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-  const baseReadiness = computeReadiness(latest, history);
-  const adjustedReadiness = applyFeelToReadiness(baseReadiness, state.feel);
-  const feelLine = state.feel ? `Self-reported state: ${FEEL_OPTIONS.find(o => o.id === state.feel).label} (${FEEL_OPTIONS.find(o => o.id === state.feel).desc})` : 'Self-reported state: not provided';
-  const fit = fitnessSnapshot(history);
 
-  const data = [
-    `Computed Readiness: ${adjustedReadiness ?? 'unable to compute'}/100${state.feel ? ' (adjusted for self-report)' : ''}`,
-    feelLine,
-    `HRV: ${getField(latest, 'hrv', 'hrvWeeklyAverage') ?? 'not synced'} ms`,
-    `Resting HR: ${getField(latest, 'restingHR') ?? 'not synced'} bpm`,
-    `Sleep: ${fmtHrs(getField(latest, 'sleepSecs')) ?? 'not synced'} hrs`,
-    `Sleep Score: ${getField(latest, 'sleepScore') ?? 'not synced'}`,
-    `CTL (fitness): ${fit.ctl != null ? Math.round(fit.ctl) : 'not synced'}`,
-    `ATL (fatigue): ${fit.atl != null ? Math.round(fit.atl) : 'not synced'}`,
-    `TSB (form): ${fit.tsb != null ? Math.round(fit.tsb) : 'not synced'}`,
-    `Stress: ${getField(latest, 'avgStressLevel') ?? 'not synced'}`
-  ].join('\n');
-
-  const recent = [...activities].sort((a, b) => (b.start_date_local || "").localeCompare(a.start_date_local || "")).slice(0, 7).map(a => {
-    const dist = a.distance ? `${fmtMiles(a.distance)} mi` : '';
-    const dur = a.moving_time ? `${fmtMins(a.moving_time)} min` : '';
-    const hr = (a.icu_average_hr ?? a.average_heartrate) ? `${Math.round(a.icu_average_hr ?? a.average_heartrate)} bpm` : '';
-    const date = (a.start_date_local || '').split('T')[0];
-    return `${date}: ${a.type} — ${a.name || ''} (${[dist,dur,hr].filter(Boolean).join(', ')})`;
-  }).join('\n') || 'No recent activities';
-
-  return `You are the personal coach for Clayton Sawyer. Here is his full coaching brief:
-
-${COACHING_BRIEF}
-
-Today is ${day}, ${dateStr}.
-
-LIVE INTERVALS.ICU DATA + SELF-REPORT:
-${data}
-
-RECENT ACTIVITIES (last 7 days):
-${recent}
-
-Important: factor his self-reported state heavily into your recommendation. If he says "sore" or "beat", recommend recovery work, NOT pushing through.
-
-Format exactly like this:
-
-READINESS ASSESSMENT
-One straight-talking sentence on his recovery state.
-
-TODAY'S SESSION
-Specific session with sets/reps/duration/intensity.
-
-KEY FOCUS
-One specific actionable cue for today.
-
-FUELING NOTE
-One sentence on nutrition/hydration given his heavy sweat rate.
-
-Tight and direct. No fluff.`;
-}
-
-async function generateSession(btnId='coach-btn') {
-  const sorted = [...state.wellness].sort((a,b) => (a.id || '').localeCompare(b.id || ''));
-  const latest = getBackfilledLatest(sorted);
-  const prompt = buildClaudePrompt(latest, sorted, state.activities);
-  try {
-    await navigator.clipboard.writeText(prompt);
-    document.querySelectorAll(`[id="${btnId}"]`).forEach(btn => {
-      btn.innerHTML = '✓ Copied — opening Claude...';
-      btn.classList.add('success');
-    });
-    setTimeout(() => {
-      window.open(CLAUDE_PROJECT_URL, '_blank');
-      setTimeout(() => {
-        document.querySelectorAll(`[id="${btnId}"]`).forEach(btn => {
-          btn.innerHTML = '⚡ Get AI Coach Response';
-          btn.classList.remove('success');
-        });
-      }, 2000);
-    }, 600);
-  } catch (e) { alert('Could not copy. Check browser permissions.'); }
-}
 
 // ════════════════════════════════════════════════════════════════════
 //  TOP-LEVEL RENDER
@@ -3159,27 +3114,6 @@ function getBackfilledLatest(sorted) {
   };
 }
 
-function render() {
-  const app = $('#app');
-
-  if (state.error === 'credentials') { app.innerHTML = renderSetup(); return; }
-  if (state.error && state.error !== 'credentials') {
-    app.innerHTML = `${renderHeader()}<div class="error">Could not reach Intervals.icu: ${state.error}<br><button onclick="clearCredentials()" style="margin-top: 12px; background: transparent; border: 1px solid var(--red); color: var(--red); padding: 8px 12px; border-radius: 6px; font-size: 13px; font-family: inherit;">Reset credentials</button></div>`;
-    return;
-  }
-  if (!state.loaded) { app.innerHTML = '<div class="loading"><span class="spinner"></span>Loading dashboard...</div>'; return; }
-
-  const sorted = [...state.wellness].sort((a,b) => (a.id || '').localeCompare(b.id || ''));
-  const latest = getBackfilledLatest(sorted);
-
-  if (state.view === 'desktop') {
-    renderDesktop(latest, sorted);
-  } else {
-    renderPhone(latest, sorted);
-  }
-  // Update performance subheader after render
-  if (state.loaded) renderPerfSubdate(latest, sorted);
-}
 
 function renderPhoneLegacy(latest, sorted) {
   $('#app').innerHTML = `
@@ -3470,23 +3404,6 @@ const fmtHm = s => s == null ? '—' : `${Math.floor(s / 3600)}:${String(Math.ro
 
 // HRV read built for newborn-era noise: judge the 7-day average against
 // Garmin's own baseline band; a single very low night still overrides.
-function garminReadiness(g) {
-  const days = g.days || [];
-  const last = lastWith(days, 'hrv');
-  const avg7raw = avgLast(days, 'hrv', 7);
-  const avg7 = avg7raw == null ? null : Math.round(avg7raw);
-  const band = lastWith(days, 'hrvLow');
-  const sleepLast = lastWith(days, 'sleepS');
-  const sleep7 = avgLast(days, 'sleepS', 7);
-  let level = 'go', text = 'Train as planned.';
-  if (last && last.hrv != null && last.hrv < 40) { level = 'rest'; text = 'Last night HRV under 40 — rest day.'; }
-  else if (avg7 && band && band.hrvLow) {
-    if (avg7 < band.hrvLow * 0.9) { level = 'z2'; text = '7-day HRV well below your baseline — Zone 2 only.'; }
-    else if (avg7 < band.hrvLow) { level = 'reduce'; text = '7-day HRV below baseline — cut volume 10–15%.'; }
-  }
-  if (level === 'go' && sleepLast && sleepLast.sleepS < 6 * 3600) { level = 'reduce'; text = 'Under 6 h sleep — drop intensity 15–20%.'; }
-  return { level, text, last, avg7, band, sleepLast, sleep7 };
-}
 
 // ── Garmin card ──────────────────────────────────────────────────────
 function renderGarminCard() {
@@ -3589,16 +3506,10 @@ function parseBackLine(text) {
 function backLine(e) {
   return `Back: pain ${e.pain}/10 · reach ${e.reach.length ? e.reach.map(s => s.toLowerCase()).join(', ') : 'none'} · ${e.sts ? 'sit-to-stand hurt' : 'sit-to-stand ok'} · ${e.routine ? 'routine done' : 'no routine'}`;
 }
-function backEntryFor(date) {
-  const local = localStorage.getItem('back_' + date);
-  if (local) { try { return JSON.parse(local); } catch (e) {} }
-  const w = (state.wellness || []).find(x => x.id === date);
-  return w ? parseBackLine(w.comments) : null;
-}
 
-const todayIso = isoLocal(new Date());
+let todayIso = isoLocal(new Date());
 state.backDraft = backEntryFor(todayIso) || { pain: null, reach: [], sts: false, routine: false };
-state.backSaved = !!localStorage.getItem('back_' + todayIso);
+state.backSaved = !!backEntryFor(todayIso);
 state.backMsg = '';
 
 function backSet(field, value) {
@@ -3610,31 +3521,6 @@ function backSet(field, value) {
   render();
 }
 
-async function saveBack() {
-  const d = state.backDraft;
-  if (d.pain == null) { state.backMsg = 'Pick a pain level first.'; render(); return; }
-  localStorage.setItem('back_' + todayIso, JSON.stringify(d));
-  state.backSaved = true;
-  state.backMsg = 'Saved on this device…';
-  render();
-  if (!state.athleteId || !state.apiKey) return;
-  try {
-    const rec = (state.wellness || []).find(x => x.id === todayIso);
-    const others = String(rec?.comments || '').split('\n').filter(l => l.trim() && !l.startsWith('Back:'));
-    const comments = [...others, backLine(d)].join('\n');
-    const res = await fetch(`https://intervals.icu/api/v1/athlete/${state.athleteId}/wellness/${todayIso}`, {
-      method: 'PUT',
-      headers: { Authorization: 'Basic ' + btoa('API_KEY:' + state.apiKey), 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: todayIso, comments })
-    });
-    if (!res.ok) throw new Error(res.status);
-    if (rec) rec.comments = comments; else state.wellness.push({ id: todayIso, comments });
-    state.backMsg = 'Saved to Intervals.icu.';
-  } catch (e) {
-    state.backMsg = 'Saved on this device (Intervals sync failed).';
-  }
-  render();
-}
 
 function backHistory(n = 14) {
   const out = [];
@@ -3832,93 +3718,9 @@ const legend = items => `<div class="ch-legend">${items.map(([c, l]) => `<span><
 const takeaway = (tone, text) => `<div class="m-take ${tone}">${text}</div>`;
 
 // ── session log (what's been done this week) ────────────────────────
-function sessionLog() { try { return JSON.parse(localStorage.getItem('session_log') || '[]'); } catch (e) { return []; } }
-function logSession(cat) {
-  const log = sessionLog().filter(x => !(x.date === todayIso && x.cat === cat));
-  log.push({ cat, date: todayIso });
-  localStorage.setItem('session_log', JSON.stringify(log.slice(-80)));
-  state.pickOverride = null;
-  render();
-}
-function unlogToday() {
-  localStorage.setItem('session_log', JSON.stringify(sessionLog().filter(x => x.date !== todayIso)));
-  render();
-}
 
-function weekCoverage() {
-  const mon = mondayOf(todayIso);
-  const log = sessionLog().filter(x => x.date >= mon);
-  const has = c => log.filter(x => x.cat === c).length;
-  const acts = garminReady() ? state.garmin.acts.filter(a => actDate(a) >= mon) : [];
-  const runs = acts.filter(a => sportOf(a.type) === 'run').length;
-  const longBike = acts.filter(a => sportOf(a.type) === 'bike' && (a.dur || 0) >= 75 * 60).length;
-  const strengthActs = acts.filter(a => sportOf(a.type) === 'strength').length;
-  return {
-    lower: has('lower'), upper: has('upper'),
-    run: Math.max(has('run'), runs), mtb: Math.max(has('mtb'), longBike), z2: has('z2'),
-    untagged: Math.max(0, strengthActs - has('lower') - has('upper')),
-    doneToday: sessionLog().filter(x => x.date === todayIso).map(x => x.cat),
-  };
-}
-function lastDone(cat) {
-  const dates = sessionLog().filter(x => x.cat === cat).map(x => x.date);
-  if (cat === 'run' && garminReady()) state.garmin.acts.filter(a => sportOf(a.type) === 'run').forEach(a => dates.push(actDate(a)));
-  return dates.sort().pop() || '0000';
-}
 
 // ── coach's call: one decision from every signal ────────────────────
-const LEVELS = { go: 0, reduce: 1, z2: 2, back: 3, rest: 4 };
-function coachCall() {
-  const reasons = [];
-  let level = 'go';
-  const bump = l => { if (LEVELS[l] > LEVELS[level]) level = l; };
-
-  let r = null, acwr = null;
-  if (garminReady()) {
-    r = garminReadiness(state.garmin);
-    acwr = garminAcwr(state.garmin);
-    bump(r.level);
-    if (r.avg7 && r.band?.hrvLow) {
-      const inBand = r.avg7 >= r.band.hrvLow;
-      reasons.push({ tone: inBand ? 'good' : 'warn', text: `HRV ${r.avg7} ms (7-day) is ${inBand ? 'inside' : 'below'} your baseline ${r.band.hrvLow}–${r.band.hrvHigh}.` });
-    }
-    if (r.sleepLast?.sleepS) {
-      const h = r.sleepLast.sleepS / 3600;
-      reasons.push({ tone: h >= 7 ? 'good' : h >= 6 ? 'neutral' : 'warn', text: `Slept ${fmtHm(r.sleepLast.sleepS)}${h < 6 ? ' — under 6 h' : ''}.` });
-    }
-    if (acwr) {
-      if (acwr.ratio > 1.3) { bump('reduce'); reasons.push({ tone: 'warn', text: `Load ratio ${acwr.ratio.toFixed(2)} is over 1.3 — hold volume.` }); }
-      else if (acwr.ratio < 0.8) reasons.push({ tone: 'neutral', text: `Load ratio ${acwr.ratio.toFixed(2)} — room to build.` });
-    }
-  } else {
-    const sorted = [...state.wellness].sort((a, b) => (a.id || '').localeCompare(b.id || ''));
-    const sc = applyFeelToReadiness(computeReadiness(getBackfilledLatest(sorted), sorted), state.feel);
-    const s = typeof sc === 'object' ? sc.score ?? sc.value : sc;
-    if (s != null) {
-      bump(s >= 70 ? 'go' : s >= 50 ? 'reduce' : s >= 35 ? 'z2' : 'rest');
-      reasons.push({ tone: s >= 70 ? 'good' : 'warn', text: `Intervals readiness ${Math.round(s)}/100.` });
-    }
-  }
-
-  if (state.feel === 'beat') { bump('z2'); reasons.push({ tone: 'warn', text: 'You feel beat — trust it.' }); }
-  else if (state.feel === 'sore') { bump('reduce'); reasons.push({ tone: 'neutral', text: 'Sore — trim the lifting.' }); }
-
-  const back = backEntryFor(todayIso);
-  if (back && back.pain != null) {
-    if (back.pain >= 6 || back.reach.includes('Knee')) { bump('back'); reasons.push({ tone: 'bad', text: `Back ${back.pain}/10${back.reach.includes('Knee') ? ', reaching the knee' : ''} — back first.` }); }
-    else if (back.pain >= 3) reasons.push({ tone: 'warn', text: `Back ${back.pain}/10 — spine-friendly lower only.` });
-    else reasons.push({ tone: 'good', text: `Back ${back.pain}/10.` });
-  } else reasons.push({ tone: 'neutral', text: 'Back not logged yet today.', action: "setTab('back')" });
-
-  const HEAD = {
-    go:     ['Green light', 'Train as planned.', 'var(--green)'],
-    reduce: ['Train, but trim', 'Cut volume 10–15%: drop the last set of each lift, keep runs under 145 bpm.', 'var(--yellow)'],
-    z2:     ['Zone 2 only', 'Easy aerobic work, HR capped at 145. No lifting intensity today.', 'var(--orange)'],
-    back:   ['Back first', 'Do the back routine, then easy Zone 2. No loaded lower body.', 'var(--orange)'],
-    rest:   ['Rest day', 'Back routine and a walk. That is the whole session.', 'var(--red)'],
-  };
-  return { level, head: HEAD[level], reasons, back, r, acwr };
-}
 
 // ── adaptive session picker ─────────────────────────────────────────
 const BACK_ROUTINE = [
@@ -3932,69 +3734,7 @@ const BACK_ROUTINE = [
 ];
 const CAT_LABEL = { lower: 'Lower', upper: 'Upper', run: 'Z2 run', mtb: 'Long MTB', z2: 'Zone 2', back: 'Back + walk' };
 
-function pickSession(call, mins) {
-  const cov = weekCoverage();
-  const pain = call.back?.pain ?? 0;
-  let cats;
-  if (call.level === 'rest') cats = ['back'];
-  else if (call.level === 'back' || call.level === 'z2') cats = ['z2', 'back'];
-  else {
-    const need = ['lower', 'upper', 'run'].filter(c => !cov[c]).sort((a, b) => lastDone(a).localeCompare(lastDone(b)));
-    const adds = [];
-    if (mins >= 90 && !cov.mtb) adds.push('mtb');
-    if (cov.upper < 2) adds.push('upper');
-    adds.push('z2');
-    cats = [...need, ...adds.filter(c => !need.includes(c))];
-    if (pain >= 6) cats = cats.filter(c => c !== 'lower');
-    if (mins < 90) cats = cats.filter(c => c !== 'mtb');
-    // don't repeat what was already done today
-    cats = cats.filter(c => !cov.doneToday.includes(c));
-    if (!cats.length) cats = ['z2'];
-  }
-  const cat = state.pickOverride && cats.concat(['lower', 'upper', 'run', 'z2', 'back', 'mtb']).includes(state.pickOverride) ? state.pickOverride : cats[0];
-  return { session: buildSession(cat, mins, call), alts: [...new Set(cats.filter(c => c !== cat))].slice(0, 3), cov };
-}
 
-function buildSession(cat, mins, call) {
-  const S = SESSIONS;
-  const trim = call.level === 'reduce';
-  const take = (list, n) => list.slice(0, n).map(e => ({ ...e }));
-  const why = {
-    lower: 'Lower body is the oldest box on your 3-day minimum.',
-    upper: 'Upper day keeps the minimum moving — incline first, biceps in.',
-    run: 'Zone 2 run with a 170 spm metronome — aerobic base and cadence.',
-    mtb: 'You have the time — long ride builds the engine.',
-    z2: call.level === 'go' ? 'Minimum is covered — bank easy aerobic time.' : 'Today calls for easy aerobic work only.',
-    back: 'Recovery day: the routine is the session.',
-  }[cat];
-  let s;
-  if (cat === 'lower') {
-    const ex = S.Monday.exercises;
-    const pick = mins <= 20 ? [ex[0], ex[2], ex[4]] : mins <= 40 ? [ex[0], ex[1], ex[2], ex[4]] : ex;
-    s = { title: 'Lower — spine-friendly', warmup: mins <= 20 ? S.Monday.warmup.slice(0, 2) : S.Monday.warmup, exercises: pick.map(e => ({ ...e })), cooldown: S.Monday.cooldown };
-  } else if (cat === 'upper') {
-    const t = S.Tuesday.exercises, f = S.Friday.exercises;
-    const find = (list, re) => list.find(e => re.test(e.name)) || list[0];
-    const incline = find(t, /Incline Barbell/), pull = find(f, /Pull-Up/), row = find(f, /Row/), hammer = find(f, /Hammer/),
-          incline2 = find(t, /Landmine|Smith/), curl = find(t, /Curl/), face = find(f, /Face Pull/);
-    const pick = mins <= 20 ? [incline, pull, hammer] : mins <= 40 ? [incline, pull, row, hammer] : [incline, pull, incline2, row, face, curl];
-    s = { title: mins <= 20 ? 'Upper — express supersets' : 'Upper — push, pull, biceps', warmup: ['Band pull-aparts — 15', 'Scap push-ups — 10', 'Light incline press — 2×10'], exercises: pick.map(e => ({ ...e })), cooldown: ['Doorway pec stretch — 30 s/side', 'Open books — 8/side'] };
-    if (mins <= 20) s.exercises.forEach(e => { e.sets = 3; e.rest = 'superset, 60 sec'; });
-  } else if (cat === 'run') {
-    const m = Math.max(20, Math.min(60, mins - 5));
-    s = { title: `Zone 2 run — ${m} min`, warmup: ['Walk 3 min', 'Leg swings — 10/side'], exercises: [{ name: 'Trail or road run', sets: 1, reps: `${m} min`, weight: '140–150 bpm cap', rest: '—', notes: '170 spm metronome. Walk the climbs if HR passes 150.' }], cooldown: ['Half-kneeling hip flexor — 60 s/side', 'Calf stretch — 45 s/side'] };
-  } else if (cat === 'mtb') {
-    const m = Math.min(150, mins);
-    s = { title: `Long MTB — ${hm(m)}`, warmup: ['First 10 min easy spin'], exercises: [{ name: 'MTB ride', sets: 1, reps: `${m} min`, weight: 'Z2, climbs ≤ Z3', rest: '—', notes: '500 mg sodium before. 60 g carbs/hour after the first hour. Stand and reset your back every 20 min.' }], cooldown: ['Half-kneeling hip flexor — 60 s/side', 'Prone press-ups — 10'] };
-  } else if (cat === 'z2') {
-    const m = Math.max(15, mins - 12);
-    s = { title: `Zone 2 + back routine`, warmup: ['Back routine first (12 min)'], exercises: [{ name: 'Easy bike, run or brisk walk', sets: 1, reps: `${m} min`, weight: '≤ 145 bpm', rest: '—', notes: 'Nasal breathing pace. Bike or walk if running bugs the back.' }], cooldown: BACK_ROUTINE };
-  } else {
-    s = { title: 'Back routine + walk', warmup: [], exercises: BACK_ROUTINE.map(n => ({ name: n })).concat(mins > 20 ? [{ name: 'Easy walk', reps: `${Math.max(10, mins - 15)} min`, notes: 'Stroller walk counts.' }] : []), cooldown: [] };
-  }
-  if (trim && ['lower', 'upper'].includes(cat)) s.exercises.forEach(e => { if (typeof e.sets === 'number' && e.sets > 2) e.sets -= 1; });
-  return { cat, mins, why, trimNote: trim && ['lower', 'upper', 'run', 'mtb'].includes(cat) ? 'Trimmed: one less set per lift, HR under 145.' : '', ...s };
-}
 
 // ── header + tab bar ────────────────────────────────────────────────
 const IC = {
@@ -4040,73 +3780,6 @@ function mTabBar() {
 }
 
 // ── TODAY ───────────────────────────────────────────────────────────
-function mToday() {
-  const call = coachCall();
-  const [head, sub, color] = call.head;
-  const r = call.r, acwr = call.acwr, back = call.back;
-  const tiles = [
-    ['HRV', r?.avg7 ? `${r.avg7}<small>ms</small>` : '—', r?.band?.hrvLow ? `base ${r.band.hrvLow}–${r.band.hrvHigh}` : '7-day avg', r?.avg7 && r?.band?.hrvLow ? (r.avg7 >= r.band.hrvLow ? 'var(--green)' : 'var(--yellow)') : 'var(--text)', 'recover'],
-    ['Sleep', r?.sleepLast?.sleepS ? fmtHm(r.sleepLast.sleepS) : '—', r?.sleep7 ? `7d ${fmtHm(r.sleep7)}` : 'last night', r?.sleepLast?.sleepS ? (r.sleepLast.sleepS >= 7 * 3600 ? 'var(--green)' : r.sleepLast.sleepS >= 6 * 3600 ? 'var(--text)' : 'var(--yellow)') : 'var(--text)', 'recover'],
-    ['Load', acwr ? acwr.ratio.toFixed(2) : '—', 'ratio · keep < 1.3', acwr ? (acwr.ratio > 1.3 ? 'var(--red)' : acwr.ratio < 0.8 ? 'var(--yellow)' : 'var(--green)') : 'var(--text)', 'train'],
-    ['Back', back ? `${back.pain}<small>/10</small>` : 'Log', back ? (back.reach.length ? back.reach.join(', ') : 'no spread') : 'tap to check in', back ? (back.pain >= 6 ? 'var(--red)' : back.pain >= 3 ? 'var(--yellow)' : 'var(--green)') : 'var(--primary)', 'back'],
-  ];
-  const { session: s, alts, cov } = pickSession(call, state.mins);
-  const doneToday = cov.doneToday.length > 0;
-
-  const exRows = s.exercises.map((ex, i) => {
-    const id = `pick-${s.cat}-${state.mins}-${i}`;
-    const checked = state.checkedExercises[id];
-    const meta = [ex.sets && `${ex.sets} sets`, ex.reps, ex.weight, ex.rest && ex.rest !== '—' && `rest ${ex.rest}`].filter(Boolean).join(' · ');
-    return `<div class="exercise ${checked ? 'checked' : ''}" id="ex-${id}">
-      <div class="exercise-check ${checked ? 'checked' : ''}" id="chk-${id}" onclick="toggleExercise('${id}')"></div>
-      <div class="exercise-info"><div class="exercise-name">${esc(ex.name)}</div>
-        ${meta ? `<div class="m-ex-meta">${esc(meta)}</div>` : ''}
-        ${ex.notes ? `<div class="exercise-note">${esc(ex.notes)}</div>` : ''}</div></div>`;
-  }).join('');
-
-  const minCats = [['lower', 'Lower'], ['upper', 'Upper'], ['run', 'Z2 run']];
-  const minDone = minCats.filter(([c]) => cov[c]).length;
-
-  return `
-  ${!garminReady() ? renderGarminCard() : ''}
-  <div class="card m-call" style="--call:${color}">
-    <div class="m-call-k"><span class="g-dot" style="background:${color}"></span>Coach's call</div>
-    <div class="m-call-h">${head}</div>
-    <div class="m-call-s">${sub}</div>
-    <ul class="m-why">${call.reasons.map(x => `<li class="${x.tone}" ${x.action ? `onclick="${x.action}"` : ''}>${x.text}</li>`).join('')}</ul>
-    <div class="m-feel">
-      <span>Feel</span>
-      ${FEEL_OPTIONS.map(o => `<button class="${state.feel === o.id ? 'on' : ''}" onclick="${state.feel === o.id ? 'clearFeel()' : `setFeel('${o.id}')`}">${o.label}</button>`).join('')}
-    </div>
-  </div>
-
-  <div class="m-tiles">
-    ${tiles.map(([k, v, sub, c, tab]) => `<button class="m-tile" onclick="setTab('${tab}')"><div class="g-k">${k}</div><div class="m-tile-v" style="color:${c}">${v}</div><div class="g-s">${sub}</div></button>`).join('')}
-  </div>
-
-  <div class="card m-sess">
-    <div class="m-sess-top">
-      <div class="g-k">Time you have</div>
-      <div class="m-seg">${[20, 40, 60, 90].map(m => `<button class="${state.mins === m ? 'on' : ''}" onclick="setMins(${m})">${m === 90 ? '90+' : m}</button>`).join('')}</div>
-    </div>
-    ${doneToday ? `<div class="m-done">Logged today: ${cov.doneToday.map(c => CAT_LABEL[c]).join(', ')} <a href="#" onclick="unlogToday();return false;">undo</a></div>` : ''}
-    <div class="m-sess-title">${esc(s.title)}</div>
-    <div class="m-sess-why">${s.why}${s.trimNote ? ` <span style="color:var(--yellow)">${s.trimNote}</span>` : ''}</div>
-    ${alts.length ? `<div class="m-alts"><span>Or</span>${alts.map(c => `<button onclick="setPick('${c}')">${CAT_LABEL[c]}</button>`).join('')}</div>` : ''}
-    ${s.warmup?.length ? protoBlock('pick-warm', 'Warm-up', s.warmup, '') : ''}
-    <div class="session-section">${exRows}</div>
-    ${s.cooldown?.length ? protoBlock('pick-cool', s.cat === 'z2' ? 'Back routine' : 'Cool-down', s.cooldown, '') : ''}
-    <button class="b-save" onclick="logSession('${s.cat}')">Done — log ${CAT_LABEL[s.cat]}</button>
-  </div>
-
-  <div class="card m-week">
-    <div class="m-row"><div class="card-title">This week · 3-day minimum</div><div class="card-meta">${minDone}/3</div></div>
-    <div class="m-min">${minCats.map(([c, l]) => `<div class="${cov[c] ? 'ok' : ''}"><span>${cov[c] ? '✓' : ''}</span>${l}</div>`).join('')}</div>
-    <div class="g-s">${minDone === 3 ? 'Minimum covered. Anything else is a bonus — long MTB, second upper, Zone 2.' : `Next up: ${minCats.filter(([c]) => !cov[c]).map(([, l]) => l).join(', ')}.`}${cov.untagged ? ` ${cov.untagged} Garmin strength session${cov.untagged > 1 ? 's' : ''} not tagged lower/upper — tap Done on the card to tag.` : ''}</div>
-  </div>
-
-  <button class="m-ai" id="coach-btn" onclick="generateSession('coach-btn')">Ask AI coach</button>`;
-}
 
 // ── TRAIN ───────────────────────────────────────────────────────────
 function mTrainLegacy() {
@@ -4460,49 +4133,6 @@ async function loadRunMechanics() {
   if (state.tab === 'train') render();
 }
 
-function renderRunMechanics() {
-  const runs = Object.values(state.runMech).filter(r => r && !r.skip && r.date).sort((a, b) => a.date.localeCompare(b.date)).slice(-12);
-  if (!runs.length) {
-    return `<div class="card m-card"><div class="card-title">Run mechanics</div>
-      <div class="g-s" id="rm-status" style="margin-top:6px">${state.runMechStatus || (runMechLoading ? 'Analysing runs…' : 'No runs of 15+ minutes in the last 6 months yet. Climb cadence and HR drift show up after your next run.')}</div></div>`;
-  }
-  const avg = (arr) => { const v = arr.filter(x => x != null); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
-  const last5 = runs.slice(-5);
-  const climb = avg(last5.map(r => r.cadClimb)), flat = avg(last5.map(r => r.cadFlat));
-  const drift = avg(last5.map(r => r.decouple)), over = avg(last5.map(r => r.over150));
-  const tone = (v, good, warn, lowerBetter = false) => v == null ? 'var(--text)' : (lowerBetter ? v <= good : v >= good) ? 'var(--green)' : (lowerBetter ? v <= warn : v >= warn) ? 'var(--yellow)' : 'var(--red)';
-
-  const takes = [];
-  if (climb != null) takes.push(climb >= 168 ? takeaway('good', `Climbing at ${Math.round(climb)} spm — holding cadence on grades. Keep the 170 metronome.`)
-    : takeaway(climb >= 160 ? 'warn' : 'bad', `Climbing at ${Math.round(climb)} spm vs 170 target${flat ? ` (${Math.round(flat)} on the flat)` : ''}. Shorter, quicker steps on grades — keep the metronome on and let pace drop, not cadence.`));
-  if (drift != null) takes.push(drift < 5 ? takeaway('good', `HR drift ${drift.toFixed(1)}% — aerobic base is holding. Add 10 minutes to the next Z2 run.`)
-    : takeaway(drift < 8 ? 'warn' : 'bad', `HR drift ${drift.toFixed(1)}% (target under 5%). Base is still thin — keep runs easier and steadier rather than longer.`));
-  if (over != null) takes.push(over <= 15 ? takeaway('good', `${Math.round(over)}% of run time over 150 bpm. Zone 2 discipline is good.`)
-    : takeaway(over <= 35 ? 'warn' : 'bad', `${Math.round(over)}% of run time over 150 bpm. Walk the climbs when HR passes 150.`));
-
-  const label = r => new Date(r.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' });
-  const cadPts = runs.map(r => ({ label: label(r), v: r.cadClimb, color: r.cadClimb == null ? null : r.cadClimb >= 168 ? 'var(--green)' : r.cadClimb >= 160 ? 'var(--yellow)' : 'var(--red)',
-    tip: `<b>${shortDate(r.date)}</b> · ${esc(r.name)} · climb ${r.cadClimb ?? '—'} spm${r.climbMins ? ` (${r.climbMins} min on 6%+)` : ''} · flat ${r.cadFlat ?? '—'} spm` }));
-  const driftBars = runs.map(r => ({ label: label(r), tip: `<b>${shortDate(r.date)}</b> · ${esc(r.name)} · drift ${r.decouple == null ? '— (under 25 min)' : r.decouple + '%'} · ${r.over150}% over 150 · ${r.mins} min`,
-    segs: [{ v: r.decouple == null ? 0 : Math.max(0.2, Math.abs(r.decouple)), color: r.decouple == null ? 'transparent' : r.decouple < 5 ? 'var(--green)' : r.decouple < 8 ? 'var(--yellow)' : 'var(--red)' }] }));
-  const lastRun = runs[runs.length - 1];
-
-  return `
-  <div class="card m-card">
-    <div class="m-row"><div class="card-title">Run mechanics · last ${runs.length} runs</div><div class="card-meta" id="rm-status">${state.runMechStatus}</div></div>
-    <div class="m-tiles m-tiles-3">
-      <div class="m-tile"><div class="g-k">Climb cad</div><div class="m-tile-v" style="color:${tone(climb, 168, 160)}">${climb ? Math.round(climb) : '—'}<small>spm</small></div><div class="g-s">6%+ grade · 170</div></div>
-      <div class="m-tile"><div class="g-k">HR drift</div><div class="m-tile-v" style="color:${tone(drift, 5, 8, true)}">${drift != null ? drift.toFixed(1) : '—'}<small>%</small></div><div class="g-s">target &lt; 5%</div></div>
-      <div class="m-tile"><div class="g-k">Over 150</div><div class="m-tile-v" style="color:${tone(over, 15, 35, true)}">${over != null ? Math.round(over) : '—'}<small>%</small></div><div class="g-s">of run time</div></div>
-    </div>
-    ${takes.join('')}
-    <div class="g-row-title" style="margin-top:6px"><span>Climb cadence per run</span><span>dashed = 170</span></div>
-    ${lineChart({ points: cadPts, color: 'var(--orange)', target: 170, read: cadPts[cadPts.length - 1].tip, height: 110 })}
-    <div class="g-row-title" style="margin-top:12px"><span>HR drift per run</span><span>dashed = 5%</span></div>
-    ${barChart({ bars: driftBars, target: 5, read: driftBars[driftBars.length - 1].tip, height: 90 })}
-    <div class="g-s" style="margin-top:6px">Last run ${shortDate(lastRun.date)}: ${lastRun.mins} min, flat ${lastRun.cadFlat ?? '—'} spm, climbs ${lastRun.cadClimb ?? '—'} spm. Averages use the last 5 runs. Drift needs 25+ minutes.</div>
-  </div>`;
-}
 
 // ── 3-week back checkpoint (Dec 12) ─────────────────────────────────
 const BACK_START = '2026-11-25', BACK_CHECK = '2026-12-12';
@@ -4704,44 +4334,6 @@ function thisWeekTable() {
 }
 
 // ── Train tab (phone) ───────────────────────────────────────────────
-function trainCharts() {
-  const g = state.garmin;
-  const { weeks, byWeek } = weeklyAgg(12);
-  const shown = weeks.slice(4);
-  const roll = (w, key) => { const i = weeks.indexOf(w); const prev = weeks.slice(Math.max(0, i - 4), i).map(x => byWeek[x][key]); return prev.length ? prev.reduce((a, b) => a + b, 0) / prev.length : null; };
-  const acwr = garminAcwr(g);
-  const zc = ['#52525B', '#22C55E', '#EAB308', '#F97316', '#EF4444'];
-  const zBars = shown.map(w => { const z = byWeek[w].z, tot = z.reduce((a, b) => a + b, 0); return { label: shortDate(w), tip: `<b>Week of ${shortDate(w)}</b> · ${tot ? Math.round((z[0] + z[1]) / tot * 100) : 0}% easy · ${z.map((m, i) => `Z${i + 1} ${Math.round(m)}m`).join(' · ')}`, segs: z.map((m, i) => ({ v: m, color: zc[i] })) }; });
-  const zNow = byWeek[shown[shown.length - 1]].z, zTot = zNow.reduce((a, b) => a + b, 0), easy = zTot ? Math.round((zNow[0] + zNow[1]) / zTot * 100) : null;
-  const zTake = easy == null ? '' : easy >= 75 ? takeaway('good', `${easy}% easy this week. That's how the aerobic base gets built.`) : takeaway('warn', `Only ${easy}% easy this week. Aerobic efficiency is the weakness — aim for 80% in Zones 1–2.`);
-  const loadBars = shown.map(w => ({ label: shortDate(w), tip: `<b>Week of ${shortDate(w)}</b> · load ${Math.round(byWeek[w].load)}`, segs: [{ v: byWeek[w].load, color: w === shown[shown.length - 1] ? 'var(--accent)' : '#3F3F46' }] }));
-  const loadTake = !acwr ? '' : acwr.ratio > 1.3 ? takeaway('bad', `Ratio ${acwr.ratio.toFixed(2)} — over the 1.3 guardrail. Hold or cut volume.`) : acwr.ratio < 0.8 ? takeaway('neutral', `Ratio ${acwr.ratio.toFixed(2)} — under-loaded. Safe to add a session.`) : takeaway('good', `Ratio ${acwr.ratio.toFixed(2)} — in the build zone (0.8–1.3).`);
-  const recent = [...g.acts].sort((a, b) => String(b.t).localeCompare(String(a.t))).slice(0, 8);
-  return `
-  <div class="sec-k">Intensity</div>
-  <div class="card m-card">
-    <div class="card-title">Heart-rate zones · minutes</div>
-    ${zTake}
-    ${barChart({ bars: zBars, read: zBars[zBars.length - 1].tip, height: 120 })}
-    ${legend([[zc[0], 'Z1 <142'], [zc[1], 'Z2 142–160'], [zc[2], 'Z3 160–169'], [zc[3], 'Z4 169–187'], [zc[4], 'Z5 187+']])}
-  </div>
-  ${renderRunMechanics()}
-  <div class="card m-card">
-    <div class="card-title">Training load · Garmin</div>
-    ${loadTake}
-    ${barChart({ bars: loadBars, line: shown.map(w => roll(w, 'load')), read: loadBars[loadBars.length - 1].tip, height: 110 })}
-    <div class="g-s">Counts every activity — paddle, surf and dirt bike included. Dashed line: 4-week average.</div>
-  </div>
-  <div class="card m-card">
-    <div class="card-title">Recent</div>
-    ${recent.map(a => {
-      const sp = sportOf(a.type);
-      const mi = a.dist ? (a.dist / 1609.34).toFixed(1) + ' mi' : '';
-      return `<div class="m-act"><i style="background:${SPORTS[sp].color}"></i><div><div class="m-act-n">${esc(a.name && a.name.length > 1 ? a.name : SPORTS[sp].label)}</div>
-        <div class="g-s">${new Date(String(a.t).replace(' ', 'T')).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} · ${[hm((a.dur || 0) / 60), mi, a.hr && `${a.hr} bpm`, a.load && `load ${Math.round(a.load)}`].filter(Boolean).join(' · ')}</div></div></div>`;
-    }).join('')}
-  </div>`;
-}
 
 function mTrain() {
   setTimeout(loadRunMechanics, 0);
@@ -4774,6 +4366,780 @@ function renderDesktop(latest, sorted) {
     </div>
   </div>`;
 }
+
+// ════════════════════════════════════════════════════════════════════
+//  v3 — synced day log, rebalanced readiness, strength log,
+//  hinge ladder, function check, body weight, weekly review
+// ════════════════════════════════════════════════════════════════════
+const Z2_CAP = 150;            // one Zone 2 ceiling everywhere
+const EASY_CAP = 140;          // "easy end of Z2" on trim days
+
+// ── Day log: one line per prefix in the Intervals wellness comment ──
+// Lines: "Back: …", "Done: …", "Lifts: …", "Check: …", "Hinge: …".
+// Writes go to a pending queue first, then PUT to Intervals; reads
+// prefer a pending value, else Intervals. Every device converges.
+var DAY_PREFIXES = ['Back:', 'Done:', 'Lifts:', 'Check:', 'Hinge:'];
+function pendKey(date, prefix) { return `pend_${date}_${prefix}`; }
+
+function dayLine(date, prefix) {
+  const p = localStorage.getItem(pendKey(date, prefix));
+  if (p != null) return p === '' ? null : p;
+  const w = (state.wellness || []).find(x => x.id === date);
+  const line = String(w?.comments || '').split('\n').find(l => l.startsWith(prefix));
+  return line || null;
+}
+function pendingDates() {
+  const out = new Set();
+  for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith('pend_')) out.add(k.slice(5, 15)); }
+  return [...out];
+}
+async function pushDay(date) {
+  if (!state.athleteId || !state.apiKey) return false;
+  const rec = (state.wellness || []).find(x => x.id === date);
+  const keep = String(rec?.comments || '').split('\n').filter(l => l.trim() && !DAY_PREFIXES.some(p => l.startsWith(p)));
+  const lines = DAY_PREFIXES.map(p => dayLine(date, p)).filter(Boolean);
+  const comments = [...keep, ...lines].join('\n');
+  try {
+    const res = await fetch(`https://intervals.icu/api/v1/athlete/${state.athleteId}/wellness/${date}`, {
+      method: 'PUT',
+      headers: { Authorization: 'Basic ' + btoa('API_KEY:' + state.apiKey), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: date, comments })
+    });
+    if (!res.ok) throw new Error(res.status);
+    if (rec) rec.comments = comments; else (state.wellness = state.wellness || []).push({ id: date, comments });
+    DAY_PREFIXES.forEach(p => localStorage.removeItem(pendKey(date, p)));
+    return true;
+  } catch (e) { return false; }
+}
+async function setDayLine(date, prefix, text) {
+  localStorage.setItem(pendKey(date, prefix), text ? `${prefix} ${text}` : '');
+  const ok = await pushDay(date);
+  state.syncMsg = ok ? '' : 'Saved on this device — will sync to Intervals.icu when it can.';
+  return ok;
+}
+async function flushPending() {
+  for (const d of pendingDates()) await pushDay(d);
+}
+// one-time migration of earlier device-only logs into the synced day log
+function migrateLocalLogs() {
+  if (localStorage.getItem('migrated_v3')) return;
+  for (let i = localStorage.length - 1; i >= 0; i--) {
+    const k = localStorage.key(i);
+    if (k && /^back_\d{4}-\d\d-\d\d$/.test(k)) {
+      try { const e = JSON.parse(localStorage.getItem(k)); if (e && e.pain != null) localStorage.setItem(pendKey(k.slice(5), 'Back:'), backLine(e)); } catch (x) {}
+      localStorage.removeItem(k);
+    }
+  }
+  try {
+    const log = JSON.parse(localStorage.getItem('session_log') || '[]');
+    const byDate = {};
+    log.forEach(x => (byDate[x.date] = byDate[x.date] || new Set()).add(x.cat));
+    Object.entries(byDate).forEach(([d, cats]) => localStorage.setItem(pendKey(d, 'Done:'), 'Done: ' + [...cats].join(', ')));
+    localStorage.removeItem('session_log');
+  } catch (x) {}
+  localStorage.setItem('migrated_v3', '1');
+}
+
+// ── live "today" (Home Screen apps can stay open past midnight) ─────
+function refreshToday() {
+  const now = isoLocal(new Date());
+  if (now === todayIso) return;
+  todayIso = now;
+  state.backDraft = backEntryFor(todayIso) || { pain: null, reach: [], sts: false, routine: false };
+  state.backSaved = !!backEntryFor(todayIso);
+  state.liftDraft = {};
+  state.pickOverride = null;
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { const before = todayIso; refreshToday(); if (before !== todayIso) render(); } });
+
+// ── Back log on the day log ─────────────────────────────────────────
+function backEntryFor(date) { return parseBackLine(dayLine(date, 'Back:')); }
+async function saveBack() {
+  const d = state.backDraft;
+  if (d.pain == null) { state.backMsg = 'Pick a pain level first.'; render(); return; }
+  state.backSaved = true; state.backMsg = 'Saving…'; render();
+  const ok = await setDayLine(todayIso, 'Back:', backLine(d).slice('Back: '.length));
+  state.backMsg = ok ? 'Saved to Intervals.icu.' : 'Saved on this device — will sync when Intervals.icu is reachable.';
+  render();
+}
+
+// ── Sessions done (synced) ──────────────────────────────────────────
+function doneOn(date) { const l = dayLine(date, 'Done:'); return l ? l.slice(5).split(',').map(s => s.trim()).filter(Boolean) : []; }
+function sessionLog(days = 120) {
+  const out = [];
+  for (let i = 0; i < days; i++) { const d = daysAgoIso(i); doneOn(d).forEach(cat => out.push({ cat, date: d })); }
+  return out;
+}
+async function logSession(cat) {
+  const cats = [...new Set([...doneOn(todayIso), cat])];
+  await setDayLine(todayIso, 'Done:', cats.join(', '));
+  if (cat === 'lower' || cat === 'upper') await saveLiftDraft();
+  if (cat === 'lower' && hingeStage().stage >= 1) await setDayLine(todayIso, 'Hinge:', `stage ${hingeStage().stage}`);
+  state.pickOverride = null;
+  render();
+}
+async function unlogToday() {
+  await setDayLine(todayIso, 'Done:', '');
+  await setDayLine(todayIso, 'Hinge:', '');
+  render();
+}
+
+// ── Readiness: rebalanced (two soft flags to downgrade, can upgrade) ─
+function sleepNorm(days) {
+  const v = days.filter(d => d.d >= daysAgoIso(14) && d.d < todayIso && d.sleepS).map(d => d.sleepS);
+  return v.length >= 5 ? v.reduce((a, b) => a + b, 0) / v.length : null;
+}
+function garminReadiness(g) {
+  const days = g.days || [];
+  const last = lastWith(days, 'hrv');
+  const avg7raw = avgLast(days, 'hrv', 7);
+  const avg7 = avg7raw == null ? null : Math.round(avg7raw);
+  const band = lastWith(days, 'hrvLow');
+  const sleepLast = lastWith(days, 'sleepS');
+  const sleep7 = avgLast(days, 'sleepS', 7);
+  const norm = sleepNorm(days);
+  const rhrLast = lastWith(days, 'rhr')?.rhr;
+  const rhr30 = avgLast(days, 'rhr', 30);
+  const hard = [], soft = [];
+  if (last?.hrv != null && last.hrv < 40) hard.push(['rest', `HRV ${last.hrv} ms last night — under 40.`]);
+  if (avg7 && band?.hrvLow && avg7 < band.hrvLow * 0.9) hard.push(['z2', `7-day HRV ${avg7} ms — more than 10% under baseline.`]);
+  else if (avg7 && band?.hrvLow && avg7 < band.hrvLow) soft.push(`7-day HRV ${avg7} ms just under baseline ${band.hrvLow}–${band.hrvHigh}.`);
+  if (sleepLast?.sleepS && (sleepLast.sleepS < 5 * 3600 || (norm && sleepLast.sleepS < norm - 45 * 60)))
+    soft.push(`Slept ${fmtHm(sleepLast.sleepS)}${norm ? ` vs your ${fmtHm(norm)} norm` : ''}.`);
+  if (rhrLast && rhr30 && rhrLast >= rhr30 + 5) soft.push(`Resting HR ${rhrLast} — ${Math.round(rhrLast - rhr30)} above normal.`);
+  let level = 'go', text = 'Train as planned.';
+  if (hard.length) { level = hard.some(h => h[0] === 'rest') ? 'rest' : 'z2'; text = hard[0][1] + (level === 'rest' ? ' Rest day.' : ' Zone 2 only.'); }
+  else if (soft.length >= 2) { level = 'reduce'; text = 'Two recovery flags — trim volume 10–15%.'; }
+  else if (soft.length === 1) text = 'One flag, not enough to change the plan — train as planned.';
+  const mid = band?.hrvLow ? (band.hrvLow + band.hrvHigh) / 2 : null;
+  const canPush = !hard.length && !soft.length && avg7 && mid && avg7 >= mid && sleepLast?.sleepS && (!norm || sleepLast.sleepS >= norm);
+  if (canPush) text = 'HRV top half of baseline and sleep at or above norm — push day.';
+  return { level, text, last, avg7, band, sleepLast, sleep7, norm, soft, hard, canPush, rhrLast, rhr30 };
+}
+
+const LEVELS = { push: -1, go: 0, reduce: 1, z2: 2, back: 3, rest: 4 };
+function coachCall() {
+  const reasons = [];
+  let level = 'go';
+  const bump = l => { if (LEVELS[l] > LEVELS[level]) level = l; };
+  let r = null, acwr = null, canPush = false;
+  if (garminReady()) {
+    r = garminReadiness(state.garmin);
+    acwr = garminAcwr(state.garmin);
+    bump(r.level);
+    canPush = r.canPush;
+    if (r.avg7 && r.band?.hrvLow) reasons.push({ tone: r.avg7 >= r.band.hrvLow ? 'good' : 'warn', text: `HRV ${r.avg7} ms (7-day) vs baseline ${r.band.hrvLow}–${r.band.hrvHigh}.` });
+    if (r.sleepLast?.sleepS) reasons.push({ tone: r.soft.some(s => s.startsWith('Slept')) ? 'warn' : 'good', text: `Slept ${fmtHm(r.sleepLast.sleepS)}${r.norm ? ` (norm ${fmtHm(r.norm)})` : ''}.` });
+    if (r.rhrLast && r.rhr30 && r.rhrLast >= r.rhr30 + 5) reasons.push({ tone: 'warn', text: `Resting HR ${r.rhrLast}, ${Math.round(r.rhrLast - r.rhr30)} above normal.` });
+    if (acwr) {
+      if (acwr.ratio > 1.3) { bump('reduce'); canPush = false; reasons.push({ tone: 'bad', text: `Load ratio ${acwr.ratio.toFixed(2)} — over 1.3. Hold volume.` }); }
+      else if (acwr.ratio > 1.15) canPush = false;
+    }
+  }
+  if (state.feel === 'beat') { bump('z2'); canPush = false; reasons.push({ tone: 'warn', text: 'You feel beat — trust it.' }); }
+  else if (state.feel === 'sore') { canPush = false; if (r && r.soft.length >= 1) bump('reduce'); reasons.push({ tone: 'neutral', text: r && r.soft.length >= 1 ? 'Sore plus a recovery flag — trim.' : 'Sore, but recovery numbers are fine — train, warm up longer.' }); }
+  const back = backEntryFor(todayIso);
+  if (back && back.pain != null) {
+    if (back.pain >= 6 || back.reach.includes('Knee')) { bump('back'); canPush = false; reasons.push({ tone: 'bad', text: `Back ${back.pain}/10${back.reach.includes('Knee') ? ', reaching the knee' : ''} — back first.` }); }
+    else if (back.pain >= 3) { canPush = false; reasons.push({ tone: 'warn', text: `Back ${back.pain}/10 — spine-friendly lower only.` }); }
+    else reasons.push({ tone: 'good', text: `Back ${back.pain}/10.` });
+  } else reasons.push({ tone: 'neutral', text: 'Back not logged yet today.', action: "setTab('back')" });
+  if (level === 'go' && canPush) level = 'push';
+
+  const HEAD = {
+    push:   ['Push day', 'Everything lines up. Take the load jumps where suggested, or add 10 minutes to the run.', 'var(--accent)'],
+    go:     ['Green light', 'Train as planned.', 'var(--green)'],
+    reduce: ['Train, but trim', `Drop the last set of each lift. Runs at the easy end of Zone 2 (under ${EASY_CAP}).`, 'var(--yellow)'],
+    z2:     ['Zone 2 only', `Easy aerobic work, HR under ${Z2_CAP}. No lifting intensity today.`, 'var(--orange)'],
+    back:   ['Back first', 'Do the back routine, then easy Zone 2. No loaded lower body.', 'var(--orange)'],
+    rest:   ['Rest day', 'Back routine and a walk. That is the whole session.', 'var(--red)'],
+  };
+  return { level, head: HEAD[level], reasons, back, r, acwr };
+}
+
+// ── Hinge return ladder ─────────────────────────────────────────────
+const HINGE_STAGES = [
+  { name: 'No loaded hinge yet', ex: null },
+  { name: 'KB deadlift from blocks', ex: { name: 'KB Deadlift from Blocks', sets: 3, reps: '8', weight: '35–53 lb', rest: '90 sec', notes: 'Bell on blocks at mid-shin. Hinge, brace, 1-second pause at the bottom. Stop if pain spreads down the leg.' } },
+  { name: 'Trap bar from blocks', ex: { name: 'Trap Bar Deadlift from Blocks', sets: 3, reps: '5', weight: '~50% of old working weight', rest: '2 min', notes: 'Blocks or pins at mid-shin. Smooth reps, nothing grindy.' } },
+  { name: 'Trap bar from the floor', ex: { name: 'Trap Bar Deadlift', sets: 3, reps: '5', weight: 'build 5–10 lb/session', rest: '2 min', notes: 'Floor pulls. Add load only if next-day pain stays at 0–2.' } },
+  { name: 'RDL back in', ex: { name: 'RDL', sets: 3, reps: '8', weight: 'light, build weekly', rest: '2 min', notes: 'Last rung. After 2 clean sessions, normal programming resumes.' } },
+];
+// Walk the history: unlock stage 1 after 5 days averaging ≤3 with no knee;
+// move up after 2 hinge sessions with no flare; a flare (next-day pain
+// up 2+ or reaching the knee) drops one stage.
+function hingeStage() {
+  let stage = 0, clean = 0, lastEvent = '';
+  const hist = [];
+  for (let i = 59; i >= 0; i--) { const d = daysAgoIso(i); hist.push({ d, e: backEntryFor(d), h: dayLine(d, 'Hinge:') }); }
+  for (let i = 0; i < hist.length; i++) {
+    const win = hist.slice(Math.max(0, i - 4), i + 1).filter(x => x.e);
+    if (stage === 0 && win.length >= 4 && win.reduce((s, x) => s + x.e.pain, 0) / win.length <= 3 && !win.some(x => x.e.reach.includes('Knee'))) { stage = 1; clean = 0; lastEvent = `Unlocked ${shortDate(hist[i].d)}`; }
+    if (hist[i].h && stage >= 1) {
+      const before = hist[i].e?.pain ?? hist[i - 1]?.e?.pain;
+      const after = hist[i + 1]?.e;
+      const flare = after && ((before != null && after.pain >= before + 2) || after.reach.includes('Knee'));
+      if (flare) { stage = Math.max(0, stage - 1); clean = 0; lastEvent = `Flared after ${shortDate(hist[i].d)} — dropped a stage`; }
+      else if (after) { clean++; if (clean >= 2 && stage < 4) { stage++; clean = 0; lastEvent = `Moved up ${shortDate(hist[i + 1].d)}`; } }
+    }
+  }
+  return { stage, clean, lastEvent, ...HINGE_STAGES[stage] };
+}
+
+// ── Strength log ────────────────────────────────────────────────────
+state.liftDraft = {};
+function parseLifts(line) {
+  if (!line) return [];
+  return line.slice(6).split(';').map(s => s.trim()).filter(Boolean).map(s => {
+    const m = /^(.*) ((?:[\d.]+x\d+\/?)+)$/.exec(s);
+    if (!m) return null;
+    return { name: m[1], sets: m[2].split('/').filter(Boolean).map(t => { const [w, r] = t.split('x'); return { w: +w, r: +r }; }) };
+  }).filter(Boolean);
+}
+function liftHistory(name, days = 120) {
+  const out = [];
+  for (let i = days - 1; i >= 0; i--) { const d = daysAgoIso(i); const l = parseLifts(dayLine(d, 'Lifts:')).find(x => x.name === name); if (l) out.push({ d, sets: l.sets }); }
+  return out;
+}
+const e1rm = (w, r) => r > 0 ? w * (1 + r / 30) : 0;
+const bestE1rm = sets => Math.max(0, ...sets.map(s => e1rm(s.w, s.r)));
+const topReps = reps => Math.max(...(String(reps || '').match(/\d+/g) || [0]).map(Number));
+const isLift = ex => typeof ex.sets === 'number' && ex.reps && /\d/.test(ex.reps) && !/min|s\/side|sec/.test(ex.reps);
+function loadStep(name) { return /Trap Bar|Hip Thrust|Squat|Deadlift/i.test(name) ? 10 : 5; }
+function suggestFor(ex) {
+  const hist = liftHistory(ex.name);
+  const last = hist[hist.length - 1];
+  if (!last) return { text: 'First time logged — pick a weight you could do for 2 more reps.', w: null };
+  const top = topReps(ex.reps), w = Math.max(...last.sets.map(s => s.w));
+  const hitAll = last.sets.length >= (ex.sets || 1) && last.sets.every(s => s.r >= top);
+  const lastTxt = `${last.sets.map(s => `${s.w}×${s.r}`).join(', ')} on ${shortDate(last.d)}`;
+  if (hitAll) return { text: `Last: ${lastTxt}. Hit every rep — go ${w + loadStep(ex.name)}.`, w: w + loadStep(ex.name), up: true };
+  return { text: `Last: ${lastTxt}. Stay at ${w} and beat the reps.`, w };
+}
+function fillLift(name, w, reps, n) { state.liftDraft[name] = { w: String(w), reps: Array(n).fill(String(reps)) }; render(); }
+function setLift(name, i, field, val) {
+  const d = state.liftDraft[name] = state.liftDraft[name] || { w: '', reps: [] };
+  if (field === 'w') d.w = val; else d.reps[i] = val;
+}
+async function saveLiftDraft() {
+  const existing = parseLifts(dayLine(todayIso, 'Lifts:'));
+  Object.entries(state.liftDraft).forEach(([name, d]) => {
+    const w = parseFloat(d.w);
+    const sets = (d.reps || []).map(r => parseInt(r, 10)).filter(r => r > 0).map(r => ({ w: isNaN(w) ? 0 : w, r }));
+    if (!sets.length) return;
+    const i = existing.findIndex(x => x.name === name);
+    if (i >= 0) existing[i].sets = sets; else existing.push({ name, sets });
+  });
+  if (!existing.length) return;
+  const txt = existing.map(l => `${l.name.replace(/;/g, ',')} ${l.sets.map(s => `${s.w}x${s.r}`).join('/')}`).join('; ');
+  await setDayLine(todayIso, 'Lifts:', txt);
+  state.liftDraft = {};
+}
+
+// ── Picker (uses hinge ladder, trim and push) ───────────────────────
+function weekCoverage() {
+  const mon = mondayOf(todayIso);
+  const log = sessionLog(8).filter(x => x.date >= mon);
+  const has = c => log.filter(x => x.cat === c).length;
+  const acts = garminReady() ? state.garmin.acts.filter(a => actDate(a) >= mon) : [];
+  const runs = acts.filter(a => sportOf(a.type) === 'run').length;
+  const longBike = acts.filter(a => sportOf(a.type) === 'bike' && (a.dur || 0) >= 75 * 60).length;
+  const strengthActs = acts.filter(a => sportOf(a.type) === 'strength').length;
+  return {
+    lower: has('lower'), upper: has('upper'), run: Math.max(has('run'), runs), mtb: Math.max(has('mtb'), longBike), z2: has('z2'),
+    untagged: Math.max(0, strengthActs - has('lower') - has('upper')), doneToday: doneOn(todayIso),
+  };
+}
+function lastDone(cat) {
+  const dates = sessionLog().filter(x => x.cat === cat).map(x => x.date);
+  if (cat === 'run' && garminReady()) state.garmin.acts.filter(a => sportOf(a.type) === 'run').forEach(a => dates.push(actDate(a)));
+  return dates.sort().pop() || '0000';
+}
+function pickSession(call, mins) {
+  const cov = weekCoverage();
+  const pain = call.back?.pain ?? 0;
+  let cats;
+  if (call.level === 'rest') cats = ['back'];
+  else if (call.level === 'back' || call.level === 'z2') cats = ['z2', 'back'];
+  else {
+    const need = ['lower', 'upper', 'run'].filter(c => !cov[c]).sort((a, b) => lastDone(a).localeCompare(lastDone(b)));
+    const adds = [];
+    if (mins >= 90 && !cov.mtb) adds.push('mtb');
+    if (cov.upper < 2) adds.push('upper');
+    adds.push('z2');
+    cats = [...need, ...adds.filter(c => !need.includes(c))];
+    if (pain >= 6) cats = cats.filter(c => c !== 'lower');
+    if (mins < 90) cats = cats.filter(c => c !== 'mtb');
+    cats = cats.filter(c => !cov.doneToday.includes(c));
+    if (!cats.length) cats = ['z2'];
+  }
+  const all = cats.concat(['lower', 'upper', 'run', 'z2', 'back', 'mtb']);
+  const cat = state.pickOverride && all.includes(state.pickOverride) ? state.pickOverride : cats[0];
+  return { session: buildSession(cat, mins, call), alts: [...new Set(cats.filter(c => c !== cat))].slice(0, 3), cov };
+}
+function buildSession(cat, mins, call) {
+  const S = SESSIONS;
+  const trim = call.level === 'reduce', push = call.level === 'push';
+  const why = {
+    lower: 'Lower body is the oldest box on your 3-day minimum.',
+    upper: 'Upper day keeps the minimum moving — incline first, biceps in.',
+    run: `Zone 2 run, HR under ${Z2_CAP}. Builds the aerobic base without the boom-bust.`,
+    mtb: 'You have the time — long ride builds the engine.',
+    z2: call.level === 'go' || push ? 'Minimum is covered — bank easy aerobic time.' : 'Today calls for easy aerobic work only.',
+    back: 'Recovery day: the routine is the session.',
+  }[cat];
+  let s;
+  if (cat === 'lower') {
+    const ex = S.Monday.exercises.map(e => ({ ...e }));
+    const h = hingeStage();
+    let pick = mins <= 20 ? [ex[0], ex[2], ex[4]] : mins <= 40 ? [ex[0], ex[1], ex[2], ex[4]] : ex;
+    if (h.ex && (call.back?.pain ?? 0) < 3) pick = [{ ...h.ex, hinge: true }, ...pick.slice(0, mins <= 20 ? 2 : pick.length)];
+    s = { title: 'Lower — spine-friendly', warmup: mins <= 20 ? S.Monday.warmup.slice(0, 2) : S.Monday.warmup, exercises: pick, cooldown: S.Monday.cooldown };
+  } else if (cat === 'upper') {
+    const t = S.Tuesday.exercises, f = S.Friday.exercises;
+    const find = (list, re) => ({ ...(list.find(e => re.test(e.name)) || list[0]) });
+    const incline = find(t, /Incline Barbell/), pull = find(f, /Pull-Up/), row = find(f, /Row/), hammer = find(f, /Hammer/),
+          incline2 = find(t, /Landmine|Smith/), curl = find(t, /Curl/), face = find(f, /Face Pull/);
+    const pick = mins <= 20 ? [incline, pull, hammer] : mins <= 40 ? [incline, pull, row, hammer] : [incline, pull, incline2, row, face, curl];
+    s = { title: mins <= 20 ? 'Upper — express supersets' : 'Upper — push, pull, biceps', warmup: ['Band pull-aparts — 15', 'Scap push-ups — 10', 'Light incline press — 2×10'], exercises: pick, cooldown: ['Doorway pec stretch — 30 s/side', 'Open books — 8/side'] };
+    if (mins <= 20) s.exercises.forEach(e => { e.sets = 3; e.rest = 'superset, 60 sec'; });
+  } else if (cat === 'run') {
+    const m = Math.max(20, Math.min(push ? 70 : 60, mins - 5));
+    const cap = trim ? EASY_CAP : Z2_CAP;
+    const rm = runCadenceTarget();
+    s = { title: `Zone 2 run — ${m} min`, warmup: ['Walk 3 min', 'Leg swings — 10/side'], exercises: [{ name: 'Trail or road run', sets: 1, reps: `${m} min`, weight: `HR under ${cap}`, rest: '—', notes: `${rm ? `Climb cadence target ${rm} spm (5% under your flat cadence).` : 'Quick, short steps on climbs.'} Walk the climbs if HR passes ${cap}.` }], cooldown: ['Half-kneeling hip flexor — 60 s/side', 'Calf stretch — 45 s/side'] };
+  } else if (cat === 'mtb') {
+    const m = Math.min(150, mins);
+    s = { title: `Long MTB — ${hm(m)}`, warmup: ['First 10 min easy spin'], exercises: [{ name: 'MTB ride', sets: 1, reps: `${m} min`, weight: `Z2, under ${Z2_CAP} on the flats`, rest: '—', notes: '500 mg sodium before. 60 g carbs/hour after the first hour. Stand and reset your back every 20 min.' }], cooldown: ['Half-kneeling hip flexor — 60 s/side', 'Prone press-ups — 10'] };
+  } else if (cat === 'z2') {
+    const m = Math.max(15, mins - 12);
+    s = { title: 'Zone 2 + back routine', warmup: ['Back routine first (12 min)'], exercises: [{ name: 'Easy bike, run or brisk walk', sets: 1, reps: `${m} min`, weight: `HR under ${trim ? EASY_CAP : Z2_CAP}`, rest: '—', notes: 'Nasal-breathing pace. Bike or walk if running bugs the back.' }], cooldown: BACK_ROUTINE };
+  } else {
+    s = { title: 'Back routine + walk', warmup: [], exercises: BACK_ROUTINE.map(n => ({ name: n })).concat(mins > 20 ? [{ name: 'Easy walk', reps: `${Math.max(10, mins - 15)} min`, notes: 'Stroller walk counts.' }] : []), cooldown: [] };
+  }
+  if (trim && ['lower', 'upper'].includes(cat)) s.exercises.forEach(e => { if (typeof e.sets === 'number' && e.sets > 2) e.sets -= 1; });
+  return { cat, mins, why, trimNote: trim && ['lower', 'upper', 'run', 'mtb'].includes(cat) ? 'Trimmed: one less set per lift, easier HR.' : '', pushNote: push && ['lower', 'upper'].includes(cat) ? 'Push day: take the suggested load jumps.' : push && cat === 'run' ? 'Push day: +10 min, same HR cap.' : '', ...s };
+}
+
+// ── Today tab ───────────────────────────────────────────────────────
+function exerciseRow(ex, i, s) {
+  const id = `pick-${s.cat}-${state.mins}-${i}`;
+  const checked = state.checkedExercises[id];
+  const meta = [ex.sets && `${ex.sets} sets`, ex.reps, ex.weight, ex.rest && ex.rest !== '—' && `rest ${ex.rest}`].filter(Boolean).join(' · ');
+  let log = '';
+  if ((s.cat === 'lower' || s.cat === 'upper') && isLift(ex)) {
+    const sug = suggestFor(ex), d = state.liftDraft[ex.name] || {};
+    const n = ex.sets || 3, top = topReps(ex.reps);
+    log = `<div class="lift-sug ${sug.up ? 'up' : ''}">${esc(sug.text)}</div>
+      <div class="lift-log">
+        <label><input inputmode="decimal" placeholder="${sug.w ?? 'lb'}" value="${esc(d.w ?? '')}" onchange="setLift('${esc(ex.name)}',0,'w',this.value)"><span>lb</span></label>
+        ${Array.from({ length: n }, (_, k) => `<input inputmode="numeric" placeholder="${top || ''}" value="${esc((d.reps || [])[k] ?? '')}" onchange="setLift('${esc(ex.name)}',${k},'r',this.value)">`).join('')}
+        <span class="lift-x">reps</span>
+        ${sug.w ? `<button class="lift-did" onclick="fillLift('${esc(ex.name)}',${sug.w},${top || 0},${n})">Did it</button>` : ''}
+      </div>`;
+  }
+  return `<div class="exercise ${checked ? 'checked' : ''} ${ex.hinge ? 'hinge' : ''}" id="ex-${id}">
+    <div class="exercise-check ${checked ? 'checked' : ''}" id="chk-${id}" onclick="toggleExercise('${id}')"></div>
+    <div class="exercise-info"><div class="exercise-name">${ex.hinge ? '<span class="hinge-tag">Hinge ladder</span>' : ''}${esc(ex.name)}</div>
+      ${meta ? `<div class="m-ex-meta">${esc(meta)}</div>` : ''}
+      ${ex.notes ? `<div class="exercise-note">${esc(ex.notes)}</div>` : ''}${log}</div></div>`;
+}
+
+function mToday() {
+  refreshToday();
+  const call = coachCall();
+  const [head, sub, color] = call.head;
+  const r = call.r, acwr = call.acwr, back = call.back;
+  const tiles = [
+    ['HRV', r?.avg7 ? `${r.avg7}<small>ms</small>` : '—', r?.band?.hrvLow ? `base ${r.band.hrvLow}–${r.band.hrvHigh}` : '7-day avg', r?.avg7 && r?.band?.hrvLow ? (r.avg7 >= r.band.hrvLow ? 'var(--green)' : 'var(--yellow)') : 'var(--text)', 'recover'],
+    ['Sleep', r?.sleepLast?.sleepS ? fmtHm(r.sleepLast.sleepS) : '—', r?.norm ? `norm ${fmtHm(r.norm)}` : 'last night', r?.sleepLast?.sleepS ? (r.soft.some(x => x.startsWith('Slept')) ? 'var(--yellow)' : 'var(--green)') : 'var(--text)', 'recover'],
+    ['Load', acwr ? acwr.ratio.toFixed(2) : '—', 'ratio · keep < 1.3', acwr ? (acwr.ratio > 1.3 ? 'var(--red)' : acwr.ratio < 0.8 ? 'var(--yellow)' : 'var(--green)') : 'var(--text)', 'train'],
+    ['Back', back ? `${back.pain}<small>/10</small>` : 'Log', back ? (back.reach.length ? back.reach.join(', ') : 'no spread') : 'tap to check in', back ? (back.pain >= 6 ? 'var(--red)' : back.pain >= 3 ? 'var(--yellow)' : 'var(--green)') : 'var(--accent)', 'back'],
+  ];
+  const { session: s, alts, cov } = pickSession(call, state.mins);
+  const minCats = [['lower', 'Lower'], ['upper', 'Upper'], ['run', 'Z2 run']];
+  const minDone = minCats.filter(([c]) => cov[c]).length;
+  const dow = new Date().getDay();
+  const review = renderWeeklyReview();
+
+  return `
+  ${!garminReady() ? renderGarminCard() : ''}
+  ${state.ivError ? `<div class="m-warn">Intervals.icu is unreachable (${esc(state.ivError)}). Garmin data is live; back log, run analysis and lift history will catch up when it's back. <a href="#" onclick="clearCredentials();return false;">Reset login</a></div>` : ''}
+  ${(dow === 0 || dow === 1) ? review : ''}
+  <div class="card m-call" style="--call:${color}">
+    <div class="m-call-k"><span class="g-dot" style="background:${color}"></span>Coach's call</div>
+    <div class="m-call-h">${head}</div>
+    <div class="m-call-s">${sub}</div>
+    <ul class="m-why">${call.reasons.map(x => `<li class="${x.tone}" ${x.action ? `onclick="${x.action}"` : ''}>${x.text}</li>`).join('')}</ul>
+    <div class="m-feel">
+      <span>Feel</span>
+      ${FEEL_OPTIONS.map(o => `<button class="${state.feel === o.id ? 'on' : ''}" onclick="${state.feel === o.id ? 'clearFeel()' : `setFeel('${o.id}')`}">${o.label}</button>`).join('')}
+    </div>
+  </div>
+
+  <div class="m-tiles">
+    ${tiles.map(([k, v, sub2, c, tab]) => `<button class="m-tile" onclick="setTab('${tab}')"><div class="g-k">${k}</div><div class="m-tile-v" style="color:${c}">${v}</div><div class="g-s">${sub2}</div></button>`).join('')}
+  </div>
+
+  <div class="card m-sess">
+    <div class="m-sess-top">
+      <div class="g-k">Time you have</div>
+      <div class="m-seg">${[20, 40, 60, 90].map(m => `<button class="${state.mins === m ? 'on' : ''}" onclick="setMins(${m})">${m === 90 ? '90+' : m}</button>`).join('')}</div>
+    </div>
+    ${cov.doneToday.length ? `<div class="m-done">Logged today: ${cov.doneToday.map(c => CAT_LABEL[c] || c).join(', ')} <a href="#" onclick="unlogToday();return false;">undo</a></div>` : ''}
+    <div class="m-sess-title">${esc(s.title)}</div>
+    <div class="m-sess-why">${s.why}${s.trimNote ? ` <span style="color:var(--yellow)">${s.trimNote}</span>` : ''}${s.pushNote ? ` <span style="color:var(--accent)">${s.pushNote}</span>` : ''}</div>
+    ${alts.length ? `<div class="m-alts"><span>Or</span>${alts.map(c => `<button onclick="setPick('${c}')">${CAT_LABEL[c]}</button>`).join('')}</div>` : ''}
+    ${s.warmup?.length ? protoBlock('pick-warm', 'Warm-up', s.warmup, '') : ''}
+    <div class="session-section">${s.exercises.map((ex, i) => exerciseRow(ex, i, s)).join('')}</div>
+    ${s.cooldown?.length ? protoBlock('pick-cool', s.cat === 'z2' ? 'Back routine' : 'Cool-down', s.cooldown, '') : ''}
+    <button class="b-save" onclick="logSession('${s.cat}')">Done — log ${CAT_LABEL[s.cat]}${(s.cat === 'lower' || s.cat === 'upper') ? ' + lifts' : ''}</button>
+    ${state.syncMsg ? `<div class="g-s" style="text-align:center;margin-top:6px">${state.syncMsg}</div>` : ''}
+  </div>
+
+  <div class="card m-week">
+    <div class="m-row"><div class="card-title">This week · 3-day minimum</div><div class="card-meta">${minDone}/3</div></div>
+    <div class="m-min">${minCats.map(([c, l]) => `<div class="${cov[c] ? 'ok' : ''}"><span>${cov[c] ? '✓' : ''}</span>${l}</div>`).join('')}</div>
+    <div class="g-s">${minDone === 3 ? 'Minimum covered. Anything else is a bonus — long MTB, second upper, Zone 2.' : `Next up: ${minCats.filter(([c]) => !cov[c]).map(([, l]) => l).join(', ')}.`}${cov.untagged ? ` ${cov.untagged} Garmin strength session${cov.untagged > 1 ? 's' : ''} not tagged lower/upper — tap Done on the card to tag.` : ''}</div>
+  </div>
+
+  ${(dow === 0 || dow === 1) ? '' : review}
+  <button class="m-ai" id="coach-btn" onclick="generateSession('coach-btn')">Ask AI coach — copies today's full picture</button>`;
+}
+
+// ── Weekly review ───────────────────────────────────────────────────
+function renderWeeklyReview() {
+  if (!garminReady()) return '';
+  const thisMon = mondayOf(todayIso);
+  const lastMon = isoLocal(new Date(new Date(thisMon + 'T12:00:00').getTime() - 7 * 86400000));
+  const inLast = d => d >= lastMon && d < thisMon;
+  const acts = state.garmin.acts.filter(a => inLast(actDate(a)));
+  const mins = acts.reduce((s, a) => s + (a.dur || 0) / 60, 0);
+  const log = sessionLog(16).filter(x => inLast(x.date));
+  const got = c => log.some(x => x.cat === c) || (c === 'run' && acts.some(a => sportOf(a.type) === 'run'));
+  const minHit = ['lower', 'upper', 'run'].filter(got);
+  const pains = d0 => { const v = []; for (let i = 0; i < 7; i++) { const d = isoLocal(new Date(new Date(d0 + 'T12:00:00').getTime() + i * 86400000)); const e = backEntryFor(d); if (e) v.push(e.pain); } return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+  const pLast = pains(lastMon), pPrev = pains(isoLocal(new Date(new Date(lastMon + 'T12:00:00').getTime() - 7 * 86400000)));
+  const easyLast = (() => { const z = [0, 0, 0, 0, 0]; acts.filter(a => ['run', 'bike'].includes(sportOf(a.type))).forEach(a => (a.z || []).forEach((s, i) => z[i] += s || 0)); const t = z.reduce((a, b) => a + b, 0); return t ? Math.round((z[0] + z[1]) / t * 100) : null; })();
+  const prs = [];
+  const names = new Set(); for (let i = 0; i < 21; i++) parseLifts(dayLine(daysAgoIso(i), 'Lifts:')).forEach(l => names.add(l.name));
+  names.forEach(n => { const h = liftHistory(n, 60); const lw = h.filter(x => inLast(x.d)), before = h.filter(x => x.d < lastMon); if (lw.length && before.length) { const a = Math.max(...lw.map(x => bestE1rm(x.sets))), b = Math.max(...before.map(x => bestE1rm(x.sets))); if (a > b) prs.push(`${n} e1RM ${Math.round(a)}`); } });
+  let focus;
+  if (minHit.length < 3) focus = `Hit the 3-day minimum — ${['lower', 'upper', 'run'].filter(c => !got(c)).map(c => CAT_LABEL[c]).join(' and ')} first, early in the week.`;
+  else if (pLast != null && pPrev != null && pLast > pPrev + 0.5) focus = 'Back got worse — routine daily and keep lower body at the current hinge stage.';
+  else if (easyLast != null && easyLast < 75) focus = `Only ${easyLast}% easy on runs and rides — slow down; HR under ${Z2_CAP}.`;
+  else focus = 'Solid week. Progress one thing: +10 min on the Z2 run or take the load jumps.';
+  return `<div class="card m-card m-review">
+    <div class="m-row"><div class="card-title">Last week · ${shortDate(lastMon)}</div><div class="card-meta">${acts.length} sessions · ${hm(mins)}</div></div>
+    <div class="m-review-grid">
+      <div><b>${minHit.length}/3</b><span>minimum</span></div>
+      <div><b>${pLast != null ? pLast.toFixed(1) : '—'}</b><span>back avg${pPrev != null && pLast != null ? ` (${pLast <= pPrev ? '▼' : '▲'} ${Math.abs(pLast - pPrev).toFixed(1)})` : ''}</span></div>
+      <div><b>${easyLast != null ? easyLast + '%' : '—'}</b><span>easy (run/bike)</span></div>
+    </div>
+    ${prs.length ? `<div class="g-s" style="margin-bottom:8px">PRs: ${prs.map(esc).join(' · ')}</div>` : ''}
+    ${takeaway('neutral', `<b>This week:</b> ${focus}`)}
+  </div>`;
+}
+
+// ── Train tab charts (Z2 cap, easy % from run/bike, load split) ─────
+function watchZones() {
+  const z = state.garmin?.zones;
+  const list = Array.isArray(z) ? z : z ? [z] : [];
+  const pick = list.find(x => /RUN/i.test(x.sport || '')) || list.find(x => /DEFAULT/i.test(x.sport || '')) || list[0];
+  if (pick && pick.zone1Floor != null) return [pick.zone1Floor, pick.zone2Floor, pick.zone3Floor, pick.zone4Floor, pick.zone5Floor];
+  if (pick && Array.isArray(pick.zoneLowBoundaries)) return pick.zoneLowBoundaries;
+  return [100, 142, 160, 169, 187];
+}
+function trainCharts() {
+  const g = state.garmin;
+  const { weeks, byWeek } = weeklyAgg(12);
+  const shown = weeks.slice(4);
+  const endu = {};
+  weeks.forEach(w => endu[w] = { load: 0, z: [0, 0, 0, 0, 0] });
+  g.acts.forEach(a => {
+    const w = mondayOf(actDate(a)); if (!endu[w]) return;
+    if (['run', 'bike', 'water'].includes(sportOf(a.type))) endu[w].load += a.load || 0;
+    if (['run', 'bike'].includes(sportOf(a.type))) (a.z || []).forEach((s, i) => endu[w].z[i] += (s || 0) / 60);
+  });
+  const roll = (w, key) => { const i = weeks.indexOf(w); const prev = weeks.slice(Math.max(0, i - 4), i).map(x => byWeek[x][key]); return prev.length ? prev.reduce((a, b) => a + b, 0) / prev.length : null; };
+  const acwr = garminAcwr(g);
+  const wz = watchZones();
+  const zc = ['#52525B', '#22C55E', '#EAB308', '#F97316', '#EF4444'];
+  const zBars = shown.map(w => { const z = endu[w].z, tot = z.reduce((a, b) => a + b, 0); return { label: shortDate(w), tip: `<b>Week of ${shortDate(w)}</b> · run + bike · ${tot ? Math.round((z[0] + z[1]) / tot * 100) : 0}% in Z1–2 · ${z.map((m, i) => `Z${i + 1} ${Math.round(m)}m`).join(' · ')}`, segs: z.map((m, i) => ({ v: m, color: zc[i] })) }; });
+  const zNow = endu[shown[shown.length - 1]].z, zTot = zNow.reduce((a, b) => a + b, 0), easy = zTot ? Math.round((zNow[0] + zNow[1]) / zTot * 100) : null;
+  const zoneMismatch = wz[2] && Math.abs(wz[2] - Z2_CAP) > 3;
+  const zTake = easy == null ? takeaway('neutral', 'No runs or rides with heart rate this week yet.') : easy >= 75 ? takeaway('good', `${easy}% of run and ride time in Zones 1–2. That's how the aerobic base gets built.`) : takeaway('warn', `Only ${easy}% of run and ride time in Zones 1–2. Aim for 80% — HR under ${Z2_CAP}.`);
+  const loadBars = shown.map(w => ({ label: shortDate(w), tip: `<b>Week of ${shortDate(w)}</b> · total ${Math.round(byWeek[w].load)} · endurance ${Math.round(endu[w].load)} · other ${Math.round(byWeek[w].load - endu[w].load)}`,
+    segs: [{ v: endu[w].load, color: w === shown[shown.length - 1] ? 'var(--accent)' : '#4D7C0F' }, { v: Math.max(0, byWeek[w].load - endu[w].load), color: '#3F3F46' }] }));
+  const loadTake = !acwr ? '' : acwr.ratio > 1.3 ? takeaway('bad', `Ratio ${acwr.ratio.toFixed(2)} — over the 1.3 guardrail. Hold or cut volume.`) : acwr.ratio < 0.8 ? takeaway('neutral', `Ratio ${acwr.ratio.toFixed(2)} — under-loaded. Safe to add a session.`) : takeaway('good', `Ratio ${acwr.ratio.toFixed(2)} — in the build zone (0.8–1.3).`);
+  const recent = [...g.acts].sort((a, b) => String(b.t).localeCompare(String(a.t))).slice(0, 8);
+  return `
+  <div class="sec-k">Intensity</div>
+  <div class="card m-card">
+    <div class="card-title">Run + ride heart-rate zones</div>
+    ${zTake}
+    ${barChart({ bars: zBars, read: zBars[zBars.length - 1].tip, height: 120 })}
+    ${legend(zc.map((c, i) => [c, `Z${i + 1} ${i < 4 ? `${wz[i]}–${wz[i + 1]}` : `${wz[4]}+`}`]))}
+    ${zoneMismatch ? `<div class="g-s" style="margin-top:8px">Your watch's Zone 2 tops out at ${wz[2]}, but your cap is ${Z2_CAP}. Set Zone 2's top to ${Z2_CAP} in Garmin Connect (Settings → Heart Rate Zones) so the watch and this page agree.</div>` : ''}
+  </div>
+  ${renderRunMechanics()}
+  ${renderStrength()}
+  <div class="card m-card">
+    <div class="card-title">Training load · Garmin</div>
+    ${loadTake}
+    ${barChart({ bars: loadBars, line: shown.map(w => roll(w, 'load')), read: loadBars[loadBars.length - 1].tip, height: 110 })}
+    ${legend([['var(--accent)', 'Endurance (run, bike, paddle)'], ['#3F3F46', 'Strength, surf, moto, other']])}
+    <div class="g-s" style="margin-top:6px">Garmin load comes from heart rate, so adrenaline-heavy sessions like dirt bike read high. Treat the ratio as a warning light, not a rule.</div>
+  </div>
+  <div class="card m-card">
+    <div class="card-title">Recent</div>
+    ${recent.map(a => {
+      const sp = sportOf(a.type);
+      const mi = a.dist ? (a.dist / 1609.34).toFixed(1) + ' mi' : '';
+      return `<div class="m-act"><i style="background:${SPORTS[sp].color}"></i><div><div class="m-act-n">${esc(a.name && a.name.length > 1 ? a.name : SPORTS[sp].label)}</div>
+        <div class="g-s">${new Date(String(a.t).replace(' ', 'T')).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} · ${[hm((a.dur || 0) / 60), mi, a.hr && `${a.hr} bpm`, a.load && `load ${Math.round(a.load)}`].filter(Boolean).join(' · ')}</div></div></div>`;
+    }).join('')}
+  </div>`;
+}
+
+// ── Strength trends (e1RM) ──────────────────────────────────────────
+function renderStrength() {
+  const counts = {};
+  for (let i = 0; i < 120; i++) parseLifts(dayLine(daysAgoIso(i), 'Lifts:')).forEach(l => counts[l.name] = (counts[l.name] || 0) + 1);
+  const names = Object.keys(counts).sort((a, b) => counts[b] - counts[a]).slice(0, 6);
+  if (!names.length) return `<div class="card m-card"><div class="card-title">Strength</div><div class="g-s" style="margin-top:6px">Log weight and reps on the session card (Today tab) and your estimated 1-rep-max trends show up here, with a load suggestion each session.</div></div>`;
+  const rows = names.map(n => {
+    const h = liftHistory(n);
+    const pts = h.map(x => Math.round(bestE1rm(x.sets)));
+    const now = pts[pts.length - 1], base = h.filter(x => x.d <= daysAgoIso(28)).map(x => Math.round(bestE1rm(x.sets))).pop();
+    const max = Math.max(...pts), min = Math.min(...pts);
+    const sp = pts.length > 1 ? pts.map((v, i) => `${(i / (pts.length - 1) * 80).toFixed(1)},${(22 - (v - min) / Math.max(1, max - min) * 20).toFixed(1)}`).join(' ') : '';
+    return `<div class="str-row" data-tip="${esc(`<b>${n}</b> · ${h.map(x => `${shortDate(x.d)} ${x.sets.map(s => `${s.w}×${s.r}`).join(',')}`).slice(-3).join(' · ')}`)}">
+      <div><div class="m-act-n">${esc(n)}</div><div class="g-s">${h.length} sessions · last ${shortDate(h[h.length - 1].d)}</div></div>
+      <svg viewBox="0 0 80 24" class="str-spark">${sp ? `<polyline points="${sp}" fill="none" stroke="var(--accent)" stroke-width="1.6"/>` : ''}</svg>
+      <div class="str-v"><b>${now}</b><span>${base ? `${now >= base ? '▲' : '▼'} ${Math.abs(now - base)} vs 4 wk` : 'e1RM'}</span></div></div>`;
+  }).join('');
+  return `<div class="card m-card ch"><div class="card-title">Strength · estimated 1-rep max</div><div class="ch-read" style="margin-top:6px">Tap a lift for its last sessions.</div>${rows}</div>`;
+}
+
+// ── Run mechanics with a personal cadence target ────────────────────
+function runCadenceTarget() {
+  const runs = Object.values(state.runMech || {}).filter(r => r && r.cadFlat).sort((a, b) => a.date.localeCompare(b.date)).slice(-5);
+  if (!runs.length) return null;
+  const flat = runs.reduce((s, r) => s + r.cadFlat, 0) / runs.length;
+  return Math.round(flat * 0.95);
+}
+function renderRunMechanics() {
+  const runs = Object.values(state.runMech).filter(r => r && !r.skip && r.date).sort((a, b) => a.date.localeCompare(b.date)).slice(-12);
+  if (!runs.length) {
+    return `<div class="card m-card"><div class="card-title">Run mechanics</div>
+      <div class="g-s" id="rm-status" style="margin-top:6px">${state.runMechStatus || (runMechLoading ? 'Analysing runs…' : state.ivError ? 'Needs Intervals.icu — offline right now.' : 'No runs of 15+ minutes in the last 6 months yet. Climb cadence and HR drift show up after your next run.')}</div></div>`;
+  }
+  const avg = arr => { const v = arr.filter(x => x != null); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+  const last5 = runs.slice(-5);
+  const climb = avg(last5.map(r => r.cadClimb)), flat = avg(last5.map(r => r.cadFlat));
+  const drift = avg(last5.map(r => r.decouple)), over = avg(last5.map(r => r.over150));
+  const target = flat ? Math.round(flat * 0.95) : null;
+  const gap = climb && flat ? (flat - climb) / flat * 100 : null;
+  const tone = (v, good, warn, lowerBetter = false) => v == null ? 'var(--text)' : (lowerBetter ? v <= good : v >= good) ? 'var(--green)' : (lowerBetter ? v <= warn : v >= warn) ? 'var(--yellow)' : 'var(--red)';
+  const takes = [];
+  if (gap != null) takes.push(gap <= 5 ? takeaway('good', `Climbing at ${Math.round(climb)} spm, within 5% of your ${Math.round(flat)} flat cadence. Mechanics hold on grades.`)
+    : takeaway(gap <= 8 ? 'warn' : 'bad', `Cadence drops ${gap.toFixed(0)}% on climbs (${Math.round(flat)} → ${Math.round(climb)}). Target ${target}+ on grades: shorter, quicker steps; let pace drop, not cadence.`));
+  if (drift != null) takes.push(drift < 5 ? takeaway('good', `HR drift ${drift.toFixed(1)}% — aerobic base is holding. Add 10 minutes to the next Z2 run.`)
+    : takeaway(drift < 8 ? 'warn' : 'bad', `HR drift ${drift.toFixed(1)}% (target under 5%). Base is still thin — keep runs easier and steadier rather than longer.`));
+  if (over != null) takes.push(over <= 15 ? takeaway('good', `${Math.round(over)}% of run time over ${Z2_CAP} bpm. Zone 2 discipline is good.`)
+    : takeaway(over <= 35 ? 'warn' : 'bad', `${Math.round(over)}% of run time over ${Z2_CAP} bpm. Walk the climbs when HR passes ${Z2_CAP}.`));
+  const label = r => new Date(r.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' });
+  const cadPts = runs.map(r => ({ label: label(r), v: r.cadClimb, color: r.cadClimb == null || !r.cadFlat ? null : (r.cadFlat - r.cadClimb) / r.cadFlat <= 0.05 ? 'var(--green)' : (r.cadFlat - r.cadClimb) / r.cadFlat <= 0.08 ? 'var(--yellow)' : 'var(--red)',
+    tip: `<b>${shortDate(r.date)}</b> · ${esc(r.name)} · climb ${r.cadClimb ?? '—'} spm${r.climbMins ? ` (${r.climbMins} min on 6%+)` : ''} · flat ${r.cadFlat ?? '—'} spm` }));
+  const driftBars = runs.map(r => ({ label: label(r), tip: `<b>${shortDate(r.date)}</b> · ${esc(r.name)} · drift ${r.decouple == null ? '— (under 25 min)' : r.decouple + '%'} · ${r.over150}% over ${Z2_CAP} · ${r.mins} min`,
+    segs: [{ v: r.decouple == null ? 0 : Math.max(0.2, Math.abs(r.decouple)), color: r.decouple == null ? 'transparent' : r.decouple < 5 ? 'var(--green)' : r.decouple < 8 ? 'var(--yellow)' : 'var(--red)' }] }));
+  const lastRun = runs[runs.length - 1];
+  return `
+  <div class="card m-card">
+    <div class="m-row"><div class="card-title">Run mechanics · last ${runs.length} runs</div><div class="card-meta" id="rm-status">${state.runMechStatus}</div></div>
+    <div class="m-tiles m-tiles-3">
+      <div class="m-tile"><div class="g-k">Climb cad</div><div class="m-tile-v" style="color:${tone(gap, 5, 8, true)}">${climb ? Math.round(climb) : '—'}<small>spm</small></div><div class="g-s">target ${target ?? '—'}</div></div>
+      <div class="m-tile"><div class="g-k">HR drift</div><div class="m-tile-v" style="color:${tone(drift, 5, 8, true)}">${drift != null ? drift.toFixed(1) : '—'}<small>%</small></div><div class="g-s">target &lt; 5%</div></div>
+      <div class="m-tile"><div class="g-k">Over ${Z2_CAP}</div><div class="m-tile-v" style="color:${tone(over, 15, 35, true)}">${over != null ? Math.round(over) : '—'}<small>%</small></div><div class="g-s">of run time</div></div>
+    </div>
+    ${takes.join('')}
+    <div class="g-row-title" style="margin-top:6px"><span>Climb cadence per run</span><span>dashed = ${target ?? '—'} (flat − 5%)</span></div>
+    ${lineChart({ points: cadPts, color: 'var(--orange)', target: target, read: cadPts[cadPts.length - 1].tip, height: 110 })}
+    <div class="g-row-title" style="margin-top:12px"><span>HR drift per run</span><span>dashed = 5%</span></div>
+    ${barChart({ bars: driftBars, target: 5, read: driftBars[driftBars.length - 1].tip, height: 90 })}
+    <div class="g-s" style="margin-top:6px">Last run ${shortDate(lastRun.date)}: ${lastRun.mins} min, flat ${lastRun.cadFlat ?? '—'} spm, climbs ${lastRun.cadClimb ?? '—'} spm. Averages use the last 5 runs. Drift needs 25+ minutes and is less reliable on hilly trails.</div>
+  </div>`;
+}
+
+// ── Recover tab: + body weight ──────────────────────────────────────
+function renderBodyWeight() {
+  const days = state.garmin.days.filter(d => d.wt);
+  if (!days.length) return `<div class="card m-card"><div class="card-title">Body weight</div><div class="g-s" style="margin-top:6px">No weigh-ins in Garmin Connect yet. Weigh in a few mornings a week (a Garmin scale, or add it manually in the Connect app) and the lean-bulk trend shows up here.</div></div>`;
+  const lb = kg => kg * 2.20462;
+  const span = Array.from({ length: 60 }, (_, i) => daysAgoIso(59 - i));
+  const byD = Object.fromEntries(days.map(d => [d.d, lb(d.wt)]));
+  const pts = span.map(d => ({ label: shortDate(d), v: byD[d] != null ? Math.round(byD[d] * 10) / 10 : null, tip: `<b>${shortDate(d)}</b> · ${byD[d] != null ? byD[d].toFixed(1) + ' lb' : 'no weigh-in'}` }));
+  const avg = span.map((d, i) => { const w = span.slice(Math.max(0, i - 6), i + 1).map(x => byD[x]).filter(v => v != null); return w.length ? w.reduce((a, b) => a + b, 0) / w.length : null; });
+  const now = avg.filter(v => v != null).pop();
+  const then = avg.slice(0, 32).filter(v => v != null).pop();
+  const perWk = now && then ? (now - then) / 4 : null;
+  const pct = perWk && now ? perWk / now * 100 : null;
+  const take = pct == null ? takeaway('neutral', 'Need a few more weeks of weigh-ins for a trend.')
+    : pct > 0.6 ? takeaway('warn', `Gaining ${perWk.toFixed(1)} lb/week (${pct.toFixed(2)}%). Faster than a lean bulk — trim 200 kcal/day.`)
+    : pct >= 0.2 ? takeaway('good', `Gaining ${perWk.toFixed(1)} lb/week (${pct.toFixed(2)}%). Right in the lean-bulk range (0.25–0.5%).`)
+    : takeaway('warn', `${perWk >= 0 ? 'Gaining' : 'Losing'} ${Math.abs(perWk).toFixed(1)} lb/week. For a lean bulk, add ~200 kcal/day of whole food.`);
+  return `<div class="card m-card">
+    <div class="m-row"><div class="card-title">Body weight · 60 days</div><div class="card-meta">${now ? now.toFixed(1) + ' lb (7-day avg)' : ''}</div></div>
+    ${take}
+    ${lineChart({ points: pts, avg, color: 'var(--accent)', read: pts.filter(p => p.v != null).pop()?.tip || '', height: 100 })}
+  </div>`;
+}
+const _mRecoverBase = mRecover;
+mRecover = function () {
+  const html = _mRecoverBase();
+  if (!garminReady()) return html;
+  const i = html.indexOf('<div class="card m-card m-settings">');
+  return i < 0 ? html + renderBodyWeight() : html.slice(0, i) + renderBodyWeight() + html.slice(i);
+};
+
+// ── Back tab: + hinge ladder + weekly function check ────────────────
+state.checkDraft = {};
+function lastCheck() { for (let i = 0; i < 60; i++) { const d = daysAgoIso(i); const l = dayLine(d, 'Check:'); if (l) return { d, ...parseCheck(l) }; } return null; }
+function parseCheck(line) {
+  const o = {};
+  line.slice(7).split('·').map(s => s.trim()).forEach(p => { const [k, ...v] = p.split(' '); o[k] = v.join(' '); });
+  return o;
+}
+function checkHistory() { const out = []; for (let i = 89; i >= 0; i--) { const d = daysAgoIso(i); const l = dayLine(d, 'Check:'); if (l) out.push({ d, ...parseCheck(l) }); } return out; }
+function setCheck(k, v) { state.checkDraft[k] = v; render(); }
+async function saveCheck() {
+  const c = state.checkDraft;
+  const need = ['sts', 'bridgeL', 'bridgeR', 'heel', 'toe', 'slr'];
+  if (need.some(k => c[k] == null || c[k] === '')) { state.checkMsg = 'Fill in all six first.'; render(); return; }
+  await setDayLine(todayIso, 'Check:', need.map(k => `${k} ${c[k]}`).join(' · '));
+  state.checkDraft = {}; state.checkMsg = 'Saved.'; render();
+}
+function renderHingeLadder() {
+  const h = hingeStage();
+  return `<div class="card m-card">
+    <div class="m-row"><div class="card-title">Return to deadlifting</div><div class="card-meta">stage ${h.stage} of 4</div></div>
+    <div class="ladder">${HINGE_STAGES.map((s, i) => `<div class="${i < h.stage ? 'done' : i === h.stage ? 'now' : ''}"><span>${i}</span>${s.name}</div>`).join('')}</div>
+    <div class="g-s" style="margin-top:8px">${h.stage === 0 ? 'Unlocks after 5 days averaging 3/10 or less with nothing reaching the knee.' : `Current rung shows up first on your Lower session. Two sessions with no flare the next day moves you up; a flare (pain up 2+ or reaching the knee) drops you one. ${h.clean}/2 clean at this rung.`}${h.lastEvent ? ` <span style="color:var(--text-muted)">${esc(h.lastEvent)}.</span>` : ''}</div>
+  </div>`;
+}
+function renderFunctionCheck() {
+  const last = lastCheck();
+  const due = !last || last.d <= daysAgoIso(7);
+  const hist = checkHistory().slice(-4);
+  const c = state.checkDraft;
+  const opt = (k, vals) => `<div class="b-chips">${vals.map(v => `<button class="${c[k] === v ? 'on' : ''}" onclick="setCheck('${k}','${v}')">${v}</button>`).join('')}</div>`;
+  const neuro = last && (last.heel === 'fail' || last.toe === 'fail');
+  return `<div class="card m-card">
+    <div class="m-row"><div class="card-title">Weekly function check</div><div class="card-meta">${due ? 'due' : `next ${shortDate(isoLocal(new Date(new Date(last.d + 'T12:00:00').getTime() + 7 * 86400000)))}`}</div></div>
+    ${neuro ? `<div class="m-warn">Last check had a failed heel or toe walk. That can mean nerve weakness — see a doctor or PT this week, not just a stretch plan.</div>` : ''}
+    ${hist.length ? `<table class="wk-table chk-table"><thead><tr><th></th>${hist.map(x => `<th>${shortDate(x.d)}</th>`).join('')}</tr></thead><tbody>
+      <tr><td>5× sit-to-stand pain</td>${hist.map(x => `<td>${esc(x.sts)}</td>`).join('')}</tr>
+      <tr><td>Bridge hold L / R (s)</td>${hist.map(x => `<td>${esc(x.bridgeL)} / ${esc(x.bridgeR)}</td>`).join('')}</tr>
+      <tr><td>Heel / toe walk</td>${hist.map(x => `<td>${esc(x.heel)} / ${esc(x.toe)}</td>`).join('')}</tr>
+      <tr><td>Leg raise (L) symptoms at</td>${hist.map(x => `<td>${esc(x.slr)}</td>`).join('')}</tr>
+    </tbody></table>` : ''}
+    ${due ? `<details class="m-rules" ${!hist.length ? 'open' : ''}><summary class="g-k" style="margin-top:10px">Do this week's check · 2 min</summary>
+      <div class="chk-q">1. Stand up from a chair 5 times. Pain (0–10)?</div>${opt('sts', ['0', '1', '2', '3', '4', '5', '6+'])}
+      <div class="chk-q">2. Single-leg glute bridge — hold each side, max 30 s. Left?</div>${opt('bridgeL', ['<10', '10', '20', '30'])}
+      <div class="chk-q">Right?</div>${opt('bridgeR', ['<10', '10', '20', '30'])}
+      <div class="chk-q">3. Walk 10 steps on your heels.</div>${opt('heel', ['ok', 'fail'])}
+      <div class="chk-q">4. Walk 10 steps on your toes.</div>${opt('toe', ['ok', 'fail'])}
+      <div class="chk-q">5. Lying on your back, raise the straight left leg. Where do leg symptoms start?</div>${opt('slr', ['<30°', '30–60°', '60°+', 'none'])}
+      <button class="b-save" onclick="saveCheck()">Save check</button>
+      ${state.checkMsg ? `<div class="g-s" style="text-align:center;margin-top:6px">${state.checkMsg}</div>` : ''}
+    </details>` : `<div class="g-s" style="margin-top:8px">Bridge holds going up and leg-raise symptoms starting later (or not at all) are progress even when pain scores are flat.</div>`}
+  </div>`;
+}
+const _mBackBase = mBack;
+mBack = function () {
+  const html = _mBackBase();
+  const i = html.indexOf('<div class="card m-card">\n    <details class="m-rules">');
+  const extra = renderHingeLadder() + renderFunctionCheck();
+  return i < 0 ? html + extra : html.slice(0, i) + extra + html.slice(i);
+};
+
+// ── AI coach prompt: send what the dashboard actually knows ─────────
+function buildClaudePrompt() {
+  refreshToday();
+  const call = coachCall();
+  const lines = [];
+  const add = (k, v) => { if (v != null && v !== '') lines.push(`${k}: ${v}`); };
+  add("Coach's call", `${call.head[0]} — ${call.head[1]}`);
+  call.reasons.forEach(r => lines.push(`  - ${r.text}`));
+  add('Self-reported feel', state.feel ? FEEL_OPTIONS.find(o => o.id === state.feel).label : 'not set');
+  if (garminReady()) {
+    const g = state.garmin, r = call.r, a = call.acwr;
+    add('HRV', r.avg7 ? `7-day ${r.avg7} ms, last night ${r.last?.hrv ?? '—'}, Garmin baseline ${r.band?.hrvLow}–${r.band?.hrvHigh}` : null);
+    add('Sleep', r.sleepLast?.sleepS ? `last night ${fmtHm(r.sleepLast.sleepS)} (score ${r.sleepLast.sleepScore ?? '—'}), 7-day ${fmtHm(r.sleep7)}, 14-day norm ${fmtHm(r.norm)}` : null);
+    add('Resting HR', r.rhrLast ? `${r.rhrLast} (30-day avg ${Math.round(r.rhr30)})` : null);
+    add('Load ratio (Garmin, 7d vs 28d)', a ? `${a.ratio.toFixed(2)} (7-day ${a.acute} vs norm ${a.chronic})` : null);
+    const { weeks, byWeek } = weeklyAgg(9); const cur = byWeek[weeks[8]]; const avg8 = weeks.slice(0, 8).reduce((s, w) => s + byWeek[w].mins, 0) / 8;
+    add('This week', `${hm(cur.mins)} over ${cur.n} sessions (8-week avg ${hm(avg8)}/week)`);
+    const recent = [...g.acts].sort((x, y) => String(y.t).localeCompare(String(x.t))).slice(0, 8)
+      .map(x => `  - ${String(x.t).slice(0, 10)} ${SPORTS[sportOf(x.type)].label}: ${esc(x.name || '')}, ${hm((x.dur || 0) / 60)}${x.dist ? `, ${(x.dist / 1609.34).toFixed(1)} mi` : ''}${x.hr ? `, avg HR ${x.hr}` : ''}${x.load ? `, load ${Math.round(x.load)}` : ''}`);
+    lines.push('Recent activities:', ...recent);
+    const wts = g.days.filter(d => d.wt); if (wts.length) add('Body weight', `${(wts[wts.length - 1].wt * 2.20462).toFixed(1)} lb on ${wts[wts.length - 1].d}`);
+  }
+  const cov = weekCoverage();
+  add('3-day minimum this week', `lower ${cov.lower ? '✓' : '✗'}, upper ${cov.upper ? '✓' : '✗'}, Z2 run ${cov.run ? '✓' : '✗'}`);
+  const hist = backHistory(14).filter(h => h.e);
+  add('Back today', call.back ? backLine(call.back) : 'not logged');
+  add('Back last 14 days', hist.length ? hist.map(h => `${h.d.slice(5)} ${h.e.pain}${h.e.reach.includes('Knee') ? 'K' : ''}`).join(', ') : 'no entries');
+  const h = hingeStage(); add('Hinge ladder', `stage ${h.stage} (${h.name})`);
+  const chk = lastCheck(); if (chk) add('Last function check', `${chk.d}: sit-to-stand pain ${chk.sts}, bridge L/R ${chk.bridgeL}/${chk.bridgeR}s, heel ${chk.heel}, toe ${chk.toe}, leg raise ${chk.slr}`);
+  const runs = Object.values(state.runMech || {}).filter(r => r && r.date).sort((x, y) => x.date.localeCompare(y.date)).slice(-5);
+  if (runs.length) add('Run mechanics (last 5)', runs.map(r => `${r.date.slice(5)} flat ${r.cadFlat ?? '—'}/climb ${r.cadClimb ?? '—'} spm, drift ${r.decouple ?? '—'}%, ${r.over150}% over ${Z2_CAP}`).join('; '));
+  const lifts = []; for (let i = 0; i < 21; i++) { const d = daysAgoIso(i); parseLifts(dayLine(d, 'Lifts:')).forEach(l => lifts.push(`${d.slice(5)} ${l.name} ${l.sets.map(s => `${s.w}x${s.r}`).join(',')}`)); }
+  if (lifts.length) lines.push('Lifts (last 3 weeks):', ...lifts.slice(0, 15).map(x => '  - ' + x));
+  const { session: s } = pickSession(call, state.mins);
+  add("Dashboard's pick", `${s.title} for ${state.mins} min — ${s.exercises.map(e => e.name).join(', ')}`);
+
+  return `You are the personal coach for Clayton Sawyer. Coaching brief:
+
+${COACHING_BRIEF}
+
+Today is ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}. He has ${state.mins} minutes.
+
+DASHBOARD DATA (Garmin + Intervals.icu + his logs):
+${lines.join('\n')}
+
+Pressure-test the dashboard's pick: agree or change it, with a reason. Respect the back rules and the hinge ladder stage. When data conflicts with how he feels, trust feel.
+
+Format:
+CALL — one straight sentence.
+SESSION — exact exercises, sets × reps × load (use his logged lifts to set loads), or duration and HR cap.
+KEY CUE — one.
+BACK — one line on the back given the trend.
+FUEL — one line.
+
+Tight and direct. No fluff.`;
+}
+async function generateSession(btnId = 'coach-btn') {
+  const prompt = buildClaudePrompt();
+  try {
+    await navigator.clipboard.writeText(prompt);
+    document.querySelectorAll(`[id="${btnId}"]`).forEach(b => { b.textContent = 'Copied — paste it into Claude'; });
+    setTimeout(() => window.open(CLAUDE_PROJECT_URL, '_blank'), 500);
+    setTimeout(() => document.querySelectorAll(`[id="${btnId}"]`).forEach(b => { b.textContent = "Ask AI coach — copies today's full picture"; }), 3000);
+  } catch (e) { alert('Could not copy. Check browser permissions.'); }
+}
+
+// ── render: Garmin works even when Intervals is down ────────────────
+function render() {
+  const app = $('#app');
+  refreshToday();
+  if (state.error === 'credentials') { app.innerHTML = renderSetup(); return; }
+  if (!state.loaded) { app.innerHTML = '<div class="loading"><span class="spinner"></span>Loading dashboard...</div>'; return; }
+  if (state.view === 'desktop') renderDesktop(); else renderPhone();
+}
+
+migrateLocalLogs();
 
 fetchData();
 </script>
