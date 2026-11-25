@@ -736,6 +736,85 @@ body.desktop-view .coach-button-fixed { display: none; }
 .b-chips button { padding: 7px 12px; font-size: 12.5px; font-weight: 600; }
 .b-chips button.on { background: var(--primary-bg); border-color: var(--primary); color: var(--text); }
 .b-chips button.on.warn { background: var(--yellow-bg); border-color: var(--yellow); }
+
+/* ── Mobile v2: tabs ─────────────────────────────── */
+.m-wrap { padding-bottom: 4px; }
+.m-head { display: flex; justify-content: space-between; align-items: center; padding: 6px 2px 4px; }
+.m-hello { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--primary); }
+.m-date { font-size: 22px; font-weight: 800; letter-spacing: -.02em; }
+.m-head-r { display: flex; gap: 8px; }
+.m-icon { width: 38px; height: 38px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); display: grid; place-items: center; cursor: pointer; }
+.m-icon svg, .m-tabs svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.m-icon.spin svg { animation: gspin 1s linear infinite; }
+.m-sub { font-size: 11px; color: var(--text-dim); margin: 0 2px 12px; }
+.m-refresh { margin: -6px 2px 10px; }
+.m-tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: flex; justify-content: center; gap: 0; background: rgba(8,12,18,.92); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid var(--border); padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); }
+.m-tabs button { position: relative; flex: 1; max-width: 120px; background: none; border: 0; color: var(--text-dim); display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0; font: inherit; font-size: 10.5px; font-weight: 700; letter-spacing: .02em; cursor: pointer; }
+.m-tabs button.on { color: var(--primary); }
+.m-tabs svg { width: 22px; height: 22px; }
+.m-dot { position: absolute; top: 4px; left: 50%; margin-left: 8px; width: 7px; height: 7px; border-radius: 50%; background: var(--yellow); }
+.m-call { position: relative; overflow: hidden; margin-bottom: 12px; }
+.m-call::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--call); }
+.m-call-k { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 6px; }
+.m-call-h { font-size: 26px; font-weight: 800; letter-spacing: -.02em; color: var(--call); line-height: 1.1; }
+.m-call-s { font-size: 14px; color: var(--text); margin: 6px 0 10px; line-height: 1.45; }
+.m-why { list-style: none; padding: 0; margin: 0 0 12px; display: grid; gap: 5px; }
+.m-why li { font-size: 12.5px; color: var(--text-muted); padding-left: 14px; position: relative; line-height: 1.4; }
+.m-why li::before { content: ''; position: absolute; left: 0; top: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--text-dim); }
+.m-why li.good::before { background: var(--green); } .m-why li.warn::before { background: var(--yellow); } .m-why li.bad::before { background: var(--red); }
+.m-why li[onclick] { cursor: pointer; color: var(--primary); }
+.m-feel { display: flex; align-items: center; gap: 6px; border-top: 1px solid var(--border); padding-top: 10px; }
+.m-feel span { font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: .06em; margin-right: 2px; }
+.m-feel button, .m-alts button { flex: 1; background: var(--surface-2); border: 1px solid var(--border-strong); color: var(--text-muted); border-radius: 999px; padding: 6px 0; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.m-feel button.on { background: var(--primary-bg); border-color: var(--primary); color: var(--text); }
+.m-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.m-tile { text-align: left; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 11px 12px; color: var(--text); font: inherit; cursor: pointer; }
+.m-tile-v { font-size: 24px; font-weight: 800; letter-spacing: -.02em; margin: 2px 0 1px; }
+.m-tile-v small { font-size: 12px; color: var(--text-dim); font-weight: 600; margin-left: 2px; }
+.m-delta { font-weight: 700; } .m-delta.up, .m-delta.down { color: var(--text-muted); }
+.m-sess, .m-week, .m-card { margin-bottom: 12px; }
+.m-sess-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.m-seg { display: inline-flex; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 3px; }
+.m-seg button { background: none; border: 0; color: var(--text-muted); font: inherit; font-size: 12.5px; font-weight: 700; padding: 6px 13px; border-radius: 999px; cursor: pointer; }
+.m-seg button.on { background: var(--primary); color: #fff; }
+.m-range { display: flex; width: max-content; margin: 0 0 12px; }
+.m-sess-title { font-size: 20px; font-weight: 800; letter-spacing: -.01em; }
+.m-sess-why { font-size: 13px; color: var(--text-muted); margin: 4px 0 10px; line-height: 1.45; }
+.m-alts { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+.m-alts span { font-size: 11px; color: var(--text-dim); font-weight: 700; text-transform: uppercase; }
+.m-alts button { flex: none; padding: 5px 12px; }
+.m-ex-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.m-done { font-size: 12.5px; color: var(--green); background: var(--green-bg); border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; }
+.m-done a { color: var(--text-dim); margin-left: 6px; }
+.m-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.m-min { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
+.m-min div { display: flex; align-items: center; gap: 6px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 9px 10px; font-size: 13px; font-weight: 700; color: var(--text-muted); }
+.m-min div span { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--border-strong); display: grid; place-items: center; font-size: 11px; }
+.m-min div.ok { color: var(--text); border-color: rgba(52,211,153,.35); }
+.m-min div.ok span { background: var(--green); border-color: var(--green); color: #0B0F14; }
+.m-ai { width: 100%; background: transparent; border: 1px solid var(--border-strong); color: var(--text-muted); border-radius: 12px; padding: 12px; font: inherit; font-weight: 700; font-size: 13px; cursor: pointer; margin-bottom: 8px; }
+.m-take { font-size: 13px; line-height: 1.45; margin: 6px 0 10px; padding-left: 10px; border-left: 3px solid var(--text-dim); color: var(--text); }
+.m-take.good { border-color: var(--green); } .m-take.warn { border-color: var(--yellow); } .m-take.bad { border-color: var(--red); }
+.ch { position: relative; }
+.ch-read { font-size: 11.5px; color: var(--text-muted); min-height: 16px; margin-bottom: 4px; }
+.ch-read b { color: var(--text); }
+.ch svg { width: 100%; display: block; overflow: visible; }
+.ch-x { font-size: 8.5px; fill: var(--text-dim); text-anchor: middle; font-family: inherit; }
+.ch-hit { fill: transparent; cursor: pointer; }
+.ch-hit.on { fill: rgba(255,255,255,.05); }
+.ch-avg { fill: none; stroke: var(--text-muted); stroke-width: 1.6; stroke-dasharray: 3 3; }
+.ch-target { stroke: var(--text-dim); stroke-width: 1; stroke-dasharray: 4 3; }
+.ch-band { fill: rgba(52,211,153,.12); }
+.ch-legend { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: 8px; font-size: 11px; color: var(--text-muted); }
+.ch-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+.m-act { display: flex; gap: 10px; align-items: flex-start; padding: 9px 0; border-top: 1px solid var(--border); }
+.m-act:first-of-type { border-top: 0; }
+.m-act > i { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex: none; }
+.m-act-n { font-size: 13.5px; font-weight: 600; }
+.m-links { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; font-size: 13px; }
+.m-links a { color: var(--primary); }
+.m-rules summary { cursor: pointer; list-style: none; }
+.m-rules ul { margin: 10px 0 0; padding-left: 18px; display: grid; gap: 6px; font-size: 13px; color: var(--text-muted); line-height: 1.45; }
 </style>
 </head>
 <body class="phone-view">
@@ -3022,7 +3101,7 @@ function render() {
   if (state.loaded) renderPerfSubdate(latest, sorted);
 }
 
-function renderPhone(latest, sorted) {
+function renderPhoneLegacy(latest, sorted) {
   $('#app').innerHTML = `
     ${renderHeader()}
     ${renderFeelCheckIn()}
@@ -3500,7 +3579,7 @@ function backGuidance(e, hist) {
   return `Green light — train as planned with the spine-friendly lower day.${trend}`;
 }
 
-function renderBackLog() {
+function renderBackLog(showHist = true) {
   const d = state.backDraft;
   const hist = backHistory(14);
   const painColor = p => p == null ? 'var(--border)' : p >= 6 ? 'var(--red)' : p >= 3 ? 'var(--yellow)' : 'var(--green)';
@@ -3523,15 +3602,672 @@ function renderBackLog() {
     <button class="b-save" onclick="saveBack()">${state.backSaved ? 'Update' : 'Save'} check-in</button>
     ${state.backMsg ? `<div class="g-s" style="text-align:center;margin-top:6px">${state.backMsg}</div>` : ''}
     ${guide ? `<div class="g-read" style="border-color:${painColor(d.pain)};margin-top:12px">${guide}</div>` : ''}
-    <div class="g-row-title" style="margin-top:12px"><span>Last 14 days</span><span>${hist.filter(h => h.e?.routine).length} routine days</span></div>
+    ${showHist ? `<div class="g-row-title" style="margin-top:12px"><span>Last 14 days</span><span>${hist.filter(h => h.e?.routine).length} routine days</span></div>
     <div class="g-weeks b-hist">
       ${hist.map(h => `<div class="g-wk" title="${h.d}: ${h.e ? `pain ${h.e.pain}/10${h.e.reach?.length ? ' · ' + h.e.reach.join(', ') : ''}${h.e.routine ? ' · routine' : ''}` : 'not logged'}"><div style="height:${h.e ? Math.max(6, h.e.pain * 10) : 3}%;background:${h.e ? painColor(h.e.pain) : 'var(--border)'}"></div>${h.e?.routine ? '<b></b>' : ''}</div>`).join('')}
-    </div>
+    </div>` : ''}
     <div class="g-s" style="margin-top:8px">Get seen urgently for groin or saddle numbness, bladder or bowel changes, or worsening leg weakness.</div>
   </div>`;
 }
 
 loadGarmin();
+
+// ════════════════════════════════════════════════════════════════════
+//  MOBILE v2 — tabbed layout (Today / Train / Recover / Back)
+//  Pattern borrowed from WHOOP / Garmin "In Focus" / TrainingPeaks:
+//  one plain-English call up top, tappable headline numbers, detail
+//  one tab away. Every chart carries a one-line takeaway.
+// ════════════════════════════════════════════════════════════════════
+state.tab = localStorage.getItem('tab') || 'today';
+state.mins = +(localStorage.getItem('mins') || 40);
+state.pickOverride = null;
+state.trainWeeks = +(localStorage.getItem('trainWeeks') || 8);
+
+function setTab(t) { state.tab = t; localStorage.setItem('tab', t); render(); window.scrollTo(0, 0); }
+function setMins(m) { state.mins = m; localStorage.setItem('mins', m); state.pickOverride = null; render(); }
+function setPick(cat) { state.pickOverride = cat; render(); }
+function setTrainWeeks(w) { state.trainWeeks = w; localStorage.setItem('trainWeeks', w); render(); }
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const garminReady = () => state.garminStatus === 'ready' && state.garmin;
+
+// ── tap / hover readouts for every chart ────────────────────────────
+// Any element with data-tip inside a .ch writes its tip into that
+// chart's .ch-read line (hover on desktop, tap on phone).
+if (!window.__chTips) {
+  window.__chTips = true;
+  const show = e => {
+    const t = e.target.closest && e.target.closest('[data-tip]');
+    if (!t) return;
+    const c = t.closest('.ch'); if (!c) return;
+    c.querySelector('.ch-read').innerHTML = t.dataset.tip;
+    c.querySelectorAll('.on').forEach(x => x.classList.remove('on'));
+    t.classList.add('on');
+  };
+  document.addEventListener('pointerover', show);
+  document.addEventListener('click', show);
+}
+
+// ── sports ──────────────────────────────────────────────────────────
+const SPORTS = {
+  run:      { label: 'Run',      color: '#FB923C' },
+  bike:     { label: 'Bike',     color: '#4F8EF7' },
+  water:    { label: 'Paddle/Surf', color: '#2DD4BF' },
+  strength: { label: 'Strength', color: '#A78BFA' },
+  moto:     { label: 'Moto',     color: '#FBBF24' },
+  other:    { label: 'Other',    color: '#64748B' },
+};
+function sportOf(typeKey) {
+  const t = String(typeKey || '').toLowerCase();
+  if (t.includes('run')) return 'run';
+  if (t.includes('cycl') || t.includes('bik') || t.includes('ride')) return t.includes('motor') ? 'moto' : 'bike';
+  if (/(paddl|kayak|surf|swim|row|sup|boat|canoe)/.test(t)) return 'water';
+  if (/(strength|hiit|training|fitness|weight|yoga|pilates|mobility)/.test(t)) return 'strength';
+  if (/(motor|moto|atv)/.test(t)) return 'moto';
+  return 'other';
+}
+const actDate = a => String(a.t || '').slice(0, 10);
+
+function mondayOf(iso) {
+  const d = new Date(iso + 'T12:00:00');
+  d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  return isoLocal(d);
+}
+function lastNWeeks(n) {
+  const thisMon = mondayOf(todayIso);
+  const out = [];
+  for (let i = n - 1; i >= 0; i--) {
+    const d = new Date(thisMon + 'T12:00:00'); d.setDate(d.getDate() - 7 * i);
+    out.push(isoLocal(d));
+  }
+  return out;
+}
+const shortDate = iso => new Date(iso + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+const hm = mins => { if (mins == null) return '—'; const t = Math.round(mins); return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`; };
+const pctDelta = (now, base) => base ? Math.round((now - base) / base * 100) : null;
+const deltaChip = d => d == null ? '' : `<span class="m-delta ${d >= 0 ? 'up' : 'down'}">${d >= 0 ? '▲' : '▼'} ${Math.abs(d)}%</span>`;
+
+// ── generic SVG charts ──────────────────────────────────────────────
+// bars: [{label, tip, segs:[{v,color}]}]; line: optional overlay values
+function barChart({ bars, height = 120, line = null, lineTip = '', target = null, unit = '', read = '' }) {
+  const W = 340, H = height, padB = 16, padT = 6;
+  const max = Math.max(1, target || 0, ...bars.map(b => b.segs.reduce((s, x) => s + (x.v || 0), 0)), ...(line || []).filter(v => v != null));
+  const bw = W / bars.length;
+  const y = v => H - padB - (v / max) * (H - padB - padT);
+  let svg = '';
+  if (target) svg += `<line x1="0" x2="${W}" y1="${y(target)}" y2="${y(target)}" class="ch-target"/>`;
+  bars.forEach((b, i) => {
+    let acc = 0;
+    const x = i * bw + bw * 0.18, w = bw * 0.64;
+    b.segs.forEach(s => {
+      if (!s.v) return;
+      const y1 = y(acc + s.v), y0 = y(acc);
+      svg += `<rect x="${x.toFixed(1)}" y="${y1.toFixed(1)}" width="${w.toFixed(1)}" height="${Math.max(0.5, y0 - y1).toFixed(1)}" rx="2" fill="${s.color}"/>`;
+      acc += s.v;
+    });
+    svg += `<rect class="ch-hit" x="${(i * bw).toFixed(1)}" y="0" width="${bw.toFixed(1)}" height="${H - padB}" data-tip="${esc(b.tip)}"/>`;
+    const kk = bars.length <= 14 ? 1 : Math.ceil(bars.length / 8);
+    if (i % kk === 0 && (i === bars.length - 1 || bars.length - 1 - i >= kk / 2 || kk === 1) || (i === bars.length - 1 && i % kk >= kk / 2))
+      svg += `<text x="${(i * bw + bw / 2).toFixed(1)}" y="${H - 3}" class="ch-x">${esc(b.label)}</text>`;
+  });
+  if (line) {
+    const pts = line.map((v, i) => v == null ? null : `${(i * bw + bw / 2).toFixed(1)},${y(v).toFixed(1)}`).filter(Boolean);
+    svg += `<polyline points="${pts.join(' ')}" class="ch-avg"/>`;
+  }
+  return `<div class="ch"><div class="ch-read">${read}</div><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:${H}px">${svg}</svg></div>`;
+}
+
+// points: [{label, v, tip}]; band [lo, hi]; avg overlay
+function lineChart({ points, height = 120, color = 'var(--primary)', band = null, avg = null, read = '', lowerBetter = false }) {
+  const W = 340, H = height, padB = 16, padT = 8;
+  const vals = points.map(p => p.v).filter(v => v != null).concat(band || [], (avg || []).filter(v => v != null));
+  if (!vals.length) return `<div class="ch"><div class="ch-read">No data yet</div></div>`;
+  let min = Math.min(...vals), max = Math.max(...vals);
+  const pad = (max - min) * 0.15 || 5; min -= pad; max += pad;
+  const step = W / points.length;
+  const x = i => i * step + step / 2;
+  const y = v => H - padB - (v - min) / (max - min) * (H - padB - padT);
+  let svg = '';
+  if (band) svg += `<rect x="0" y="${y(band[1]).toFixed(1)}" width="${W}" height="${(y(band[0]) - y(band[1])).toFixed(1)}" class="ch-band"/>`;
+  const segs = []; let cur = [];
+  points.forEach((p, i) => { if (p.v == null) { if (cur.length) segs.push(cur); cur = []; } else cur.push(`${x(i).toFixed(1)},${y(p.v).toFixed(1)}`); });
+  if (cur.length) segs.push(cur);
+  segs.forEach(s => svg += `<polyline points="${s.join(' ')}" fill="none" stroke="${color}" stroke-width="1.6" stroke-opacity=".55"/>`);
+  if (avg) {
+    const pts = avg.map((v, i) => v == null ? null : `${x(i).toFixed(1)},${y(v).toFixed(1)}`).filter(Boolean);
+    svg += `<polyline points="${pts.join(' ')}" fill="none" stroke="${color}" stroke-width="2.6"/>`;
+  }
+  points.forEach((p, i) => {
+    if (p.v != null) svg += `<circle cx="${x(i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="2.4" fill="${p.color || color}"/>`;
+    svg += `<rect class="ch-hit" x="${(i * step).toFixed(1)}" y="0" width="${step.toFixed(1)}" height="${H - padB}" data-tip="${esc(p.tip)}"/>`;
+    const kp = Math.ceil(points.length / 6);
+    if ((i % kp === 0 && points.length - 1 - i >= kp / 2) || i === points.length - 1)
+      svg += `<text x="${x(i).toFixed(1)}" y="${H - 3}" class="ch-x">${esc(p.label)}</text>`;
+  });
+  return `<div class="ch"><div class="ch-read">${read}</div><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:${H}px">${svg}</svg></div>`;
+}
+
+const legend = items => `<div class="ch-legend">${items.map(([c, l]) => `<span><i style="background:${c}"></i>${l}</span>`).join('')}</div>`;
+const takeaway = (tone, text) => `<div class="m-take ${tone}">${text}</div>`;
+
+// ── session log (what's been done this week) ────────────────────────
+function sessionLog() { try { return JSON.parse(localStorage.getItem('session_log') || '[]'); } catch (e) { return []; } }
+function logSession(cat) {
+  const log = sessionLog().filter(x => !(x.date === todayIso && x.cat === cat));
+  log.push({ cat, date: todayIso });
+  localStorage.setItem('session_log', JSON.stringify(log.slice(-80)));
+  state.pickOverride = null;
+  render();
+}
+function unlogToday() {
+  localStorage.setItem('session_log', JSON.stringify(sessionLog().filter(x => x.date !== todayIso)));
+  render();
+}
+
+function weekCoverage() {
+  const mon = mondayOf(todayIso);
+  const log = sessionLog().filter(x => x.date >= mon);
+  const has = c => log.filter(x => x.cat === c).length;
+  const acts = garminReady() ? state.garmin.acts.filter(a => actDate(a) >= mon) : [];
+  const runs = acts.filter(a => sportOf(a.type) === 'run').length;
+  const longBike = acts.filter(a => sportOf(a.type) === 'bike' && (a.dur || 0) >= 75 * 60).length;
+  const strengthActs = acts.filter(a => sportOf(a.type) === 'strength').length;
+  return {
+    lower: has('lower'), upper: has('upper'),
+    run: Math.max(has('run'), runs), mtb: Math.max(has('mtb'), longBike), z2: has('z2'),
+    untagged: Math.max(0, strengthActs - has('lower') - has('upper')),
+    doneToday: sessionLog().filter(x => x.date === todayIso).map(x => x.cat),
+  };
+}
+function lastDone(cat) {
+  const dates = sessionLog().filter(x => x.cat === cat).map(x => x.date);
+  if (cat === 'run' && garminReady()) state.garmin.acts.filter(a => sportOf(a.type) === 'run').forEach(a => dates.push(actDate(a)));
+  return dates.sort().pop() || '0000';
+}
+
+// ── coach's call: one decision from every signal ────────────────────
+const LEVELS = { go: 0, reduce: 1, z2: 2, back: 3, rest: 4 };
+function coachCall() {
+  const reasons = [];
+  let level = 'go';
+  const bump = l => { if (LEVELS[l] > LEVELS[level]) level = l; };
+
+  let r = null, acwr = null;
+  if (garminReady()) {
+    r = garminReadiness(state.garmin);
+    acwr = garminAcwr(state.garmin);
+    bump(r.level);
+    if (r.avg7 && r.band?.hrvLow) {
+      const inBand = r.avg7 >= r.band.hrvLow;
+      reasons.push({ tone: inBand ? 'good' : 'warn', text: `HRV ${r.avg7} ms (7-day) is ${inBand ? 'inside' : 'below'} your baseline ${r.band.hrvLow}–${r.band.hrvHigh}.` });
+    }
+    if (r.sleepLast?.sleepS) {
+      const h = r.sleepLast.sleepS / 3600;
+      reasons.push({ tone: h >= 7 ? 'good' : h >= 6 ? 'neutral' : 'warn', text: `Slept ${fmtHm(r.sleepLast.sleepS)}${h < 6 ? ' — under 6 h' : ''}.` });
+    }
+    if (acwr) {
+      if (acwr.ratio > 1.3) { bump('reduce'); reasons.push({ tone: 'warn', text: `Load ratio ${acwr.ratio.toFixed(2)} is over 1.3 — hold volume.` }); }
+      else if (acwr.ratio < 0.8) reasons.push({ tone: 'neutral', text: `Load ratio ${acwr.ratio.toFixed(2)} — room to build.` });
+    }
+  } else {
+    const sorted = [...state.wellness].sort((a, b) => (a.id || '').localeCompare(b.id || ''));
+    const sc = applyFeelToReadiness(computeReadiness(getBackfilledLatest(sorted), sorted), state.feel);
+    const s = typeof sc === 'object' ? sc.score ?? sc.value : sc;
+    if (s != null) {
+      bump(s >= 70 ? 'go' : s >= 50 ? 'reduce' : s >= 35 ? 'z2' : 'rest');
+      reasons.push({ tone: s >= 70 ? 'good' : 'warn', text: `Intervals readiness ${Math.round(s)}/100.` });
+    }
+  }
+
+  if (state.feel === 'beat') { bump('z2'); reasons.push({ tone: 'warn', text: 'You feel beat — trust it.' }); }
+  else if (state.feel === 'sore') { bump('reduce'); reasons.push({ tone: 'neutral', text: 'Sore — trim the lifting.' }); }
+
+  const back = backEntryFor(todayIso);
+  if (back && back.pain != null) {
+    if (back.pain >= 6 || back.reach.includes('Knee')) { bump('back'); reasons.push({ tone: 'bad', text: `Back ${back.pain}/10${back.reach.includes('Knee') ? ', reaching the knee' : ''} — back first.` }); }
+    else if (back.pain >= 3) reasons.push({ tone: 'warn', text: `Back ${back.pain}/10 — spine-friendly lower only.` });
+    else reasons.push({ tone: 'good', text: `Back ${back.pain}/10.` });
+  } else reasons.push({ tone: 'neutral', text: 'Back not logged yet today.', action: "setTab('back')" });
+
+  const HEAD = {
+    go:     ['Green light', 'Train as planned.', 'var(--green)'],
+    reduce: ['Train, but trim', 'Cut volume 10–15%: drop the last set of each lift, keep runs under 145 bpm.', 'var(--yellow)'],
+    z2:     ['Zone 2 only', 'Easy aerobic work, HR capped at 145. No lifting intensity today.', 'var(--orange)'],
+    back:   ['Back first', 'Do the back routine, then easy Zone 2. No loaded lower body.', 'var(--orange)'],
+    rest:   ['Rest day', 'Back routine and a walk. That is the whole session.', 'var(--red)'],
+  };
+  return { level, head: HEAD[level], reasons, back, r, acwr };
+}
+
+// ── adaptive session picker ─────────────────────────────────────────
+const BACK_ROUTINE = [
+  'Prone press-ups — 10 slow (keep only if leg pain eases)',
+  'Cat-cow — 10',
+  'Seated nerve sliders — 2×10 left (glide, don’t stretch)',
+  'Half-kneeling hip flexor — 2×30 s/side, glute on',
+  '90/90 hip switches — 8 each way',
+  'Open books — 8/side',
+  'Bird dog 2×8/side + side plank 2×20 s/side',
+];
+const CAT_LABEL = { lower: 'Lower', upper: 'Upper', run: 'Z2 run', mtb: 'Long MTB', z2: 'Zone 2', back: 'Back + walk' };
+
+function pickSession(call, mins) {
+  const cov = weekCoverage();
+  const pain = call.back?.pain ?? 0;
+  let cats;
+  if (call.level === 'rest') cats = ['back'];
+  else if (call.level === 'back' || call.level === 'z2') cats = ['z2', 'back'];
+  else {
+    const need = ['lower', 'upper', 'run'].filter(c => !cov[c]).sort((a, b) => lastDone(a).localeCompare(lastDone(b)));
+    const adds = [];
+    if (mins >= 90 && !cov.mtb) adds.push('mtb');
+    if (cov.upper < 2) adds.push('upper');
+    adds.push('z2');
+    cats = [...need, ...adds.filter(c => !need.includes(c))];
+    if (pain >= 6) cats = cats.filter(c => c !== 'lower');
+    if (mins < 90) cats = cats.filter(c => c !== 'mtb');
+    // don't repeat what was already done today
+    cats = cats.filter(c => !cov.doneToday.includes(c));
+    if (!cats.length) cats = ['z2'];
+  }
+  const cat = state.pickOverride && cats.concat(['lower', 'upper', 'run', 'z2', 'back', 'mtb']).includes(state.pickOverride) ? state.pickOverride : cats[0];
+  return { session: buildSession(cat, mins, call), alts: [...new Set(cats.filter(c => c !== cat))].slice(0, 3), cov };
+}
+
+function buildSession(cat, mins, call) {
+  const S = SESSIONS;
+  const trim = call.level === 'reduce';
+  const take = (list, n) => list.slice(0, n).map(e => ({ ...e }));
+  const why = {
+    lower: 'Lower body is the oldest box on your 3-day minimum.',
+    upper: 'Upper day keeps the minimum moving — incline first, biceps in.',
+    run: 'Zone 2 run with a 170 spm metronome — aerobic base and cadence.',
+    mtb: 'You have the time — long ride builds the engine.',
+    z2: call.level === 'go' ? 'Minimum is covered — bank easy aerobic time.' : 'Today calls for easy aerobic work only.',
+    back: 'Recovery day: the routine is the session.',
+  }[cat];
+  let s;
+  if (cat === 'lower') {
+    const ex = S.Monday.exercises;
+    const pick = mins <= 20 ? [ex[0], ex[2], ex[4]] : mins <= 40 ? [ex[0], ex[1], ex[2], ex[4]] : ex;
+    s = { title: 'Lower — spine-friendly', warmup: mins <= 20 ? S.Monday.warmup.slice(0, 2) : S.Monday.warmup, exercises: pick.map(e => ({ ...e })), cooldown: S.Monday.cooldown };
+  } else if (cat === 'upper') {
+    const t = S.Tuesday.exercises, f = S.Friday.exercises;
+    const find = (list, re) => list.find(e => re.test(e.name)) || list[0];
+    const incline = find(t, /Incline Barbell/), pull = find(f, /Pull-Up/), row = find(f, /Row/), hammer = find(f, /Hammer/),
+          incline2 = find(t, /Landmine|Smith/), curl = find(t, /Curl/), face = find(f, /Face Pull/);
+    const pick = mins <= 20 ? [incline, pull, hammer] : mins <= 40 ? [incline, pull, row, hammer] : [incline, pull, incline2, row, face, curl];
+    s = { title: mins <= 20 ? 'Upper — express supersets' : 'Upper — push, pull, biceps', warmup: ['Band pull-aparts — 15', 'Scap push-ups — 10', 'Light incline press — 2×10'], exercises: pick.map(e => ({ ...e })), cooldown: ['Doorway pec stretch — 30 s/side', 'Open books — 8/side'] };
+    if (mins <= 20) s.exercises.forEach(e => { e.sets = 3; e.rest = 'superset, 60 sec'; });
+  } else if (cat === 'run') {
+    const m = Math.max(20, Math.min(60, mins - 5));
+    s = { title: `Zone 2 run — ${m} min`, warmup: ['Walk 3 min', 'Leg swings — 10/side'], exercises: [{ name: 'Trail or road run', sets: 1, reps: `${m} min`, weight: '140–150 bpm cap', rest: '—', notes: '170 spm metronome. Walk the climbs if HR passes 150.' }], cooldown: ['Half-kneeling hip flexor — 60 s/side', 'Calf stretch — 45 s/side'] };
+  } else if (cat === 'mtb') {
+    const m = Math.min(150, mins);
+    s = { title: `Long MTB — ${hm(m)}`, warmup: ['First 10 min easy spin'], exercises: [{ name: 'MTB ride', sets: 1, reps: `${m} min`, weight: 'Z2, climbs ≤ Z3', rest: '—', notes: '500 mg sodium before. 60 g carbs/hour after the first hour. Stand and reset your back every 20 min.' }], cooldown: ['Half-kneeling hip flexor — 60 s/side', 'Prone press-ups — 10'] };
+  } else if (cat === 'z2') {
+    const m = Math.max(15, mins - 12);
+    s = { title: `Zone 2 + back routine`, warmup: ['Back routine first (12 min)'], exercises: [{ name: 'Easy bike, run or brisk walk', sets: 1, reps: `${m} min`, weight: '≤ 145 bpm', rest: '—', notes: 'Nasal breathing pace. Bike or walk if running bugs the back.' }], cooldown: BACK_ROUTINE };
+  } else {
+    s = { title: 'Back routine + walk', warmup: [], exercises: BACK_ROUTINE.map(n => ({ name: n })).concat(mins > 20 ? [{ name: 'Easy walk', reps: `${Math.max(10, mins - 15)} min`, notes: 'Stroller walk counts.' }] : []), cooldown: [] };
+  }
+  if (trim && ['lower', 'upper'].includes(cat)) s.exercises.forEach(e => { if (typeof e.sets === 'number' && e.sets > 2) e.sets -= 1; });
+  return { cat, mins, why, trimNote: trim && ['lower', 'upper', 'run', 'mtb'].includes(cat) ? 'Trimmed: one less set per lift, HR under 145.' : '', ...s };
+}
+
+// ── header + tab bar ────────────────────────────────────────────────
+const IC = {
+  today:   '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>',
+  train:   '<svg viewBox="0 0 24 24"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/></svg>',
+  recover: '<svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>',
+  back:    '<svg viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M8 6h8M7 10h10M8 14h8M9 18h6"/></svg>',
+  refresh: '<svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.5 15a9 9 0 1 1-2.1-9.4L23 10"/></svg>',
+  desk:    '<svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="13" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/></svg>',
+  chev:    '<svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>',
+};
+
+function mHeader() {
+  const now = new Date();
+  const h = now.getHours();
+  const hello = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  const upd = garminReady() ? new Date(state.garmin.generated).toLocaleString('en-US', { weekday: 'short', hour: 'numeric', minute: '2-digit' }) : '';
+  return `
+  <div class="m-head">
+    <div>
+      <div class="m-hello">${hello}, ${ATHLETE_NAME}</div>
+      <div class="m-date">${now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</div>
+    </div>
+    <div class="m-head-r">
+      ${garminReady() ? `<button class="m-icon ${garminRefreshing ? 'spin' : ''}" onclick="refreshGarmin()" title="Refresh Garmin (updated ${upd})">${IC.refresh}</button>` : ''}
+      <button class="m-icon" onclick="setView('desktop')" title="Desktop view">${IC.desk}</button>
+    </div>
+  </div>
+  ${garminReady() ? `<div class="m-sub">Garmin ${garminRefreshing ? 'pulling…' : 'updated ' + upd}</div>` : ''}
+  <div class="g-s m-refresh" id="g-refresh-msg" style="${state.garminRefresh ? '' : 'display:none'}">${state.garminRefresh}</div>
+  ${state.ghSetup ? `<div class="card g-setup">
+      <div class="g-note">One-time setup so Refresh can start the pull. Paste a GitHub fine-grained token with <strong>Actions: Read and write</strong> on the Coach repo only. It stays on this device.</div>
+      <div class="g-unlock"><input id="gh-token" type="password" autocomplete="off" placeholder="github_pat_…" onkeydown="if(event.key==='Enter')saveGhToken()"><button onclick="saveGhToken()">Save</button></div>
+      ${ghToken() ? '<div class="g-foot" style="text-align:left"><a href="#" onclick="clearGhToken();return false;">Remove saved token</a></div>' : ''}
+    </div>` : ''}`;
+}
+
+function mTabBar() {
+  const back = backEntryFor(todayIso);
+  const tabs = [['today', 'Today'], ['train', 'Train'], ['recover', 'Recover'], ['back', 'Back']];
+  return `<nav class="m-tabs">${tabs.map(([id, l]) => `
+    <button class="${state.tab === id ? 'on' : ''}" onclick="setTab('${id}')">${IC[id]}<span>${l}</span>${id === 'back' && !back ? '<b class="m-dot"></b>' : ''}</button>`).join('')}</nav>`;
+}
+
+// ── TODAY ───────────────────────────────────────────────────────────
+function mToday() {
+  const call = coachCall();
+  const [head, sub, color] = call.head;
+  const r = call.r, acwr = call.acwr, back = call.back;
+  const tiles = [
+    ['HRV', r?.avg7 ? `${r.avg7}<small>ms</small>` : '—', r?.band?.hrvLow ? `base ${r.band.hrvLow}–${r.band.hrvHigh}` : '7-day avg', r?.avg7 && r?.band?.hrvLow ? (r.avg7 >= r.band.hrvLow ? 'var(--green)' : 'var(--yellow)') : 'var(--text)', 'recover'],
+    ['Sleep', r?.sleepLast?.sleepS ? fmtHm(r.sleepLast.sleepS) : '—', r?.sleep7 ? `7d ${fmtHm(r.sleep7)}` : 'last night', r?.sleepLast?.sleepS ? (r.sleepLast.sleepS >= 7 * 3600 ? 'var(--green)' : r.sleepLast.sleepS >= 6 * 3600 ? 'var(--text)' : 'var(--yellow)') : 'var(--text)', 'recover'],
+    ['Load', acwr ? acwr.ratio.toFixed(2) : '—', 'ratio · keep < 1.3', acwr ? (acwr.ratio > 1.3 ? 'var(--red)' : acwr.ratio < 0.8 ? 'var(--yellow)' : 'var(--green)') : 'var(--text)', 'train'],
+    ['Back', back ? `${back.pain}<small>/10</small>` : 'Log', back ? (back.reach.length ? back.reach.join(', ') : 'no spread') : 'tap to check in', back ? (back.pain >= 6 ? 'var(--red)' : back.pain >= 3 ? 'var(--yellow)' : 'var(--green)') : 'var(--primary)', 'back'],
+  ];
+  const { session: s, alts, cov } = pickSession(call, state.mins);
+  const doneToday = cov.doneToday.length > 0;
+
+  const exRows = s.exercises.map((ex, i) => {
+    const id = `pick-${s.cat}-${state.mins}-${i}`;
+    const checked = state.checkedExercises[id];
+    const meta = [ex.sets && `${ex.sets} sets`, ex.reps, ex.weight, ex.rest && ex.rest !== '—' && `rest ${ex.rest}`].filter(Boolean).join(' · ');
+    return `<div class="exercise ${checked ? 'checked' : ''}" id="ex-${id}">
+      <div class="exercise-check ${checked ? 'checked' : ''}" id="chk-${id}" onclick="toggleExercise('${id}')"></div>
+      <div class="exercise-info"><div class="exercise-name">${esc(ex.name)}</div>
+        ${meta ? `<div class="m-ex-meta">${esc(meta)}</div>` : ''}
+        ${ex.notes ? `<div class="exercise-note">${esc(ex.notes)}</div>` : ''}</div></div>`;
+  }).join('');
+
+  const minCats = [['lower', 'Lower'], ['upper', 'Upper'], ['run', 'Z2 run']];
+  const minDone = minCats.filter(([c]) => cov[c]).length;
+
+  return `
+  ${!garminReady() ? renderGarminCard() : ''}
+  <div class="card m-call" style="--call:${color}">
+    <div class="m-call-k"><span class="g-dot" style="background:${color}"></span>Coach's call</div>
+    <div class="m-call-h">${head}</div>
+    <div class="m-call-s">${sub}</div>
+    <ul class="m-why">${call.reasons.map(x => `<li class="${x.tone}" ${x.action ? `onclick="${x.action}"` : ''}>${x.text}</li>`).join('')}</ul>
+    <div class="m-feel">
+      <span>Feel</span>
+      ${FEEL_OPTIONS.map(o => `<button class="${state.feel === o.id ? 'on' : ''}" onclick="${state.feel === o.id ? 'clearFeel()' : `setFeel('${o.id}')`}">${o.label}</button>`).join('')}
+    </div>
+  </div>
+
+  <div class="m-tiles">
+    ${tiles.map(([k, v, sub, c, tab]) => `<button class="m-tile" onclick="setTab('${tab}')"><div class="g-k">${k}</div><div class="m-tile-v" style="color:${c}">${v}</div><div class="g-s">${sub}</div></button>`).join('')}
+  </div>
+
+  <div class="card m-sess">
+    <div class="m-sess-top">
+      <div class="g-k">Time you have</div>
+      <div class="m-seg">${[20, 40, 60, 90].map(m => `<button class="${state.mins === m ? 'on' : ''}" onclick="setMins(${m})">${m === 90 ? '90+' : m}</button>`).join('')}</div>
+    </div>
+    ${doneToday ? `<div class="m-done">Logged today: ${cov.doneToday.map(c => CAT_LABEL[c]).join(', ')} <a href="#" onclick="unlogToday();return false;">undo</a></div>` : ''}
+    <div class="m-sess-title">${esc(s.title)}</div>
+    <div class="m-sess-why">${s.why}${s.trimNote ? ` <span style="color:var(--yellow)">${s.trimNote}</span>` : ''}</div>
+    ${alts.length ? `<div class="m-alts"><span>Or</span>${alts.map(c => `<button onclick="setPick('${c}')">${CAT_LABEL[c]}</button>`).join('')}</div>` : ''}
+    ${s.warmup?.length ? protoBlock('pick-warm', 'Warm-up', s.warmup, '') : ''}
+    <div class="session-section">${exRows}</div>
+    ${s.cooldown?.length ? protoBlock('pick-cool', s.cat === 'z2' ? 'Back routine' : 'Cool-down', s.cooldown, '') : ''}
+    <button class="b-save" onclick="logSession('${s.cat}')">Done — log ${CAT_LABEL[s.cat]}</button>
+  </div>
+
+  <div class="card m-week">
+    <div class="m-row"><div class="card-title">This week · 3-day minimum</div><div class="card-meta">${minDone}/3</div></div>
+    <div class="m-min">${minCats.map(([c, l]) => `<div class="${cov[c] ? 'ok' : ''}"><span>${cov[c] ? '✓' : ''}</span>${l}</div>`).join('')}</div>
+    <div class="g-s">${minDone === 3 ? 'Minimum covered. Anything else is a bonus — long MTB, second upper, Zone 2.' : `Next up: ${minCats.filter(([c]) => !cov[c]).map(([, l]) => l).join(', ')}.`}${cov.untagged ? ` ${cov.untagged} Garmin strength session${cov.untagged > 1 ? 's' : ''} not tagged lower/upper — tap Done on the card to tag.` : ''}</div>
+  </div>
+
+  <button class="m-ai" id="coach-btn" onclick="generateSession('coach-btn')">Ask AI coach</button>`;
+}
+
+// ── TRAIN ───────────────────────────────────────────────────────────
+function mTrain() {
+  if (!garminReady()) return renderGarminCard();
+  const g = state.garmin, n = state.trainWeeks;
+  const weeks = lastNWeeks(n + 4);           // +4 for rolling average lead-in
+  const byWeek = {};
+  weeks.forEach(w => byWeek[w] = { mins: 0, load: 0, n: 0, sport: {}, z: [0, 0, 0, 0, 0] });
+  g.acts.forEach(a => {
+    const w = mondayOf(actDate(a)); const b = byWeek[w]; if (!b) return;
+    const sp = sportOf(a.type), m = (a.dur || 0) / 60;
+    b.mins += m; b.load += a.load || 0; b.n += 1;
+    b.sport[sp] = (b.sport[sp] || 0) + m;
+    (a.z || []).forEach((s, i) => b.z[i] += (s || 0) / 60);
+  });
+  const shown = weeks.slice(4);
+  const roll = (w, key) => { const i = weeks.indexOf(w); const prev = weeks.slice(Math.max(0, i - 4), i).map(x => byWeek[x][key]); return prev.length ? prev.reduce((a, b) => a + b, 0) / prev.length : null; };
+  const cur = byWeek[shown[shown.length - 1]];
+  const base = { mins: roll(shown[shown.length - 1], 'mins'), load: roll(shown[shown.length - 1], 'load'), n: roll(shown[shown.length - 1], 'n') };
+  const acwr = garminAcwr(g);
+  const dayOfWeek = (new Date().getDay() + 6) % 7 + 1;
+
+  // weekly time by sport
+  const sportsUsed = Object.keys(SPORTS).filter(sp => shown.some(w => byWeek[w].sport[sp]));
+  const timeBars = shown.map(w => ({
+    label: shortDate(w),
+    tip: `<b>Week of ${shortDate(w)}</b> · ${hm(byWeek[w].mins)} · ${byWeek[w].n} sessions · ${sportsUsed.filter(sp => byWeek[w].sport[sp]).map(sp => `${SPORTS[sp].label} ${hm(byWeek[w].sport[sp])}`).join(' · ') || 'nothing logged'}`,
+    segs: sportsUsed.map(sp => ({ v: (byWeek[w].sport[sp] || 0) / 60, color: SPORTS[sp].color })),
+  }));
+  const timeAvg = shown.map(w => { const v = roll(w, 'mins'); return v == null ? null : v / 60; });
+  // Pro-rate the 4-week average to today so midweek isn't always "behind"
+  const frac = dayOfWeek / 7, dayName = new Date().toLocaleDateString('en-US', { weekday: 'short' });
+  const pace = k => base[k] == null ? null : base[k] * frac;
+  const tDelta = pctDelta(cur.mins, pace('mins'));
+  const timeTake = !base.mins ? '' : tDelta <= -30
+      ? takeaway('warn', `${hm(cur.mins)} through ${dayName} — ${Math.abs(tDelta)}% behind your usual pace (${hm(base.mins)} a week).${dayOfWeek >= 5 ? ' Weekend is where to catch up.' : ''}`)
+      : tDelta >= 30 ? takeaway('warn', `${hm(cur.mins)} through ${dayName} — ${tDelta}% ahead of your usual pace. That is how boom-bust starts; don't stack more.`)
+      : takeaway('good', `${hm(cur.mins)} through ${dayName} — on pace for your usual ${hm(base.mins)} week.`);
+
+  // zones per week
+  const zc = ['#64748B', 'var(--green)', 'var(--yellow)', 'var(--orange)', 'var(--red)'];
+  const zBars = shown.map(w => {
+    const z = byWeek[w].z, tot = z.reduce((a, b) => a + b, 0);
+    return { label: shortDate(w), tip: `<b>Week of ${shortDate(w)}</b> · ${tot ? Math.round((z[0] + z[1]) / tot * 100) : 0}% easy · ${z.map((m, i) => `Z${i + 1} ${Math.round(m)}m`).join(' · ')}`, segs: z.map((m, i) => ({ v: m, color: zc[i] })) };
+  });
+  const zNow = cur.z, zTot = zNow.reduce((a, b) => a + b, 0), easy = zTot ? Math.round((zNow[0] + zNow[1]) / zTot * 100) : null;
+  const zTake = easy == null ? '' : easy >= 75 ? takeaway('good', `${easy}% easy this week. That's how the aerobic base gets built.`) : takeaway('warn', `Only ${easy}% easy this week. Your weakness is aerobic efficiency — aim for 80% in Zones 1–2.`);
+
+  // load
+  const loadBars = shown.map(w => ({ label: shortDate(w), tip: `<b>Week of ${shortDate(w)}</b> · load ${Math.round(byWeek[w].load)}`, segs: [{ v: byWeek[w].load, color: w === shown[shown.length - 1] ? 'var(--primary)' : '#3B4B63' }] }));
+  const loadAvg = shown.map(w => roll(w, 'load'));
+  const loadTake = !acwr ? '' : acwr.ratio > 1.3 ? takeaway('bad', `Ratio ${acwr.ratio.toFixed(2)} — over your 1.3 guardrail. Hold or cut volume this week.`) : acwr.ratio < 0.8 ? takeaway('neutral', `Ratio ${acwr.ratio.toFixed(2)} — under-loaded. Safe to add a session.`) : takeaway('good', `Ratio ${acwr.ratio.toFixed(2)} — in the build zone (0.8–1.3).`);
+
+  const recent = [...g.acts].sort((a, b) => String(b.t).localeCompare(String(a.t))).slice(0, 8);
+
+  return `
+  <div class="m-seg m-range">${[4, 8, 12].map(w => `<button class="${n === w ? 'on' : ''}" onclick="setTrainWeeks(${w})">${w} wk</button>`).join('')}</div>
+
+  <div class="m-tiles">
+    <div class="m-tile"><div class="g-k">Time this wk</div><div class="m-tile-v">${hm(cur.mins)}</div><div class="g-s">${deltaChip(tDelta)} vs usual by ${dayName}</div></div>
+    <div class="m-tile"><div class="g-k">Sessions</div><div class="m-tile-v">${cur.n}</div><div class="g-s">${deltaChip(pctDelta(cur.n, pace('n')))} vs usual by ${dayName}</div></div>
+    <div class="m-tile"><div class="g-k">Garmin load</div><div class="m-tile-v">${Math.round(cur.load)}</div><div class="g-s">${deltaChip(pctDelta(cur.load, pace('load')))} vs usual by ${dayName}</div></div>
+    <div class="m-tile"><div class="g-k">Load ratio</div><div class="m-tile-v" style="color:${!acwr ? 'var(--text)' : acwr.ratio > 1.3 ? 'var(--red)' : acwr.ratio < 0.8 ? 'var(--yellow)' : 'var(--green)'}">${acwr ? acwr.ratio.toFixed(2) : '—'}</div><div class="g-s">7-day vs 28-day</div></div>
+  </div>
+
+  <div class="card m-card">
+    <div class="card-title">Each week · hours</div>
+    ${timeTake}
+    ${barChart({ bars: timeBars, line: timeAvg, read: timeBars[timeBars.length - 1].tip, height: 130 })}
+    ${legend([...sportsUsed.map(sp => [SPORTS[sp].color, SPORTS[sp].label]), ['transparent;border-top:2px dashed var(--text-muted);height:0', '4-wk avg']])}
+  </div>
+
+  <div class="card m-card">
+    <div class="card-title">Heart-rate zones · minutes</div>
+    ${zTake}
+    ${barChart({ bars: zBars, read: zBars[zBars.length - 1].tip, height: 120 })}
+    ${legend([[zc[0], 'Z1 <142'], [zc[1], 'Z2 142–160'], [zc[2], 'Z3 160–169'], [zc[3], 'Z4 169–187'], [zc[4], 'Z5 187+']])}
+  </div>
+
+  <div class="card m-card">
+    <div class="card-title">Training load · Garmin</div>
+    ${loadTake}
+    ${barChart({ bars: loadBars, line: loadAvg, read: loadBars[loadBars.length - 1].tip, height: 110 })}
+    <div class="g-s">Counts every activity — paddle, surf and dirt bike included. Dashed line: 4-week average.</div>
+  </div>
+
+  <div class="card m-card">
+    <div class="card-title">Recent</div>
+    ${recent.map(a => {
+      const sp = sportOf(a.type);
+      const mi = a.dist ? (a.dist / 1609.34).toFixed(1) + ' mi' : '';
+      return `<div class="m-act"><i style="background:${SPORTS[sp].color}"></i><div><div class="m-act-n">${esc(a.name && a.name.length > 1 ? a.name : SPORTS[sp].label)}</div>
+        <div class="g-s">${new Date(a.t.replace(' ', 'T')).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} · ${[hm((a.dur || 0) / 60), mi, a.hr && `${a.hr} bpm`, a.load && `load ${Math.round(a.load)}`].filter(Boolean).join(' · ')}</div></div></div>`;
+    }).join('')}
+  </div>`;
+}
+
+// ── RECOVER ─────────────────────────────────────────────────────────
+function mRecover() {
+  if (!garminReady()) return renderGarminCard();
+  const g = state.garmin, days = g.days;
+  const byD = Object.fromEntries(days.map(d => [d.d, d]));
+  const span = n => Array.from({ length: n }, (_, i) => daysAgoIso(n - 1 - i));
+  const r = garminReadiness(g);
+
+  // HRV 30 days with Garmin baseline band and 7-day average
+  const d30 = span(30);
+  const hrvPts = d30.map(d => ({ label: shortDate(d), v: byD[d]?.hrv ?? null, tip: `<b>${shortDate(d)}</b> · ${byD[d]?.hrv ?? '—'} ms · 7-day ${byD[d]?.hrvWeek ?? '—'}${byD[d]?.hrvStatus ? ' · ' + String(byD[d].hrvStatus).toLowerCase() : ''}` }));
+  const hrvAvg = d30.map((d, i) => { const w = d30.slice(Math.max(0, i - 6), i + 1).map(x => byD[x]?.hrv).filter(v => v != null); return w.length >= 3 ? w.reduce((a, b) => a + b, 0) / w.length : null; });
+  const band = r.band?.hrvLow ? [r.band.hrvLow, r.band.hrvHigh] : null;
+  const hrvTake = !r.avg7 || !band ? '' : r.avg7 < band[0] * 0.9 ? takeaway('bad', `7-day HRV ${r.avg7} ms — well under baseline. Zone 2 only until it climbs back.`)
+    : r.avg7 < band[0] ? takeaway('warn', `7-day HRV ${r.avg7} ms — just under baseline. Trim volume 10–15%.`)
+    : takeaway('good', `7-day HRV ${r.avg7} ms — inside your ${band[0]}–${band[1]} baseline.`);
+
+  // Sleep 14 nights, stages
+  const d14 = span(14);
+  const sleepBars = d14.map(d => {
+    const x = byD[d] || {}, tot = (x.sleepS || 0) / 3600, deep = (x.deepS || 0) / 3600, rem = (x.remS || 0) / 3600;
+    return { label: new Date(d + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'narrow' }), tip: x.sleepS ? `<b>${shortDate(d)}</b> · ${fmtHm(x.sleepS)} · score ${x.sleepScore ?? '—'} · deep ${fmtHm(x.deepS)} · REM ${fmtHm(x.remS)}` : `<b>${shortDate(d)}</b> · no sleep data`,
+      segs: [{ v: deep, color: '#3B5BDB' }, { v: rem, color: '#A78BFA' }, { v: Math.max(0, tot - deep - rem), color: '#4F8EF7' }] };
+  });
+  const s7 = r.sleep7 ? r.sleep7 / 3600 : null;
+  const sleepTake = s7 == null ? '' : s7 >= 7 ? takeaway('good', `Averaging ${fmtHm(r.sleep7)} this week. Protect it.`) : takeaway(s7 < 6 ? 'bad' : 'warn', `Averaging ${fmtHm(r.sleep7)} — ${Math.round((7 - s7) * 60)} min a night short of 7 h. Newborn tax: keep intensity honest and nap when you can.`);
+
+  // Resting HR 30 days
+  const rhrPts = d30.map(d => ({ label: shortDate(d), v: byD[d]?.rhr ?? null, tip: `<b>${shortDate(d)}</b> · resting HR ${byD[d]?.rhr ?? '—'} bpm` }));
+  const rhrVals = rhrPts.map(p => p.v).filter(v => v != null);
+  const rhrBase = rhrVals.length ? rhrVals.reduce((a, b) => a + b, 0) / rhrVals.length : null;
+  const rhrLast = rhrVals[rhrVals.length - 1];
+  const rhrTake = rhrBase == null ? '' : rhrLast >= rhrBase + 5 ? takeaway('warn', `Resting HR ${rhrLast} — ${Math.round(rhrLast - rhrBase)} above your 30-day average. Often illness, stress or poor sleep coming.`) : takeaway('good', `Resting HR ${rhrLast} bpm, in line with your ${Math.round(rhrBase)} average.`);
+
+  // Body Battery range 14 days
+  const bbBars = d14.map(d => { const x = byD[d] || {}; return { label: new Date(d + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'narrow' }), tip: `<b>${shortDate(d)}</b> · Body Battery ${x.bbMin ?? '—'} → ${x.bbMax ?? '—'}`, segs: [{ v: x.bbMin || 0, color: 'transparent' }, { v: Math.max(0, (x.bbMax || 0) - (x.bbMin || 0)), color: 'var(--teal)' }] }; });
+  const bbLast = lastWith(days, 'bbMax');
+
+  return `
+  <div class="card m-call" style="--call:${{ go: 'var(--green)', reduce: 'var(--yellow)', z2: 'var(--orange)', rest: 'var(--red)' }[r.level]}">
+    <div class="m-call-k">Recovery read</div>
+    <div class="m-call-s" style="margin:0">${r.text}</div>
+  </div>
+
+  <div class="card m-card">
+    <div class="m-row"><div class="card-title">HRV · 30 days</div><div class="card-meta">${r.last?.hrv ?? '—'} ms last night</div></div>
+    ${hrvTake}
+    ${lineChart({ points: hrvPts, band, avg: hrvAvg, color: 'var(--green)', read: hrvPts[hrvPts.length - 1].tip, height: 130 })}
+    ${legend([['var(--green)', 'Nightly'], ['rgba(52,211,153,.18)', 'Garmin baseline'], ['var(--green);height:3px', '7-day avg']])}
+  </div>
+
+  <div class="card m-card">
+    <div class="m-row"><div class="card-title">Sleep · 14 nights</div><div class="card-meta">${r.sleepLast?.sleepScore ? 'score ' + r.sleepLast.sleepScore : ''}</div></div>
+    ${sleepTake}
+    ${barChart({ bars: sleepBars, target: 7, read: sleepBars[sleepBars.length - 1].tip, height: 120 })}
+    ${legend([['#3B5BDB', 'Deep'], ['#A78BFA', 'REM'], ['#4F8EF7', 'Light'], ['transparent;border-top:2px dashed var(--text-dim);height:0', '7 h']])}
+  </div>
+
+  <div class="card m-card">
+    <div class="card-title">Resting heart rate · 30 days</div>
+    ${rhrTake}
+    ${lineChart({ points: rhrPts, color: 'var(--red)', read: rhrPts[rhrPts.length - 1].tip, height: 100 })}
+  </div>
+
+  <div class="card m-card">
+    <div class="m-row"><div class="card-title">Body Battery · 14 days</div><div class="card-meta">${bbLast ? `charged to ${bbLast.bbMax}` : ''}</div></div>
+    ${barChart({ bars: bbBars, read: bbBars[bbBars.length - 1].tip, height: 90 })}
+    <div class="g-s">Bar runs from the day's low to its high. Charging under 60 overnight is a soft signal to go easier.</div>
+  </div>
+
+  <div class="card m-card m-settings">
+    <div class="card-title">Data</div>
+    <div class="g-s">Garmin updated ${new Date(g.generated).toLocaleString('en-US', { weekday: 'short', hour: 'numeric', minute: '2-digit' })} · pulls ~3:40am, 4:40am, 1:15pm.</div>
+    <div class="m-links">
+      <a href="#" onclick="toggleGhSetup();window.scrollTo(0,0);return false;">${ghToken() ? 'Refresh settings' : 'Set up Refresh button'}</a>
+      <a href="#" onclick="lockGarmin();return false;">Lock Garmin on this device</a>
+      <a href="#" onclick="clearCredentials();return false;">Reset Intervals login</a>
+    </div>
+  </div>`;
+}
+
+// ── BACK ────────────────────────────────────────────────────────────
+function routineState() { try { return JSON.parse(localStorage.getItem('routine_' + todayIso) || '[]'); } catch (e) { return []; } }
+function toggleRoutine(i) {
+  const s = new Set(routineState());
+  s.has(i) ? s.delete(i) : s.add(i);
+  localStorage.setItem('routine_' + todayIso, JSON.stringify([...s]));
+  if (s.size === BACK_ROUTINE.length && !state.backDraft.routine) { state.backDraft.routine = true; state.backSaved = false; state.backMsg = 'Routine complete — save your check-in.'; }
+  render();
+}
+
+function mBack() {
+  const done = new Set(routineState());
+  const hist = backHistory(30);
+  const painColor = p => p >= 6 ? 'var(--red)' : p >= 3 ? 'var(--yellow)' : 'var(--green)';
+  const bars = hist.map(h => ({
+    label: new Date(h.d + 'T12:00:00').toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' }),
+    tip: h.e ? `<b>${shortDate(h.d)}</b> · pain ${h.e.pain}/10${h.e.reach.length ? ' · ' + h.e.reach.join(', ') : ''}${h.e.sts ? ' · sit-to-stand hurt' : ''}${h.e.routine ? ' · routine ✓' : ''}` : `<b>${shortDate(h.d)}</b> · not logged`,
+    segs: [{ v: h.e ? Math.max(0.3, h.e.pain) : 0, color: h.e ? painColor(h.e.pain) : 'transparent' }],
+  }));
+  const logged = hist.filter(h => h.e);
+  const routineDays = logged.filter(h => h.e.routine).length;
+  const wk = a => a.length ? +(a.reduce((s, h) => s + h.e.pain, 0) / a.length).toFixed(1) : null;
+  const last7 = logged.filter(h => h.d >= daysAgoIso(6)), prev7 = logged.filter(h => h.d < daysAgoIso(6) && h.d >= daysAgoIso(13));
+  const trendTake = last7.length >= 3 && prev7.length >= 3
+    ? (wk(last7) < wk(prev7) - 0.5 ? takeaway('good', `Averaging ${wk(last7)}/10 this week vs ${wk(prev7)} last week. The routine is working.`)
+      : wk(last7) > wk(prev7) + 0.5 ? takeaway('bad', `Averaging ${wk(last7)}/10 vs ${wk(prev7)} last week — worse. If that holds another week, book a PT or sports med visit.`)
+      : takeaway('neutral', `Flat at ${wk(last7)}/10. Give it the full 2–3 weeks, then reassess.`))
+    : takeaway('neutral', `${logged.length} of 30 days logged. Log daily for two weeks and this turns into a trend.`);
+
+  return `
+  ${renderBackLog(false)}
+
+  <div class="card m-card">
+    <div class="m-row"><div class="card-title">Today's routine</div><div class="card-meta">${done.size}/${BACK_ROUTINE.length} · ~12 min</div></div>
+    ${BACK_ROUTINE.map((t, i) => `<div class="exercise ${done.has(i) ? 'checked' : ''}" onclick="toggleRoutine(${i})"><div class="exercise-check ${done.has(i) ? 'checked' : ''}"></div><div class="exercise-info"><div class="exercise-name" style="font-size:13.5px">${t}</div></div></div>`).join('')}
+    <div class="g-s" style="margin-top:8px">Gentle tension, never more symptoms. Anything that pushes pain further down the leg is out.</div>
+  </div>
+
+  <div class="card m-card">
+    <div class="m-row"><div class="card-title">Pain · 30 days</div><div class="card-meta">${routineDays} routine days</div></div>
+    ${trendTake}
+    ${barChart({ bars, read: bars[bars.length - 1].tip, height: 100 })}
+  </div>
+
+  <div class="card m-card">
+    <details class="m-rules"><summary class="card-title">Rules while it's irritated</summary>
+      <ul>
+        <li>Pain stays in the back or retreats from the leg → train.</li>
+        <li>Pain spreads further down the leg → stop that movement.</li>
+        <li>Pain 6+ or reaching the knee → routine + easy Zone 2 only.</li>
+        <li>No heavy trap bar, RDL or back squat until a full week at 0–2.</li>
+        <li>No dumbbell kick-ups — landmine or Smith incline instead.</li>
+        <li>Sit-to-stand: edge of seat, brace, drive through both legs. Up every 30–45 min at work.</li>
+        <li>Not clearly better by ~Dec 12, or worse at any point → PT or sports med.</li>
+      </ul>
+    </details>
+  </div>`;
+}
+
+// ── phone shell ─────────────────────────────────────────────────────
+function renderPhone(latest, sorted) {
+  const body = { today: mToday, train: mTrain, recover: mRecover, back: mBack }[state.tab] || mToday;
+  $('#app').innerHTML = `<div class="m-wrap">${mHeader()}${body()}</div>${mTabBar()}`;
+}
 
 fetchData();
 </script>
