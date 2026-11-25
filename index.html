@@ -905,14 +905,14 @@ body.desktop-view .num-grid { grid-template-columns: repeat(6, 1fr); }
 <script>
 const CLAUDE_PROJECT_URL = "https://claude.ai/new";
 const RACE_DATE = new Date("2026-10-17");
-const RACE_NAME = "Gaviota OCR";
+const RACE_NAME = "";
 const ATHLETE_NAME = "Clayton";
 
 const COACHING_BRIEF = `ATHLETE COACHING BRIEF — Clayton Sawyer (v3.0 — Nov 2026)
 AGE: 26 | SLO, CA | Ocean Lifeguard 9 years
 SPORT: Catalina Classic 7:01:00 first crossing. 1:31 half marathon minimal training. Weekly: MTB, surf, dirt bike, trail run, prone paddle. Strength 3-4/wk when life allows.
 HOME GYM: Pull-up bar, cable stack, bench, DBs 5-80lb, barbell+plates, trap bar, tricep bar, bands.
-STATUS: Did NOT race Montecito Mash (Oct 2026) — left-sided back/leg pain ("sciatica"). Pain reaches about the knee and up toward the neck; worst on sit-to-stand, occasional pinches lying down, kicking DBs up to bench hurts. Chiro (adjustment + Softwave) gave little relief. Athlete wants to keep a stretching/mobility approach. Next goal: Gaviota OCR 2027.
+STATUS: Did NOT race Montecito Mash (Oct 2026) — left-sided back/leg pain ("sciatica"). Pain reaches about the knee and up toward the neck; worst on sit-to-stand, occasional pinches lying down, kicking DBs up to bench hurts. Chiro (adjustment + Softwave) gave little relief. Athlete wants to keep a stretching/mobility approach. No race goal right now — focus is getting the back to 100% and building consistency.
 LIFE: Newborn at home. Schedule is unpredictable — sessions are chosen by time available, not by weekday. 3-day minimum: Lower (spine-friendly), combined Upper, Zone 2 run with cadence focus.
 BACK RULES: Pain that stays in the back or retreats from the leg = OK to train. Pain that spreads further down the leg = back off that movement. Pain ≥6 or reaching the knee = routine + easy Z2 only. No heavy trap bar / RDL / back squat until a full week at 0-2. No DB kick-ups (landmine/Smith incline instead). Daily 12-min back routine. If not clearly better in 2-3 weeks, or any worsening, refer to PT/sports med. Urgent red flags: saddle numbness, bladder/bowel change, progressive weakness/foot drop.
 DATA: Garmin Personal API (daily, encrypted) gives Garmin training load on every activity, HRV vs Garmin baseline, sleep, HR zones. Intervals.icu CTL is hrTSS-based single-digit scale and undercounts surf/MTB/dirt bike. Daily back check-in (pain 0-10, reach, sit-to-stand, routine) is logged in Intervals wellness comments.
@@ -4536,7 +4536,7 @@ function renderBackCheckpoint() {
 // ════════════════════════════════════════════════════════════════════
 //  "TRAINING DASHBOARD" LOOK — hero cards, Your numbers, desktop page
 // ════════════════════════════════════════════════════════════════════
-const GOAL = { name: 'Gaviota OCR', year: 2027, date: null };   // set date: '2027-MM-DD' for a countdown
+const GOAL = { name: null, date: null };   // set e.g. { name: 'Big Sur Half', date: '2027-04-26' } to switch the hero to a race countdown
 
 function weeklyAgg(nWeeks) {
   const weeks = lastNWeeks(nWeeks);
@@ -4570,6 +4570,13 @@ function progRow(label, value, pct, color, caption) {
     <div class="prog-bar"><i style="width:${Math.max(2, Math.min(100, pct))}%;background:${color}"></i></div>
     <div class="prog-cap">${caption}</div></div>`;
 }
+function consistentWeeks() {
+  // full weeks in a row (not counting this one) with 3+ Garmin sessions
+  const { weeks, byWeek } = weeklyAgg(27);
+  let n = 0;
+  for (let i = weeks.length - 2; i >= 0; i--) { if (byWeek[weeks[i]].n >= 3) n++; else break; }
+  return n;
+}
 function heroTrainingFor() {
   const days = GOAL.date ? Math.ceil((new Date(GOAL.date + 'T12:00:00') - new Date()) / 86400000) : null;
   const streak = painFreeStreak();
@@ -4577,20 +4584,18 @@ function heroTrainingFor() {
   const minCats = [['lower', 'Lower'], ['upper', 'Upper'], ['run', 'Z2 run']];
   const minDone = minCats.filter(([c]) => cov[c]).length;
   const next = minCats.filter(([c]) => !cov[c]).map(([, l]) => l);
-  // longest run, last 90 days
-  const cutoff = daysAgoIso(89);
-  const longest = (state.garmin?.acts || []).filter(a => sportOf(a.type) === 'run' && actDate(a) >= cutoff).sort((a, b) => (b.dist || 0) - (a.dist || 0))[0];
+  const cw = consistentWeeks();
   return `
   <div class="hero">
-    <div class="hero-k">Training for</div>
-    <div class="hero-h">${GOAL.name}</div>
-    <div class="hero-sub">${days != null ? `${days} days to race day` : `Race day in ${GOAL.year}`} · back first, then build</div>
+    <div class="hero-k">${GOAL.name ? 'Training for' : 'Current focus'}</div>
+    <div class="hero-h">${GOAL.name ? esc(GOAL.name) : 'Back to 100%'}</div>
+    <div class="hero-sub">${GOAL.name ? (days != null ? `${days} days to race day` : 'Race date not set') : 'No race on the calendar · fix the back, build the habit'}</div>
     ${progRow('Pain-free streak', `${Math.min(streak, 7)} of 7 days · ${Math.round(Math.min(streak, 7) / 7 * 100)}%`, streak / 7 * 100, 'var(--accent)',
       streak >= 7 ? 'A full week at 0–2 — light trap bar and RDL are back on' : 'A full week at 0–2 brings back trap bar and RDL')}
     ${progRow('3-day minimum, this week', `${minDone} of 3 · ${Math.round(minDone / 3 * 100)}%`, minDone / 3 * 100, '#3B82F6',
       minDone === 3 ? 'Covered — anything else is a bonus' : `Next: ${next.join(', ')}`)}
-    ${longest ? progRow('Longest run, last 90 days', `${(longest.dist / 1609.34).toFixed(1)} mi · ${hm(longest.dur / 60)}`, Math.min(100, longest.dist / 1609.34 / 10 * 100), '#E2572B',
-      `${esc(longest.name || 'Run')} · ${new Date(longest.t.replace(' ', 'T')).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} · bar = 10 mi (Mash trail leg)`) : ''}
+    ${progRow('Consistent weeks in a row', `${Math.min(cw, 8)} of 8 · ${Math.round(Math.min(cw, 8) / 8 * 100)}%`, cw / 8 * 100, '#E2572B',
+      cw >= 8 ? 'Two months without a crash — the boom-bust pattern is broken' : 'Weeks with 3+ sessions. Eight straight breaks the boom-bust cycle')}
   </div>`;
 }
 
@@ -4749,7 +4754,7 @@ function renderDesktop(latest, sorted) {
   const upd = garminReady() ? new Date(state.garmin.generated).toLocaleString('en-US', { month: 'short', day: '2-digit', year: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
   const top = `
     <div class="d-head">
-      <div><b>${GOAL.name.toUpperCase()}</b><span>·</span>TRAINING DASHBOARD</div>
+      <div><b>${(GOAL.name || ATHLETE_NAME).toUpperCase()}</b><span>·</span>TRAINING DASHBOARD</div>
       <div class="d-head-r">${upd ? `Updated ${upd}` : ''}
         ${garminReady() ? `<button class="m-icon ${garminRefreshing ? 'spin' : ''}" onclick="refreshGarmin()" title="Refresh Garmin">${IC.refresh}</button>` : ''}
         <button class="m-icon" onclick="setView('phone')" title="Phone view"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg></button>
