@@ -6,8 +6,12 @@ name: Garmin pull
 
 on:
   schedule:
-    - cron: "17 15 * * *"   # ~7:17am Pacific (after the morning watch sync)
-    - cron: "17 21 * * *"   # ~1:17pm Pacific
+    # Cron is UTC. Two early runs so one lands ~4:40am Pacific in both
+    # winter (PST) and summer (PDT). GitHub can start scheduled runs
+    # 5-20 min late, so these sit well ahead of a 5am session.
+    - cron: "40 11 * * *"   # 3:40am PST / 4:40am PDT
+    - cron: "40 12 * * *"   # 4:40am PST / 5:40am PDT
+    - cron: "17 21 * * *"   # ~1:17pm Pacific (catches the morning session)
   workflow_dispatch:
     inputs:
       debug_shape:
