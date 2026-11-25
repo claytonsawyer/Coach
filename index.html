@@ -770,6 +770,9 @@ body.desktop-view .coach-button-fixed { display: none; }
 .m-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
 .m-tile { text-align: left; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 11px 12px; color: var(--text); font: inherit; cursor: pointer; }
 .m-tile-v { font-size: 24px; font-weight: 800; letter-spacing: -.02em; margin: 2px 0 1px; }
+.m-tiles-3 { grid-template-columns: repeat(3, 1fr); margin: 4px 0 10px; }
+.m-tiles-3 .m-tile { padding: 9px 10px; cursor: default; }
+.m-tiles-3 .m-tile-v { font-size: 20px; }
 .m-tile-v small { font-size: 12px; color: var(--text-dim); font-weight: 600; margin-left: 2px; }
 .m-delta { font-weight: 700; } .m-delta.up, .m-delta.down { color: var(--text-muted); }
 .m-sess, .m-week, .m-card { margin-bottom: 12px; }
@@ -1128,6 +1131,7 @@ async function fetchData() {
     state.loaded = true;
     state.error = null;
     render();
+    setTimeout(() => loadRunMechanics(), 1500);
   } catch (e) {
     console.error('❌ fetchData error:', e.message);
     state.error = e.message;
@@ -3718,9 +3722,9 @@ function barChart({ bars, height = 120, line = null, lineTip = '', target = null
 }
 
 // points: [{label, v, tip}]; band [lo, hi]; avg overlay
-function lineChart({ points, height = 120, color = 'var(--primary)', band = null, avg = null, read = '', lowerBetter = false }) {
+function lineChart({ points, height = 120, color = 'var(--primary)', band = null, avg = null, read = '', lowerBetter = false, target = null }) {
   const W = 340, H = height, padB = 16, padT = 8;
-  const vals = points.map(p => p.v).filter(v => v != null).concat(band || [], (avg || []).filter(v => v != null));
+  const vals = points.map(p => p.v).filter(v => v != null).concat(band || [], (avg || []).filter(v => v != null), target != null ? [target] : []);
   if (!vals.length) return `<div class="ch"><div class="ch-read">No data yet</div></div>`;
   let min = Math.min(...vals), max = Math.max(...vals);
   const pad = (max - min) * 0.15 || 5; min -= pad; max += pad;
@@ -3728,6 +3732,7 @@ function lineChart({ points, height = 120, color = 'var(--primary)', band = null
   const x = i => i * step + step / 2;
   const y = v => H - padB - (v - min) / (max - min) * (H - padB - padT);
   let svg = '';
+  if (target != null) svg += `<line x1="0" x2="${W}" y1="${y(target).toFixed(1)}" y2="${y(target).toFixed(1)}" class="ch-target"/>`;
   if (band) svg += `<rect x="0" y="${y(band[1]).toFixed(1)}" width="${W}" height="${(y(band[0]) - y(band[1])).toFixed(1)}" class="ch-band"/>`;
   const segs = []; let cur = [];
   points.forEach((p, i) => { if (p.v == null) { if (cur.length) segs.push(cur); cur = []; } else cur.push(`${x(i).toFixed(1)},${y(p.v).toFixed(1)}`); });
@@ -4029,7 +4034,8 @@ function mToday() {
 
 // ── TRAIN ───────────────────────────────────────────────────────────
 function mTrain() {
-  if (!garminReady()) return renderGarminCard();
+  setTimeout(loadRunMechanics, 0);
+  if (!garminReady()) return renderGarminCard() + renderRunMechanics();
   const g = state.garmin, n = state.trainWeeks;
   const weeks = lastNWeeks(n + 4);           // +4 for rolling average lead-in
   const byWeek = {};
@@ -4104,6 +4110,8 @@ function mTrain() {
     ${barChart({ bars: zBars, read: zBars[zBars.length - 1].tip, height: 120 })}
     ${legend([[zc[0], 'Z1 <142'], [zc[1], 'Z2 142–160'], [zc[2], 'Z3 160–169'], [zc[3], 'Z4 169–187'], [zc[4], 'Z5 187+']])}
   </div>
+
+  ${renderRunMechanics()}
 
   <div class="card m-card">
     <div class="card-title">Training load · Garmin</div>
@@ -4234,6 +4242,7 @@ function mBack() {
     : takeaway('neutral', `${logged.length} of 30 days logged. Log daily for two weeks and this turns into a trend.`);
 
   return `
+  ${renderBackCheckpoint()}
   ${renderBackLog(false)}
 
   <div class="card m-card">
@@ -4267,6 +4276,185 @@ function mBack() {
 function renderPhone(latest, sorted) {
   const body = { today: mToday, train: mTrain, recover: mRecover, back: mBack }[state.tab] || mToday;
   $('#app').innerHTML = `<div class="m-wrap">${mHeader()}${body()}</div>${mTabBar()}`;
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  RUN MECHANICS — climb cadence, HR drift, Z2 discipline
+//  Per-second streams come from Intervals.icu (already synced from the
+//  watch). Each run is analysed once and cached on this device.
+// ════════════════════════════════════════════════════════════════════
+const RM_KEY = 'runmech_v1';
+state.runMech = (() => { try { return JSON.parse(localStorage.getItem(RM_KEY) || '{}'); } catch (e) { return {}; } })();
+state.runMechStatus = '';
+let runMechLoading = false;
+const runMechTried = new Set();  // never re-request a run in the same session
+
+function analyseRunStreams(streams) {
+  const get = (...names) => { for (const n of names) { const s = streams.find(x => x.type === n); if (s && s.data && s.data.length) return s.data; } return null; };
+  const t = get('time'), hr = get('heartrate'), cadRaw = get('cadence'), dist = get('distance');
+  const alt = get('fixed_altitude', 'altitude'), gradeS = get('grade_smooth'), velS = get('velocity_smooth');
+  if (!t || !hr || t.length < 300) return null;
+  const n = t.length;
+
+  // speed (m/s)
+  const v = velS || (dist ? t.map((_, i) => i ? Math.max(0, (dist[i] - dist[i - 1]) / Math.max(1, t[i] - t[i - 1])) : 0) : null);
+  // grade (%) over a ~40 m window when no smoothed grade is provided
+  let grade = gradeS;
+  if (!grade && alt && dist) {
+    grade = new Array(n).fill(0);
+    let j = 0;
+    for (let i = 0; i < n; i++) {
+      while (j < i && dist[i] - dist[j] > 40) j++;
+      const dd = dist[i] - dist[j];
+      grade[i] = dd > 15 ? (alt[i] - alt[j]) / dd * 100 : (i ? grade[i - 1] : 0);
+    }
+  }
+  // running cadence: FIT stores strides/min (~85); convert to steps/min
+  let cad = cadRaw;
+  if (cad) {
+    const nz = cad.filter(c => c > 30).sort((a, b) => a - b);
+    const med = nz.length ? nz[Math.floor(nz.length / 2)] : 0;
+    if (med && med < 120) cad = cad.map(c => c * 2);
+  }
+
+  let moving = 0, over150 = 0, flatT = 0, flatC = 0, climbT = 0, climbC = 0;
+  const steady = [];  // [dtCumulative, v, hr] for flat-ish moving samples
+  for (let i = 1; i < n; i++) {
+    const dt = Math.min(5, t[i] - t[i - 1]);
+    if (dt <= 0) continue;
+    const isMoving = v ? v[i] > 0.8 : true;
+    if (!isMoving) continue;
+    moving += dt;
+    if (hr[i] > 150) over150 += dt;
+    const g = grade ? grade[i] : 0;
+    const c = cad ? cad[i] : 0;
+    if (c > 100) {
+      if (g >= 6) { climbT += dt; climbC += c * dt; }
+      else if (Math.abs(g) < 2) { flatT += dt; flatC += c * dt; }
+    }
+    if (v && hr[i] > 80 && Math.abs(g) < 4) steady.push([moving, v[i], hr[i], dt]);
+  }
+  if (moving < 600) return null;
+
+  // aerobic decoupling: efficiency (speed / HR) first half vs second half
+  let decouple = null;
+  if (steady.length > 200 && moving >= 25 * 60) {
+    const half = moving / 2;
+    const ef = part => { let sv = 0, sh = 0, st = 0; part.forEach(([, sp, h, dt]) => { sv += sp * dt; sh += h * dt; st += dt; }); return st > 300 ? (sv / st) / (sh / st) : null; };
+    const a = ef(steady.filter(x => x[0] <= half)), b = ef(steady.filter(x => x[0] > half));
+    if (a && b) decouple = Math.round((a - b) / a * 1000) / 10;
+  }
+  return {
+    mins: Math.round(moving / 60),
+    cadFlat: flatT >= 120 ? Math.round(flatC / flatT) : null,
+    cadClimb: climbT >= 90 ? Math.round(climbC / climbT) : null,
+    climbMins: Math.round(climbT / 60 * 10) / 10,
+    decouple,
+    over150: Math.round(over150 / moving * 100),
+  };
+}
+
+async function loadRunMechanics() {
+  if (runMechLoading || !state.athleteId || !state.apiKey) return;
+  const runs = (state.activities || [])
+    .filter(a => /run/i.test(a.type || '') && (a.moving_time || 0) >= 15 * 60)
+    .sort((a, b) => (b.start_date_local || '').localeCompare(a.start_date_local || ''))
+    .slice(0, 12);
+  const todo = runs.filter(a => !state.runMech[a.id] && !runMechTried.has(a.id));
+  todo.forEach(a => runMechTried.add(a.id));
+  if (!todo.length) return;
+  runMechLoading = true;
+  const auth = 'Basic ' + btoa('API_KEY:' + state.apiKey);
+  let done = 0;
+  for (const a of todo) {
+    state.runMechStatus = `Analysing runs… ${done + 1}/${todo.length}`;
+    const el = document.getElementById('rm-status'); if (el) el.textContent = state.runMechStatus;
+    try {
+      const r = await fetch(`https://intervals.icu/api/v1/activity/${a.id}/streams.json?types=time,heartrate,cadence,distance,altitude,fixed_altitude,grade_smooth,velocity_smooth`, { headers: { Authorization: auth } });
+      if (r.ok) {
+        const res = analyseRunStreams(await r.json());
+        state.runMech[a.id] = res ? { ...res, date: (a.start_date_local || '').slice(0, 10), name: a.name || 'Run' } : { skip: true };
+      }
+    } catch (e) { /* try again next load */ }
+    done++;
+  }
+  try { localStorage.setItem(RM_KEY, JSON.stringify(state.runMech)); } catch (e) {}
+  state.runMechStatus = '';
+  runMechLoading = false;
+  if (state.tab === 'train') render();
+}
+
+function renderRunMechanics() {
+  const runs = Object.values(state.runMech).filter(r => r && !r.skip && r.date).sort((a, b) => a.date.localeCompare(b.date)).slice(-12);
+  if (!runs.length) {
+    return `<div class="card m-card"><div class="card-title">Run mechanics</div>
+      <div class="g-s" id="rm-status" style="margin-top:6px">${state.runMechStatus || (runMechLoading ? 'Analysing runs…' : 'No runs of 15+ minutes in the last 6 months yet. Climb cadence and HR drift show up after your next run.')}</div></div>`;
+  }
+  const avg = (arr) => { const v = arr.filter(x => x != null); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+  const last5 = runs.slice(-5);
+  const climb = avg(last5.map(r => r.cadClimb)), flat = avg(last5.map(r => r.cadFlat));
+  const drift = avg(last5.map(r => r.decouple)), over = avg(last5.map(r => r.over150));
+  const tone = (v, good, warn, lowerBetter = false) => v == null ? 'var(--text)' : (lowerBetter ? v <= good : v >= good) ? 'var(--green)' : (lowerBetter ? v <= warn : v >= warn) ? 'var(--yellow)' : 'var(--red)';
+
+  const takes = [];
+  if (climb != null) takes.push(climb >= 168 ? takeaway('good', `Climbing at ${Math.round(climb)} spm — holding cadence on grades. Keep the 170 metronome.`)
+    : takeaway(climb >= 160 ? 'warn' : 'bad', `Climbing at ${Math.round(climb)} spm vs 170 target${flat ? ` (${Math.round(flat)} on the flat)` : ''}. Shorter, quicker steps on grades — keep the metronome on and let pace drop, not cadence.`));
+  if (drift != null) takes.push(drift < 5 ? takeaway('good', `HR drift ${drift.toFixed(1)}% — aerobic base is holding. Add 10 minutes to the next Z2 run.`)
+    : takeaway(drift < 8 ? 'warn' : 'bad', `HR drift ${drift.toFixed(1)}% (target under 5%). Base is still thin — keep runs easier and steadier rather than longer.`));
+  if (over != null) takes.push(over <= 15 ? takeaway('good', `${Math.round(over)}% of run time over 150 bpm. Zone 2 discipline is good.`)
+    : takeaway(over <= 35 ? 'warn' : 'bad', `${Math.round(over)}% of run time over 150 bpm. Walk the climbs when HR passes 150.`));
+
+  const label = r => new Date(r.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' });
+  const cadPts = runs.map(r => ({ label: label(r), v: r.cadClimb, color: r.cadClimb == null ? null : r.cadClimb >= 168 ? 'var(--green)' : r.cadClimb >= 160 ? 'var(--yellow)' : 'var(--red)',
+    tip: `<b>${shortDate(r.date)}</b> · ${esc(r.name)} · climb ${r.cadClimb ?? '—'} spm${r.climbMins ? ` (${r.climbMins} min on 6%+)` : ''} · flat ${r.cadFlat ?? '—'} spm` }));
+  const driftBars = runs.map(r => ({ label: label(r), tip: `<b>${shortDate(r.date)}</b> · ${esc(r.name)} · drift ${r.decouple == null ? '— (under 25 min)' : r.decouple + '%'} · ${r.over150}% over 150 · ${r.mins} min`,
+    segs: [{ v: r.decouple == null ? 0 : Math.max(0.2, Math.abs(r.decouple)), color: r.decouple == null ? 'transparent' : r.decouple < 5 ? 'var(--green)' : r.decouple < 8 ? 'var(--yellow)' : 'var(--red)' }] }));
+  const lastRun = runs[runs.length - 1];
+
+  return `
+  <div class="card m-card">
+    <div class="m-row"><div class="card-title">Run mechanics · last ${runs.length} runs</div><div class="card-meta" id="rm-status">${state.runMechStatus}</div></div>
+    <div class="m-tiles m-tiles-3">
+      <div class="m-tile"><div class="g-k">Climb cad</div><div class="m-tile-v" style="color:${tone(climb, 168, 160)}">${climb ? Math.round(climb) : '—'}<small>spm</small></div><div class="g-s">6%+ grade · 170</div></div>
+      <div class="m-tile"><div class="g-k">HR drift</div><div class="m-tile-v" style="color:${tone(drift, 5, 8, true)}">${drift != null ? drift.toFixed(1) : '—'}<small>%</small></div><div class="g-s">target &lt; 5%</div></div>
+      <div class="m-tile"><div class="g-k">Over 150</div><div class="m-tile-v" style="color:${tone(over, 15, 35, true)}">${over != null ? Math.round(over) : '—'}<small>%</small></div><div class="g-s">of run time</div></div>
+    </div>
+    ${takes.join('')}
+    <div class="g-row-title" style="margin-top:6px"><span>Climb cadence per run</span><span>dashed = 170</span></div>
+    ${lineChart({ points: cadPts, color: 'var(--orange)', target: 170, read: cadPts[cadPts.length - 1].tip, height: 110 })}
+    <div class="g-row-title" style="margin-top:12px"><span>HR drift per run</span><span>dashed = 5%</span></div>
+    ${barChart({ bars: driftBars, target: 5, read: driftBars[driftBars.length - 1].tip, height: 90 })}
+    <div class="g-s" style="margin-top:6px">Last run ${shortDate(lastRun.date)}: ${lastRun.mins} min, flat ${lastRun.cadFlat ?? '—'} spm, climbs ${lastRun.cadClimb ?? '—'} spm. Averages use the last 5 runs. Drift needs 25+ minutes.</div>
+  </div>`;
+}
+
+// ── 3-week back checkpoint (Dec 12) ─────────────────────────────────
+const BACK_START = '2026-11-25', BACK_CHECK = '2026-12-12';
+function renderBackCheckpoint() {
+  const daysLeft = Math.round((new Date(BACK_CHECK + 'T12:00:00') - new Date(todayIso + 'T12:00:00')) / 86400000);
+  const span = [];
+  for (let d = new Date(BACK_START + 'T12:00:00'); isoLocal(d) <= todayIso; d.setDate(d.getDate() + 1)) span.push(isoLocal(d));
+  const logged = span.map(d => ({ d, e: backEntryFor(d) })).filter(x => x.e && x.e.pain != null);
+  const routine = logged.filter(x => x.e.routine).length;
+  const mean = a => a.length ? a.reduce((s, x) => s + x.e.pain, 0) / a.length : null;
+  const first = mean(logged.slice(0, 7)), last = mean(logged.slice(-7));
+  const kneeLast = logged.slice(-7).some(x => x.e.reach.includes('Knee'));
+
+  if (daysLeft > 0) {
+    return `<div class="card m-card m-check">
+      <div class="m-row"><div class="card-title">Checkpoint · Dec 12</div><div class="card-meta">${daysLeft} day${daysLeft === 1 ? '' : 's'}</div></div>
+      <div class="g-s">On Dec 12 this card says whether the routine is working or it's time for a PT. So far: ${logged.length}/${span.length} days logged, routine on ${routine}. ${logged.length < span.length ? 'Log every day so the verdict is real.' : 'Keep it up.'}</div>
+    </div>`;
+  }
+  let verdict;
+  if (logged.length < 10) verdict = takeaway('warn', `Only ${logged.length} days logged since Nov 25 — not enough to call it. If it doesn't feel clearly better, book the PT anyway.`);
+  else if (last <= 2 && !kneeLast) verdict = takeaway('good', `Working. Down to ${last.toFixed(1)}/10 from ${first.toFixed(1)}. Keep the routine; once you have a full week at 0–2, start bringing back light trap bar work.`);
+  else if (last <= first - 1.5 && !kneeLast) verdict = takeaway('good', `Improving: ${first.toFixed(1)} → ${last.toFixed(1)}/10. Give it two more weeks, same plan.`);
+  else verdict = takeaway('bad', `Not clearly better: ${first.toFixed(1)} → ${last.toFixed(1)}/10${kneeLast ? ', still reaching the knee' : ''}. Stretching alone isn't fixing this — book a physical therapist or sports med visit this week.`);
+  return `<div class="card m-card m-check">
+    <div class="m-row"><div class="card-title">3-week checkpoint</div><div class="card-meta">${logged.length} days · routine ${routine}</div></div>
+    ${verdict}
+  </div>`;
 }
 
 fetchData();
