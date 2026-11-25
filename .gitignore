@@ -1,0 +1,3 @@
+tests/*.png
+tests/__pycache__/
+tests/garmin.enc.json
