@@ -721,6 +721,13 @@ body.desktop-view .coach-button-fixed { display: none; }
 .b-hist .g-wk b { position: absolute; bottom: -6px; left: 50%; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--teal); }
 .b-hist { margin-bottom: 6px; }
 .g-zbar { display: flex; height: 10px; border-radius: 5px; overflow: hidden; gap: 1px; margin-bottom: 6px; }
+.g-head-r { display: flex; align-items: center; gap: 8px; }
+.g-refresh { display: inline-flex; align-items: center; gap: 5px; background: var(--primary-bg); color: var(--primary); border: 1px solid rgba(79,142,247,.35); border-radius: 999px; padding: 5px 10px; font: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer; }
+.g-refresh[disabled] { opacity: .8; cursor: default; }
+.g-refresh.spin svg { animation: gspin 1s linear infinite; }
+@keyframes gspin { to { transform: rotate(360deg); } }
+.g-setup { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-inner); padding: 12px; margin-bottom: 12px; }
+.g-warn { font-size: 12px; color: var(--yellow); background: var(--yellow-bg); border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; }
 .g-foot { margin-top: 10px; text-align: right; font-size: 11px; }
 .g-foot a { color: var(--text-dim); }
 .b-pain { display: grid; grid-template-columns: repeat(11, 1fr); gap: 4px; }
@@ -3123,18 +3130,102 @@ async function decryptGarmin(blob, pass) {
   return JSON.parse(new TextDecoder().decode(pt));
 }
 
-async function loadGarmin() {
-  state.garminStatus = 'loading';
+const GH_REPO = 'claytonsawyer/Coach';
+const GH_WORKFLOW = 'garmin.yml';
+const ghToken = () => localStorage.getItem('gh_token') || '';
+const ghHeaders = (extra = {}) => ({ Authorization: 'Bearer ' + ghToken(), 'X-GitHub-Api-Version': '2022-11-28', ...extra });
+
+async function fetchGarminBlob() {
+  if (ghToken()) {  // API read is never CDN-cached, so a refresh shows up immediately
+    try {
+      const r = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/garmin.enc.json?ref=garmin-data&t=${Date.now()}`,
+        { headers: ghHeaders({ Accept: 'application/vnd.github.raw+json' }), cache: 'no-store' });
+      if (r.ok) return await r.json();
+    } catch (e) { /* fall back */ }
+  }
   for (const url of GARMIN_URLS) {
     try {
       const r = await fetch(url + '?t=' + Date.now(), { cache: 'no-store' });
-      if (r.ok) { state.garminBlob = await r.json(); break; }
+      if (r.ok) return await r.json();
     } catch (e) { /* try next */ }
   }
-  if (!state.garminBlob) { state.garminStatus = 'missing'; render(); return; }
+  return null;
+}
+
+async function loadGarmin() {
+  if (!state.garmin) state.garminStatus = 'loading';
+  const blob = await fetchGarminBlob();
+  if (!blob) { if (!state.garmin) { state.garminStatus = 'missing'; render(); } return; }
+  state.garminBlob = blob;
   const pass = localStorage.getItem('garmin_pass');
   if (!pass) { state.garminStatus = 'locked'; render(); return; }
   await unlockGarmin(pass, false);
+}
+
+// ── Refresh button: starts the GitHub Action, waits, reloads ─────────
+state.ghSetup = false;
+state.garminRefresh = '';   // '' | text shown while running / on error
+let garminRefreshing = false;
+
+function toggleGhSetup() { state.ghSetup = !state.ghSetup; render(); }
+function saveGhToken() {
+  const v = (document.getElementById('gh-token')?.value || '').trim();
+  if (!v) return;
+  localStorage.setItem('gh_token', v);
+  state.ghSetup = false; state.garminRefresh = 'Saved. Tap Refresh to test it.'; render();
+}
+function clearGhToken() { localStorage.removeItem('gh_token'); state.garminRefresh = ''; render(); }
+
+function setRefreshMsg(m) {
+  state.garminRefresh = m;
+  const el = document.getElementById('g-refresh-msg');
+  if (el) { el.textContent = m; el.style.display = ''; } else render();
+}
+
+async function refreshGarmin() {
+  if (garminRefreshing) return;
+  if (!ghToken()) { state.ghSetup = true; render(); return; }
+  garminRefreshing = true;
+  const started = Date.now();
+  const before = state.garmin?.generated;
+  setRefreshMsg('Starting pull…'); render();
+  try {
+    const d = await fetch(`https://api.github.com/repos/${GH_REPO}/actions/workflows/${GH_WORKFLOW}/dispatches`, {
+      method: 'POST', headers: ghHeaders({ Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ ref: 'main' })
+    });
+    if (d.status === 401) throw new Error('GitHub token is invalid or expired — set it up again.');
+    if (d.status === 403 || d.status === 404) throw new Error('Token can\'t run the action — it needs Actions: Read and write on the Coach repo.');
+    if (!d.ok) throw new Error('GitHub said ' + d.status);
+
+    let run = null;
+    while (Date.now() - started < 6 * 60000) {
+      await new Promise(r => setTimeout(r, 6000));
+      const secs = Math.round((Date.now() - started) / 1000);
+      const r = await fetch(`https://api.github.com/repos/${GH_REPO}/actions/workflows/${GH_WORKFLOW}/runs?event=workflow_dispatch&per_page=3&t=${Date.now()}`,
+        { headers: ghHeaders({ Accept: 'application/vnd.github+json' }), cache: 'no-store' });
+      if (r.ok) {
+        const runs = (await r.json()).workflow_runs || [];
+        run = runs.find(x => new Date(x.created_at).getTime() >= started - 15000) || run;
+      }
+      if (run && run.status === 'completed') break;
+      setRefreshMsg(`Pulling from Garmin… ${secs}s`);
+    }
+    if (!run || run.status !== 'completed') throw new Error('Still running — check back in a minute.');
+    if (run.conclusion !== 'success') throw new Error('The pull failed — open the Actions tab on GitHub for the log.');
+
+    setRefreshMsg('Loading new data…');
+    for (let i = 0; i < 5; i++) {
+      await loadGarmin();
+      if (state.garmin?.generated && state.garmin.generated !== before) break;
+      await new Promise(r => setTimeout(r, 4000));
+    }
+    state.garminRefresh = '';
+  } catch (e) {
+    state.garminRefresh = e.message;
+  }
+  garminRefreshing = false;
+  render();
 }
 
 async function unlockGarmin(pass, fromInput = true) {
@@ -3242,6 +3333,15 @@ function garminReadiness(g) {
 function renderGarminCard() {
   const st = state.garminStatus;
   const head = (meta = '') => `<div class="card-header"><div class="card-title">Garmin</div><div class="card-meta">${meta}</div></div>`;
+  const refreshIcon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>';
+  const readyHead = meta => `<div class="card-header"><div class="card-title">Garmin</div><div class="g-head-r"><span class="card-meta">${meta}</span><button class="g-refresh ${garminRefreshing ? 'spin' : ''}" onclick="refreshGarmin()" ${garminRefreshing ? 'disabled' : ''}>${refreshIcon}<span>${garminRefreshing ? 'Pulling' : 'Refresh'}</span></button></div></div>`;
+  const ghPanel = state.ghSetup ? `
+    <div class="g-setup">
+      <div class="g-note">One-time setup so this button can start the pull. Paste a GitHub fine-grained token with <strong>Actions: Read and write</strong> on the Coach repo only. It stays on this device.</div>
+      <div class="g-unlock"><input id="gh-token" type="password" autocomplete="off" placeholder="github_pat_…" onkeydown="if(event.key==='Enter')saveGhToken()"><button onclick="saveGhToken()">Save</button></div>
+      ${ghToken() ? '<div class="g-foot" style="text-align:left"><a href="#" onclick="clearGhToken();return false;">Remove saved token</a></div>' : ''}
+    </div>` : '';
+  const refreshMsg = `<div class="g-s" id="g-refresh-msg" style="margin:-4px 0 10px;${state.garminRefresh ? '' : 'display:none'}">${state.garminRefresh}</div>`;
   if (st === 'idle' || st === 'loading') return `<div class="card g-card">${head('Loading…')}</div>`;
   if (st === 'missing') return `<div class="card g-card">${head('Not set up')}<div class="g-note">No Garmin data published yet. Run the "Garmin pull" action once in GitHub.</div></div>`;
   if (st === 'locked' || st === 'badpass') return `
@@ -3260,6 +3360,7 @@ function renderGarminCard() {
   const z = garminZones7d(g);
   const zTot = z.reduce((a, b) => a + b, 0);
   const updated = new Date(g.generated);
+  const sleepMissing = !(g.days || []).some(d => d.d === todayIso && d.sleepS);
   const lvlColor = { go: 'var(--green)', reduce: 'var(--yellow)', z2: 'var(--orange)', rest: 'var(--red)' }[r.level];
 
   const acwrColor = !acwr ? 'var(--text-dim)' : acwr.ratio > 1.3 ? 'var(--red)' : acwr.ratio < 0.8 ? 'var(--yellow)' : 'var(--green)';
@@ -3269,7 +3370,9 @@ function renderGarminCard() {
 
   return `
   <div class="card g-card">
-    ${head(`Updated ${updated.toLocaleString('en-US', { weekday: 'short', hour: 'numeric', minute: '2-digit' })}`)}
+    ${readyHead(`Updated ${updated.toLocaleString('en-US', { weekday: 'short', hour: 'numeric', minute: '2-digit' })}`)}
+    ${refreshMsg}${ghPanel}
+    ${sleepMissing ? '<div class="g-warn">Last night\'s sleep hasn\'t come off your watch yet. Open Garmin Connect for a few seconds so it syncs, then tap Refresh.</div>' : ''}
     <div class="g-read" style="border-color:${lvlColor}"><span class="g-dot" style="background:${lvlColor}"></span>${r.text}</div>
 
     <div class="g-grid">
@@ -3302,7 +3405,7 @@ function renderGarminCard() {
       ${zTot ? z.map((s, i) => s ? `<div title="Z${i + 1}: ${Math.round(s / 60)} min" style="flex:${s};background:${zColors[i]}"></div>` : '').join('') : '<div style="flex:1;background:var(--border)"></div>'}
     </div>
     <div class="g-s">${zTot ? z.map((s, i) => `Z${i + 1} ${Math.round(s / 60)}m`).join(' · ') : 'No HR-tracked sessions this week'}</div>
-    <div class="g-foot"><a href="#" onclick="lockGarmin();return false;">Lock on this device</a></div>
+    <div class="g-foot"><a href="#" onclick="toggleGhSetup();return false;">${ghToken() ? 'Refresh settings' : 'Set up refresh'}</a> · <a href="#" onclick="lockGarmin();return false;">Lock on this device</a></div>
   </div>`;
 }
 
