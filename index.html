@@ -695,6 +695,40 @@ body.desktop-view .coach-button-fixed { display: none; }
 .rec-align-status { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
 .rec-align-note { font-size: 12px; color: var(--text-dim); line-height: 1.4; }
 
+
+/* ── Garmin + back log ─────────────────────────────── */
+.g-card, .b-card { margin-bottom: 14px; }
+.g-note { font-size: 12.5px; color: var(--text-muted); margin-bottom: 10px; }
+.g-unlock { display: flex; gap: 8px; }
+.g-unlock input { flex: 1; background: var(--surface-2); border: 1px solid var(--border-strong); border-radius: var(--r-inner); color: var(--text); padding: 10px 12px; font: inherit; font-size: 16px; }
+.g-unlock button, .b-save { background: var(--primary); color: #fff; border: 0; border-radius: var(--r-inner); padding: 10px 16px; font: inherit; font-weight: 700; font-size: 13px; cursor: pointer; }
+.b-save { width: 100%; margin-top: 12px; }
+.g-read { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; padding: 10px 12px; border-left: 3px solid; background: var(--surface-2); border-radius: 6px; margin-bottom: 12px; }
+.g-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.g-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.g-stat { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-inner); padding: 10px 12px; }
+.g-k { font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-dim); }
+.g-v { font-size: 22px; font-weight: 800; margin: 2px 0; }
+.g-v span { font-size: 11px; color: var(--text-dim); font-weight: 600; margin-left: 3px; }
+.g-s { font-size: 11px; color: var(--text-dim); line-height: 1.4; }
+.g-row-title { display: flex; justify-content: space-between; font-size: 11.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+.g-bar { position: relative; height: 8px; background: var(--surface-3); border-radius: 4px; margin-bottom: 6px; }
+.g-bar > div { height: 100%; border-radius: 4px; }
+.g-bar i { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--text-muted); }
+.g-weeks { display: flex; align-items: flex-end; gap: 4px; height: 44px; }
+.g-wk { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; position: relative; }
+.g-wk > div { border-radius: 3px 3px 0 0; min-height: 2px; }
+.b-hist .g-wk b { position: absolute; bottom: -6px; left: 50%; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--teal); }
+.b-hist { margin-bottom: 6px; }
+.g-zbar { display: flex; height: 10px; border-radius: 5px; overflow: hidden; gap: 1px; margin-bottom: 6px; }
+.g-foot { margin-top: 10px; text-align: right; font-size: 11px; }
+.g-foot a { color: var(--text-dim); }
+.b-pain { display: grid; grid-template-columns: repeat(11, 1fr); gap: 4px; }
+.b-pain button, .b-chips button { background: var(--surface-2); border: 1px solid var(--border-strong); color: var(--text-muted); border-radius: 8px; font: inherit; font-size: 13px; font-weight: 700; padding: 8px 0; cursor: pointer; }
+.b-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.b-chips button { padding: 7px 12px; font-size: 12.5px; font-weight: 600; }
+.b-chips button.on { background: var(--primary-bg); border-color: var(--primary); color: var(--text); }
+.b-chips button.on.warn { background: var(--yellow-bg); border-color: var(--yellow); }
 </style>
 </head>
 <body class="phone-view">
@@ -706,21 +740,22 @@ body.desktop-view .coach-button-fixed { display: none; }
 <script>
 const CLAUDE_PROJECT_URL = "https://claude.ai/new";
 const RACE_DATE = new Date("2026-10-17");
-const RACE_NAME = "Montecito Mash";
+const RACE_NAME = "Gaviota OCR";
 const ATHLETE_NAME = "Clayton";
 
-const COACHING_BRIEF = `ATHLETE COACHING BRIEF — Clayton Sawyer (v2.0 — May 2026)
+const COACHING_BRIEF = `ATHLETE COACHING BRIEF — Clayton Sawyer (v3.0 — Nov 2026)
 AGE: 26 | SLO, CA | Ocean Lifeguard 9 years
-SPORT: Catalina Classic 7:01:00 first crossing. 1:31 half marathon minimal training. Weekly: MTB, surf, dirt bike, trail run, prone paddle. Strength 3-4/wk.
+SPORT: Catalina Classic 7:01:00 first crossing. 1:31 half marathon minimal training. Weekly: MTB, surf, dirt bike, trail run, prone paddle. Strength 3-4/wk when life allows.
 HOME GYM: Pull-up bar, cable stack, bench, DBs 5-80lb, barbell+plates, trap bar, tricep bar, bands.
-RACE: Montecito Mash Oct 17 2026 (7mi paddle + 10mi trail run + 15mi MTB). Cramped on bike last year.
-LIFE: Baby due October 2026. High stress. Sleep 7.2hrs avg. When baby comes drop to 3-day plan.
-FITNESS: CTL tracked via Intervals.icu (hrTSS-based, single-digit scale — only HR-tracked sessions count, so surf/MTB/dirt-bike volume is under-captured). HRV 90-111ms range. Hill score 30 — climbing deficit. Historically boom-bust.
+STATUS: Did NOT race Montecito Mash (Oct 2026) — left-sided back/leg pain ("sciatica"). Pain reaches about the knee and up toward the neck; worst on sit-to-stand, occasional pinches lying down, kicking DBs up to bench hurts. Chiro (adjustment + Softwave) gave little relief. Athlete wants to keep a stretching/mobility approach. Next goal: Gaviota OCR 2027.
+LIFE: Newborn at home. Schedule is unpredictable — sessions are chosen by time available, not by weekday. 3-day minimum: Lower (spine-friendly), combined Upper, Zone 2 run with cadence focus.
+BACK RULES: Pain that stays in the back or retreats from the leg = OK to train. Pain that spreads further down the leg = back off that movement. Pain ≥6 or reaching the knee = routine + easy Z2 only. No heavy trap bar / RDL / back squat until a full week at 0-2. No DB kick-ups (landmine/Smith incline instead). Daily 12-min back routine. If not clearly better in 2-3 weeks, or any worsening, refer to PT/sports med. Urgent red flags: saddle numbness, bladder/bowel change, progressive weakness/foot drop.
+DATA: Garmin Personal API (daily, encrypted) gives Garmin training load on every activity, HRV vs Garmin baseline, sleep, HR zones. Intervals.icu CTL is hrTSS-based single-digit scale and undercounts surf/MTB/dirt bike. Daily back check-in (pain 0-10, reach, sit-to-stand, routine) is logged in Intervals wellness comments.
+READINESS (newborn era): judge 7-day HRV avg vs Garmin baseline band, not one night. Below band = -10-15%; >10% below = Z2 only; single night <40 = rest. <6h sleep = drop intensity 15-20%.
 PHYSIOLOGY: Cadence 173 flat → 152 steep (target 170+). Heavy sweater 1520ml/90min — drives cramps. Naturally runs 90%+ HR (must discipline 140-150 for endurance). Paddle is NOT a weakness. LTHR ~178, max HR ~193-207.
-WEAKNESSES: Aerobic efficiency, lower body resilience, fueling/sweat, climb cadence, training consistency, mobility.
-PLAN: M Lower A | T Upper A push/paddle | W Z2+mobility | Th trail run | F Upper B pull/biceps | Sa long MTB | Su OFF
+WEAKNESSES: Back/sciatica (current #1), aerobic efficiency, lower body resilience, fueling/sweat, climb cadence, training consistency, mobility.
 PREFERENCES: Incline-first chest. High bicep frequency. No sugarcoating.
-ACWR rule: never exceed 1.3x chronic load. Cramp protocol: 500mg sodium pre-load, 60g carbs/hr.`;
+ACWR rule: never exceed 1.3x chronic load (use Garmin load). Cramp protocol: 500mg sodium pre-load, 60g carbs/hr.`;
 
 const FEEL_OPTIONS = [
   { id: 'fresh', icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>', label: 'Fresh', desc: 'Ready to push, no soreness, sleep was solid' },
@@ -730,10 +765,10 @@ const FEEL_OPTIONS = [
 ];
 
 const SESSIONS = {
-  "Monday": { title: "Lower A — Heavy Bilateral", intensity: "hard", summary: "Low volume, high quality. The two big lifts get all your focus. Builds the legs to climb Gibraltar without cramping.", duration: "60-75 min", warmup: ["Hip 90/90s — 1 min each side", "Goblet squat hold — 30 sec x 2", "Ankle CARs — 10 each", "Glute bridges — 15 reps", "Empty bar squats — 10 reps"], exercises: [ { name: "Trap Bar Deadlift", sets: 4, reps: "5", weight: "Build to top set", rest: "3 min", notes: "Reset each rep. Brace HARD. Top set leaves 1-2 in tank." }, { name: "Barbell Back Squat", sets: 3, reps: "6", weight: "75-80% 1RM", rest: "2-3 min", notes: "Below parallel. Vertical torso. Drive knees out." }, { name: "Romanian Deadlift", sets: 3, reps: "8", weight: "Moderate-heavy", rest: "90 sec", notes: "Feel hamstrings load. Bar stays close to legs." }, { name: "Hanging Knee Raise", sets: 3, reps: "10", weight: "Bodyweight", rest: "60 sec", notes: "Slow controlled. Or sub Ab Wheel x10." } ], cooldown: ["Couch stretch — 90 sec each side", "Pigeon pose — 90 sec each side", "Foam roll quads + IT band — 2 min"], fueling: "Pre: oats + banana + protein shake. Post: protein + carbs within 60 min." },
-  "Tuesday": { title: "Upper A — Push & Paddle", intensity: "hard", summary: "Incline-first chest day with paddle-specific finishers. Upper chest priority for fullness, with shoulder stability work for the 7-mile Mash paddle.", duration: "55-70 min", warmup: ["Band pull-aparts — 15 reps x 2", "Shoulder CARs — 10 each direction", "Wall slides — 10 reps", "Light DB press — 12 reps x 2"], exercises: [ { name: "Incline Barbell Press", sets: 4, reps: "8", weight: "70-75% 1RM", rest: "2-3 min", notes: "Bench at 30-45°. Bar to upper chest. Pause briefly." }, { name: "Incline Dumbbell Press", sets: 3, reps: "10-12", weight: "Moderate", rest: "90 sec", notes: "Slight squeeze at top. DBs nearly touching." }, { name: "Cable Incline Fly", sets: 3, reps: "12-15", weight: "Light-moderate", rest: "60 sec", notes: "Low-to-high arc. Squeeze upper chest at top." }, { name: "Standing Overhead Press", sets: 3, reps: "10", weight: "Moderate", rest: "90 sec", notes: "Tight core. No lower back arch." }, { name: "Cable Tricep Pushdown", sets: 3, reps: "12-15", weight: "Moderate", rest: "60 sec", notes: "Elbows pinned. Full extension." }, { name: "Prone Plank to Extend", sets: 3, reps: "10", weight: "Bodyweight", rest: "60 sec", notes: "Paddle simulation. Stretch shoulders forward." }, { name: "Cable Pulldown in Hip Hinge", sets: 3, reps: "12-15", weight: "Light", rest: "60 sec", notes: "Mimic paddle stroke. Hinge at hips." }, { name: "Cable Curl + DB Curl", sets: 2, reps: "15", weight: "Light pump", rest: "45 sec", notes: "Bicep finisher — burn out for size." } ], cooldown: ["Doorway pec stretch — 60 sec each side", "Cross-body shoulder stretch — 30 sec each", "Foam roll thoracic spine — 90 sec"], fueling: "Carbs around training. Hydrate aggressively given heavy sweat rate." },
-  "Wednesday": { title: "Zone 2 + Full Mobility", intensity: "easy", summary: "The most underrated session of the week. Builds aerobic base and fixes mobility deficits spiking your vertical ratio on climbs. NEVER skip this.", duration: "50-60 min", warmup: ["5 min easy warm-up before main set"], exercises: [ { name: "Zone 2 Cardio (bike, swim, or easy run)", sets: 1, reps: "30-40 min", weight: "140-150bpm cap", rest: "—", notes: "Conversational pace. Nasal breathing. Builds the engine for the Mash." } ], cooldown: ["Foam roll thoracic spine — 2 min", "Foam roll quads — 2 min each leg", "Foam roll hamstrings — 2 min each leg", "Hip flexor stretch — 2 min each side", "Pigeon pose — 2 min each side", "Hamstring band floss — 1 min each side", "Doorway pec stretch — 1 min each side", "Ankle CARs + calf stretch — 2 min total"], fueling: "Light meal beforehand. Plenty of water + electrolytes." },
-  "Thursday": { title: "Trail Run", intensity: "moderate", summary: "The session that wins or loses the Mash. HR cap is non-negotiable — discipline now means you don't blow up on Gibraltar in October.", duration: "45-90 min", warmup: ["Bulgarian Split Squats — 8 reps each side x 2 (BW)", "Nordic curl negatives — 5 reps x 2", "Walking lunges — 10 each side", "Leg swings — 10 each direction", "5 min easy walk into slow jog"], exercises: [ { name: "Trail Run", sets: 1, reps: "Build to 90 min", weight: "140-150 bpm cap", rest: "—", notes: "Use HR monitor strictly. Walk hills if needed to stay under cap. Metronome at 170 spm — non-negotiable on climbs." } ], cooldown: ["Walk 5 min cool-down", "Calf stretch — 60 sec each", "Couch stretch — 90 sec each", "Pigeon pose — 90 sec each"], fueling: "If running >60 min: 30-60g carbs/hr + electrolytes. PRACTICE this — don't wait for race day." },
+  "Monday": {"title": "Lower A — Spine-Friendly Strength", "intensity": "moderate", "summary": "Sciatica phase: no heavy loaded hinges or bilateral squats until a symptom-free week. Single-leg strength and glutes keep the legs building without compressing the back. Stop any lift that sends pain further down the leg.", "duration": "45-60 min", "warmup": ["Cat-cow — 10", "Bird dog — 8/side", "90/90 hip switches — 8 each way", "Glute bridges — 15", "Bodyweight split squat — 8/side"], "exercises": [{"name": "Rear-Foot Elevated Split Squat", "sets": 3, "reps": "8/side", "weight": "DBs, moderate", "rest": "90 sec", "notes": "Torso tall. Pick DBs up from a bench, not the floor."}, {"name": "DB Step-Up", "sets": 3, "reps": "8/side", "weight": "Moderate", "rest": "90 sec", "notes": "Knee-height box. Drive through the front heel, no push-off from the back leg."}, {"name": "Barbell or DB Hip Thrust", "sets": 3, "reps": "10", "weight": "Moderate-heavy", "rest": "90 sec", "notes": "Ribs down, no lower-back arch at the top. Pad the bar."}, {"name": "Goblet Box Squat", "sets": 3, "reps": "8", "weight": "Light-moderate", "rest": "90 sec", "notes": "Only if pain-free. Sit back to a box at parallel."}, {"name": "Side Plank + Bird Dog", "sets": 3, "reps": "20s/side + 8/side", "weight": "Bodyweight", "rest": "45 sec", "notes": "Trunk stability — this is what fixes sit-to-stand."}], "cooldown": ["Half-kneeling hip flexor — 60 sec/side", "Supine figure-4 — gentle, 45 sec/side", "Prone press-ups — 10 (if they help)"], "fueling": "Protein + carbs within 60 min. Bring heavy trap bar work back once a full week passes with pain at 0–2."},
+  "Tuesday": { title: "Upper A — Push & Paddle", intensity: "hard", summary: "Incline-first chest day with paddle-specific finishers. Upper chest priority for fullness, with shoulder stability work for the 7-mile Mash paddle.", duration: "55-70 min", warmup: ["Band pull-aparts — 15 reps x 2", "Shoulder CARs — 10 each direction", "Wall slides — 10 reps", "Light DB press — 12 reps x 2"], exercises: [ { name: "Incline Barbell Press", sets: 4, reps: "8", weight: "70-75% 1RM", rest: "2-3 min", notes: "Bench at 30-45°. Bar to upper chest. Pause briefly." }, { name: "Landmine or Smith Incline Press", sets: 3, reps: "10-12", weight: "Moderate", rest: "90 sec", notes: "Replaces incline DBs while the back is irritated — no kicking dumbbells up." }, { name: "Cable Incline Fly", sets: 3, reps: "12-15", weight: "Light-moderate", rest: "60 sec", notes: "Low-to-high arc. Squeeze upper chest at top." }, { name: "Standing Overhead Press", sets: 3, reps: "10", weight: "Moderate", rest: "90 sec", notes: "Tight core. No lower back arch." }, { name: "Cable Tricep Pushdown", sets: 3, reps: "12-15", weight: "Moderate", rest: "60 sec", notes: "Elbows pinned. Full extension." }, { name: "Prone Plank to Extend", sets: 3, reps: "10", weight: "Bodyweight", rest: "60 sec", notes: "Paddle simulation. Stretch shoulders forward." }, { name: "Cable Pulldown in Hip Hinge", sets: 3, reps: "12-15", weight: "Light", rest: "60 sec", notes: "Mimic paddle stroke. Hinge at hips." }, { name: "Cable Curl + DB Curl", sets: 2, reps: "15", weight: "Light pump", rest: "45 sec", notes: "Bicep finisher — burn out for size." } ], cooldown: ["Doorway pec stretch — 60 sec each side", "Cross-body shoulder stretch — 30 sec each", "Foam roll thoracic spine — 90 sec"], fueling: "Carbs around training. Hydrate aggressively given heavy sweat rate." },
+  "Wednesday": { title: "Zone 2 + Back Routine", intensity: "easy", summary: "The most underrated session of the week. Builds aerobic base and fixes mobility deficits spiking your vertical ratio on climbs. NEVER skip this.", duration: "50-60 min", warmup: ["5 min easy warm-up before main set"], exercises: [ { name: "Zone 2 Cardio (bike, swim, or easy run)", sets: 1, reps: "30-40 min", weight: "140-150bpm cap", rest: "—", notes: "Conversational pace. Nasal breathing. Builds the engine for the Mash." } ], cooldown: ["Back routine (12 min):", "Prone press-ups — 10 slow (keep only if leg pain eases or moves toward the back)", "Cat-cow — 10", "Seated sciatic nerve sliders — 2x10 left (glide, don't stretch)", "Half-kneeling hip flexor — 2x30s/side, glute squeezed, no arch", "90/90 hip switches — 8 each way", "Open books — 8/side", "Bird dog 2x8/side + side plank 2x20s/side"], fueling: "Light meal beforehand. Plenty of water + electrolytes." },
+  "Thursday": { title: "Trail Run", intensity: "moderate", summary: "The session that wins or loses the Mash. HR cap is non-negotiable — discipline now means you don't blow up on Gibraltar in October.", duration: "45-90 min", warmup: ["Bulgarian Split Squats — 8 reps each side x 2 (BW)", "Nordic curl negatives — 5 reps x 2", "Walking lunges — 10 each side", "Leg swings — 10 each direction", "5 min easy walk into slow jog"], exercises: [ { name: "Trail Run", sets: 1, reps: "Build to 90 min", weight: "140-150 bpm cap", rest: "—", notes: "Use HR monitor strictly. Walk hills if needed to stay under cap. Metronome at 170 spm — non-negotiable on climbs." } ], cooldown: ["Walk 5 min cool-down", "Calf stretch — 60 sec each", "Half-kneeling hip flexor — 60 sec each", "Supine figure-4 — gentle, 45 sec each"], fueling: "If running >60 min: 30-60g carbs/hr + electrolytes. PRACTICE this — don't wait for race day." },
   "Friday": { title: "Upper B — Pull & Biceps", intensity: "hard", summary: "Pull-up day. Posture, paddle power, and bicep size all built here. Highest direct bicep volume of the week — make it count.", duration: "55-70 min", warmup: ["Band pull-aparts — 15 x 2", "Dead hang — 20 sec x 2", "Scap pull-ups — 8 reps x 2", "Light DB row — 10 reps x 2"], exercises: [ { name: "Weighted Pull-Ups", sets: 4, reps: "6-8", weight: "Add weight as needed", rest: "2-3 min", notes: "Most important upper body lift for the Mash. Full ROM. Chin clears bar." }, { name: "Barbell or DB Row", sets: 4, reps: "10", weight: "Moderate-heavy", rest: "90 sec", notes: "Hinge to ~45°. Pull to lower chest/upper abs. Squeeze." }, { name: "Cable Face Pulls", sets: 3, reps: "15", weight: "Light-moderate", rest: "60 sec", notes: "External rotation at end. Shoulder health insurance." }, { name: "Single Arm Cable Row", sets: 3, reps: "12 each", weight: "Moderate", rest: "60 sec", notes: "Full stretch at start. Drive elbow back hard." }, { name: "Hammer Curl", sets: 3, reps: "12", weight: "Moderate", rest: "60 sec", notes: "Hits brachialis — adds arm thickness." }, { name: "Incline Dumbbell Curl", sets: 3, reps: "12", weight: "Moderate", rest: "60 sec", notes: "Bench 45-60°. Long head emphasis — KEY for size." }, { name: "Cable Curl", sets: 3, reps: "15", weight: "Moderate", rest: "45 sec", notes: "Constant tension burn. Squeeze at top." }, { name: "Pallof Press + Dead Bug", sets: 3, reps: "12 + 8", weight: "Cable + BW", rest: "45 sec", notes: "Anti-rotation core finisher." } ], cooldown: ["Lat stretch (overhead reach) — 60 sec each", "Bicep stretch (against wall) — 30 sec each", "Foam roll lats + upper back — 2 min"], fueling: "High protein day. ~30-40g protein at every meal." },
   "Saturday": { title: "Long MTB Ride", intensity: "moderate", summary: "Race-specific bike training. Build to 2+ hours with sustained climbing. Practice fueling protocol that prevents Mash cramps.", duration: "90 min - 2.5 hrs", warmup: ["10 min easy spin to start", "Gradually build to working effort"], exercises: [ { name: "Long MTB Ride", sets: 1, reps: "Build to 2+ hrs", weight: "Mostly Z2, some Z3 climbs", rest: "—", notes: "Smooth pedaling. Higher cadence on climbs (don't grind). Practice descending technical terrain." } ], cooldown: ["10 min easy spin", "Hip flexor stretch 2 min each", "Foam roll quads + glutes", "Calf stretch each side"], fueling: "PRACTICE RACE FUELING: 500mg sodium pre-load 30 min before. 60g carbs/hour during." },
   "Sunday": { title: "Rest / Active Recovery", intensity: "rest", summary: "Protect HRV. Sleep early. Walk, surf easy, foam roll. Sunday rest is what makes Monday's lift possible.", duration: "Optional 20-30 min easy", warmup: [], exercises: [ { name: "Easy walk, surf, or full rest", sets: 1, reps: "Optional", weight: "Conversational only", rest: "—", notes: "Body Battery should be charging not draining." } ], cooldown: ["Full body stretch routine — 15-20 min", "Hip + hamstring focus", "Thoracic spine mobility"], fueling: "Whole foods. Hydrate well." }
@@ -2212,7 +2247,8 @@ function buildSummary(latest, history, activities) {
   if (adjustedReadiness == null && hrv == null && sleep == null) parts.push(`<em style="color: var(--text-dim);">Wellness data not syncing from Garmin — check Intervals settings.</em>`);
 
   const days = Math.ceil((RACE_DATE - today) / 86400000);
-  if (days <= 14) parts.push(`<span class="highlight-warn">${days} days to the Mash — race week mode.</span>`);
+  if (days < 0) { /* race passed — no countdown */ }
+  else if (days <= 14) parts.push(`<span class="highlight-warn">${days} days to the Mash — race week mode.</span>`);
   else if (days <= 60) parts.push(`${days} days to the Mash — entering peaking phase soon.`);
 
   return parts.join(' ');
@@ -2986,6 +3022,8 @@ function renderPhone(latest, sorted) {
     ${renderCoachCard(latest, sorted, state.activities)}
     ${renderAlerts(latest)}
     ${renderHealthSnapshot(latest, sorted)}
+    ${renderBackLog()}
+    ${renderGarminCard()}
     <div class="phone-data-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
       ${renderZoneDonut(state.activities)}
       ${renderWeeklyVolume(state.activities)}
@@ -3018,6 +3056,7 @@ function renderDesktop(latest, sorted) {
       <div class="col-4" style="display: flex; flex-direction: column; gap: 16px;">
         ${renderFeelCheckIn()}
         ${renderAlerts(latest) || ''}
+        ${renderBackLog()}
         ${renderCoachCard(latest, sorted, state.activities)}
         ${renderWeekPlanner(state.activities)}
       </div>
@@ -3025,6 +3064,7 @@ function renderDesktop(latest, sorted) {
       <!-- MIDDLE COLUMN: Health Snapshot + Insights + Zone + Volume -->
       <div class="col-4" style="display: flex; flex-direction: column; gap: 16px;">
         ${renderHealthSnapshot(latest, sorted, '-d')}
+        ${renderGarminCard()}
         ${renderInsights(sorted, state.activities)}
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
           ${renderZoneDonut(state.activities)}
@@ -3057,6 +3097,338 @@ function renderDesktop(latest, sorted) {
     </div>
   `;
 }
+
+// ════════════════════════════════════════════════════════════════════
+//  GARMIN (official Personal API → GitHub Action → encrypted file)
+// ════════════════════════════════════════════════════════════════════
+// The Action writes garmin.enc.json to the `garmin-data` branch. It is
+// encrypted (PBKDF2-SHA256 + AES-256-GCM); the passphrase lives only on
+// this device. Nothing readable about Clayton is public.
+const GARMIN_URLS = [
+  'https://raw.githubusercontent.com/claytonsawyer/Coach/garmin-data/garmin.enc.json',
+];
+state.garmin = null;          // decrypted payload
+state.garminStatus = 'idle';  // idle | loading | locked | badpass | missing | ready
+state.garminBlob = null;
+
+const b64bytes = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+
+async function decryptGarmin(blob, pass) {
+  const enc = new TextEncoder();
+  const base = await crypto.subtle.importKey('raw', enc.encode(pass), 'PBKDF2', false, ['deriveKey']);
+  const key = await crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt: b64bytes(blob.salt), iterations: blob.iter, hash: 'SHA-256' },
+    base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+  const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64bytes(blob.iv) }, key, b64bytes(blob.ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+
+async function loadGarmin() {
+  state.garminStatus = 'loading';
+  for (const url of GARMIN_URLS) {
+    try {
+      const r = await fetch(url + '?t=' + Date.now(), { cache: 'no-store' });
+      if (r.ok) { state.garminBlob = await r.json(); break; }
+    } catch (e) { /* try next */ }
+  }
+  if (!state.garminBlob) { state.garminStatus = 'missing'; render(); return; }
+  const pass = localStorage.getItem('garmin_pass');
+  if (!pass) { state.garminStatus = 'locked'; render(); return; }
+  await unlockGarmin(pass, false);
+}
+
+async function unlockGarmin(pass, fromInput = true) {
+  if (fromInput) pass = (document.getElementById('garmin-pass')?.value || '').trim();
+  if (!pass || !state.garminBlob) return;
+  try {
+    state.garmin = await decryptGarmin(state.garminBlob, pass);
+    localStorage.setItem('garmin_pass', pass);
+    state.garminStatus = 'ready';
+    window.debugGarmin = () => console.log('Garmin payload:', state.garmin);
+  } catch (e) {
+    localStorage.removeItem('garmin_pass');
+    state.garmin = null;
+    state.garminStatus = fromInput ? 'badpass' : 'locked';
+  }
+  render();
+}
+
+function lockGarmin() {
+  localStorage.removeItem('garmin_pass');
+  state.garmin = null; state.garminStatus = 'locked'; render();
+}
+
+// ── Garmin maths ─────────────────────────────────────────────────────
+const isoLocal = d => d.toLocaleDateString('en-CA');           // YYYY-MM-DD
+const daysAgoIso = n => isoLocal(new Date(Date.now() - n * 86400000));
+
+function garminDailyLoad(g) {
+  const m = {};
+  (g.acts || []).forEach(a => {
+    const d = String(a.t || '').slice(0, 10);
+    if (d && a.load != null) m[d] = (m[d] || 0) + a.load;
+  });
+  return m;
+}
+
+function garminAcwr(g) {
+  const load = garminDailyLoad(g);
+  const first = Object.keys(load).sort()[0];
+  if (!first || first > daysAgoIso(27)) return null;
+  let acute = 0, chronic = 0;
+  for (let i = 0; i < 28; i++) {
+    const v = load[daysAgoIso(i)] || 0;
+    chronic += v; if (i < 7) acute += v;
+  }
+  const weeklyChronic = chronic / 4;
+  if (!weeklyChronic) return null;
+  return { acute: Math.round(acute), chronic: Math.round(weeklyChronic), ratio: acute / weeklyChronic };
+}
+
+function garminWeeklyLoad(g, weeks = 8) {
+  const load = garminDailyLoad(g);
+  const now = new Date(); now.setHours(0, 0, 0, 0);
+  const monday = new Date(now); monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+  const out = [];
+  for (let w = weeks - 1; w >= 0; w--) {
+    const start = new Date(monday); start.setDate(monday.getDate() - 7 * w);
+    let sum = 0;
+    for (let i = 0; i < 7; i++) { const d = new Date(start); d.setDate(start.getDate() + i); sum += load[isoLocal(d)] || 0; }
+    out.push({ label: start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), value: Math.round(sum), current: w === 0 });
+  }
+  return out;
+}
+
+function garminZones7d(g) {
+  const cutoff = daysAgoIso(6);
+  const z = [0, 0, 0, 0, 0];
+  (g.acts || []).forEach(a => {
+    if (String(a.t || '').slice(0, 10) >= cutoff) (a.z || []).forEach((s, i) => z[i] += s || 0);
+  });
+  return z;
+}
+
+function lastWith(days, key) {
+  for (let i = days.length - 1; i >= 0; i--) if (days[i][key] != null) return days[i];
+  return null;
+}
+function avgLast(days, key, n = 7) {
+  const vals = days.filter(d => d.d >= daysAgoIso(n - 1) && d[key] != null).map(d => d[key]);
+  return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+}
+const fmtHm = s => s == null ? '—' : `${Math.floor(s / 3600)}:${String(Math.round((s % 3600) / 60)).padStart(2, '0')}`;
+
+// HRV read built for newborn-era noise: judge the 7-day average against
+// Garmin's own baseline band; a single very low night still overrides.
+function garminReadiness(g) {
+  const days = g.days || [];
+  const last = lastWith(days, 'hrv');
+  const avg7raw = avgLast(days, 'hrv', 7);
+  const avg7 = avg7raw == null ? null : Math.round(avg7raw);
+  const band = lastWith(days, 'hrvLow');
+  const sleepLast = lastWith(days, 'sleepS');
+  const sleep7 = avgLast(days, 'sleepS', 7);
+  let level = 'go', text = 'Train as planned.';
+  if (last && last.hrv != null && last.hrv < 40) { level = 'rest'; text = 'Last night HRV under 40 — rest day.'; }
+  else if (avg7 && band && band.hrvLow) {
+    if (avg7 < band.hrvLow * 0.9) { level = 'z2'; text = '7-day HRV well below your baseline — Zone 2 only.'; }
+    else if (avg7 < band.hrvLow) { level = 'reduce'; text = '7-day HRV below baseline — cut volume 10–15%.'; }
+  }
+  if (level === 'go' && sleepLast && sleepLast.sleepS < 6 * 3600) { level = 'reduce'; text = 'Under 6 h sleep — drop intensity 15–20%.'; }
+  return { level, text, last, avg7, band, sleepLast, sleep7 };
+}
+
+// ── Garmin card ──────────────────────────────────────────────────────
+function renderGarminCard() {
+  const st = state.garminStatus;
+  const head = (meta = '') => `<div class="card-header"><div class="card-title">Garmin</div><div class="card-meta">${meta}</div></div>`;
+  if (st === 'idle' || st === 'loading') return `<div class="card g-card">${head('Loading…')}</div>`;
+  if (st === 'missing') return `<div class="card g-card">${head('Not set up')}<div class="g-note">No Garmin data published yet. Run the "Garmin pull" action once in GitHub.</div></div>`;
+  if (st === 'locked' || st === 'badpass') return `
+    <div class="card g-card">${head('Locked')}
+      <div class="g-note">${st === 'badpass' ? '<span style="color:var(--red)">Wrong passphrase.</span> ' : ''}Enter your dashboard passphrase. It stays on this device.</div>
+      <div class="g-unlock">
+        <input id="garmin-pass" type="password" autocomplete="current-password" placeholder="Passphrase" onkeydown="if(event.key==='Enter')unlockGarmin()">
+        <button onclick="unlockGarmin()">Unlock</button>
+      </div>
+    </div>`;
+
+  const g = state.garmin;
+  const r = garminReadiness(g);
+  const acwr = garminAcwr(g);
+  const weeks = garminWeeklyLoad(g);
+  const z = garminZones7d(g);
+  const zTot = z.reduce((a, b) => a + b, 0);
+  const updated = new Date(g.generated);
+  const lvlColor = { go: 'var(--green)', reduce: 'var(--yellow)', z2: 'var(--orange)', rest: 'var(--red)' }[r.level];
+
+  const acwrColor = !acwr ? 'var(--text-dim)' : acwr.ratio > 1.3 ? 'var(--red)' : acwr.ratio < 0.8 ? 'var(--yellow)' : 'var(--green)';
+  const acwrPct = acwr ? Math.min(100, acwr.ratio / 2 * 100) : 0;
+  const maxW = Math.max(1, ...weeks.map(w => w.value));
+  const zColors = ['#64748B', 'var(--green)', 'var(--yellow)', 'var(--orange)', 'var(--red)'];
+
+  return `
+  <div class="card g-card">
+    ${head(`Updated ${updated.toLocaleString('en-US', { weekday: 'short', hour: 'numeric', minute: '2-digit' })}`)}
+    <div class="g-read" style="border-color:${lvlColor}"><span class="g-dot" style="background:${lvlColor}"></span>${r.text}</div>
+
+    <div class="g-grid">
+      <div class="g-stat" title="Last night ${r.last?.hrv ?? '—'} ms · Garmin baseline ${r.band?.hrvLow ?? '—'}–${r.band?.hrvHigh ?? '—'} ms">
+        <div class="g-k">HRV 7-day</div>
+        <div class="g-v">${r.avg7 ? Math.round(r.avg7) : '—'}<span>ms</span></div>
+        <div class="g-s">base ${r.band?.hrvLow ?? '—'}–${r.band?.hrvHigh ?? '—'} · last ${r.last?.hrv ?? '—'}</div>
+      </div>
+      <div class="g-stat" title="Last night ${fmtHm(r.sleepLast?.sleepS)} · score ${r.sleepLast?.sleepScore ?? '—'} · deep ${fmtHm(r.sleepLast?.deepS)} · REM ${fmtHm(r.sleepLast?.remS)}">
+        <div class="g-k">Sleep</div>
+        <div class="g-v">${fmtHm(r.sleepLast?.sleepS)}<span>h</span></div>
+        <div class="g-s">score ${r.sleepLast?.sleepScore ?? '—'} · 7d ${fmtHm(r.sleep7)}</div>
+      </div>
+    </div>
+
+    <div class="g-row-title"><span>Load ratio (acute : chronic)</span><span style="color:${acwrColor};font-weight:700">${acwr ? acwr.ratio.toFixed(2) : '—'}</span></div>
+    <div class="g-bar" title="${acwr ? `7-day load ${acwr.acute} vs 4-week weekly average ${acwr.chronic}. Guardrail 1.3.` : 'Needs 4 weeks of data'}">
+      <div style="width:${acwrPct}%;background:${acwrColor}"></div>
+      <i style="left:${1.3 / 2 * 100}%"></i>
+    </div>
+    <div class="g-s" style="margin-bottom:12px">Garmin training load on every activity — paddle, surf and dirt bike included. Keep under 1.3.</div>
+
+    <div class="g-row-title"><span>Weekly load · 8 wk</span><span>${weeks[weeks.length - 1].value} this week</span></div>
+    <div class="g-weeks">
+      ${weeks.map(w => `<div class="g-wk" title="Week of ${w.label}: load ${w.value}"><div style="height:${Math.max(3, w.value / maxW * 100)}%;background:${w.current ? 'var(--primary)' : 'var(--border-strong)'}"></div></div>`).join('')}
+    </div>
+
+    <div class="g-row-title" style="margin-top:12px"><span>Heart-rate zones · 7 days</span><span>${zTot ? Math.round((z[0] + z[1]) / zTot * 100) + '% easy' : '—'}</span></div>
+    <div class="g-zbar">
+      ${zTot ? z.map((s, i) => s ? `<div title="Z${i + 1}: ${Math.round(s / 60)} min" style="flex:${s};background:${zColors[i]}"></div>` : '').join('') : '<div style="flex:1;background:var(--border)"></div>'}
+    </div>
+    <div class="g-s">${zTot ? z.map((s, i) => `Z${i + 1} ${Math.round(s / 60)}m`).join(' · ') : 'No HR-tracked sessions this week'}</div>
+    <div class="g-foot"><a href="#" onclick="lockGarmin();return false;">Lock on this device</a></div>
+  </div>`;
+}
+
+// ── Back / sciatica log ──────────────────────────────────────────────
+// Saved to Intervals.icu wellness "comments" as one "Back:" line (other
+// comment text is kept), so it follows you across phone and desktop.
+const BACK_REACH = ['Back', 'Buttock', 'Thigh', 'Knee', 'Neck'];
+
+function parseBackLine(text) {
+  const line = String(text || '').split('\n').find(l => l.startsWith('Back: pain '));
+  if (!line) return null;
+  const parts = line.split(' · ').map(x => x.trim());
+  const pain = parseInt(parts[0].replace('Back: pain ', ''), 10);
+  if (isNaN(pain)) return null;
+  const reachPart = parts.find(x => x.startsWith('reach ')) || '';
+  return {
+    pain,
+    reach: reachPart.slice(6).split(',').map(x => x.trim()).filter(x => x && x !== 'none').map(x => x[0].toUpperCase() + x.slice(1)),
+    sts: parts.includes('sit-to-stand hurt'), routine: parts.includes('routine done')
+  };
+}
+function backLine(e) {
+  return `Back: pain ${e.pain}/10 · reach ${e.reach.length ? e.reach.map(s => s.toLowerCase()).join(', ') : 'none'} · ${e.sts ? 'sit-to-stand hurt' : 'sit-to-stand ok'} · ${e.routine ? 'routine done' : 'no routine'}`;
+}
+function backEntryFor(date) {
+  const local = localStorage.getItem('back_' + date);
+  if (local) { try { return JSON.parse(local); } catch (e) {} }
+  const w = (state.wellness || []).find(x => x.id === date);
+  return w ? parseBackLine(w.comments) : null;
+}
+
+const todayIso = isoLocal(new Date());
+state.backDraft = backEntryFor(todayIso) || { pain: null, reach: [], sts: false, routine: false };
+state.backSaved = !!localStorage.getItem('back_' + todayIso);
+state.backMsg = '';
+
+function backSet(field, value) {
+  const d = state.backDraft;
+  if (field === 'reach') d.reach = d.reach.includes(value) ? d.reach.filter(r => r !== value) : [...d.reach, value];
+  else if (field === 'pain') d.pain = value;
+  else d[field] = !d[field];
+  state.backSaved = false; state.backMsg = '';
+  render();
+}
+
+async function saveBack() {
+  const d = state.backDraft;
+  if (d.pain == null) { state.backMsg = 'Pick a pain level first.'; render(); return; }
+  localStorage.setItem('back_' + todayIso, JSON.stringify(d));
+  state.backSaved = true;
+  state.backMsg = 'Saved on this device…';
+  render();
+  if (!state.athleteId || !state.apiKey) return;
+  try {
+    const rec = (state.wellness || []).find(x => x.id === todayIso);
+    const others = String(rec?.comments || '').split('\n').filter(l => l.trim() && !l.startsWith('Back:'));
+    const comments = [...others, backLine(d)].join('\n');
+    const res = await fetch(`https://intervals.icu/api/v1/athlete/${state.athleteId}/wellness/${todayIso}`, {
+      method: 'PUT',
+      headers: { Authorization: 'Basic ' + btoa('API_KEY:' + state.apiKey), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: todayIso, comments })
+    });
+    if (!res.ok) throw new Error(res.status);
+    if (rec) rec.comments = comments; else state.wellness.push({ id: todayIso, comments });
+    state.backMsg = 'Saved to Intervals.icu.';
+  } catch (e) {
+    state.backMsg = 'Saved on this device (Intervals sync failed).';
+  }
+  render();
+}
+
+function backHistory(n = 14) {
+  const out = [];
+  for (let i = n - 1; i >= 0; i--) { const d = daysAgoIso(i); out.push({ d, e: backEntryFor(d) }); }
+  return out;
+}
+
+function backGuidance(e, hist) {
+  if (!e || e.pain == null) return '';
+  const logged = hist.filter(h => h.e && h.e.pain != null);
+  const recent = logged.slice(-3).map(h => h.e.pain), earlier = logged.slice(-7, -3).map(h => h.e.pain);
+  const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
+  let trend = '';
+  if (recent.length >= 2 && earlier.length >= 2) {
+    const diff = mean(recent) - mean(earlier);
+    trend = diff <= -1 ? ' Trending better.' : diff >= 1 ? ' Trending worse — if this holds a week, book a PT or sports med visit.' : '';
+  }
+  if (e.reach.includes('Knee') || e.pain >= 6)
+    return `Back off today: no loaded hinges or squats. Routine + easy Zone 2 only.${trend}`;
+  if (e.pain >= 3)
+    return `Train around it: single-leg and spine-friendly options, no kick-ups. Stop any movement that sends pain further down the leg.${trend}`;
+  return `Green light — train as planned with the spine-friendly lower day.${trend}`;
+}
+
+function renderBackLog() {
+  const d = state.backDraft;
+  const hist = backHistory(14);
+  const painColor = p => p == null ? 'var(--border)' : p >= 6 ? 'var(--red)' : p >= 3 ? 'var(--yellow)' : 'var(--green)';
+  const guide = backGuidance(d, hist);
+  return `
+  <div class="card b-card">
+    <div class="card-header"><div class="card-title">Back check-in</div><div class="card-meta">${state.backSaved ? 'Logged today' : 'Not logged today'}</div></div>
+    <div class="g-k" style="margin-bottom:6px">Pain right now</div>
+    <div class="b-pain">
+      ${Array.from({ length: 11 }, (_, i) => `<button class="${d.pain === i ? 'on' : ''}" style="${d.pain === i ? `background:${painColor(i)};border-color:${painColor(i)};color:#0B0F14` : ''}" onclick="backSet('pain',${i})">${i}</button>`).join('')}
+    </div>
+    <div class="g-k" style="margin:10px 0 6px">How far it reached</div>
+    <div class="b-chips">
+      ${BACK_REACH.map(r => `<button class="${d.reach.includes(r) ? 'on' : ''}" onclick="backSet('reach','${r}')">${r}</button>`).join('')}
+    </div>
+    <div class="b-chips" style="margin-top:8px">
+      <button class="${d.sts ? 'on warn' : ''}" onclick="backSet('sts')">Sit-to-stand hurt</button>
+      <button class="${d.routine ? 'on' : ''}" onclick="backSet('routine')">Did the routine</button>
+    </div>
+    <button class="b-save" onclick="saveBack()">${state.backSaved ? 'Update' : 'Save'} check-in</button>
+    ${state.backMsg ? `<div class="g-s" style="text-align:center;margin-top:6px">${state.backMsg}</div>` : ''}
+    ${guide ? `<div class="g-read" style="border-color:${painColor(d.pain)};margin-top:12px">${guide}</div>` : ''}
+    <div class="g-row-title" style="margin-top:12px"><span>Last 14 days</span><span>${hist.filter(h => h.e?.routine).length} routine days</span></div>
+    <div class="g-weeks b-hist">
+      ${hist.map(h => `<div class="g-wk" title="${h.d}: ${h.e ? `pain ${h.e.pain}/10${h.e.reach?.length ? ' · ' + h.e.reach.join(', ') : ''}${h.e.routine ? ' · routine' : ''}` : 'not logged'}"><div style="height:${h.e ? Math.max(6, h.e.pain * 10) : 3}%;background:${h.e ? painColor(h.e.pain) : 'var(--border)'}"></div>${h.e?.routine ? '<b></b>' : ''}</div>`).join('')}
+    </div>
+    <div class="g-s" style="margin-top:8px">Get seen urgently for groin or saddle numbness, bladder or bowel changes, or worsening leg weakness.</div>
+  </div>`;
+}
+
+loadGarmin();
 
 fetchData();
 </script>

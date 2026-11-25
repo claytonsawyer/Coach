@@ -1,0 +1,62 @@
+name: Garmin pull
+
+# Pulls Garmin data with the official Personal API, encrypts it, and
+# force-pushes it as the only file on the `garmin-data` branch (no history
+# piles up). The dashboard reads it from there and decrypts it on-device.
+
+on:
+  schedule:
+    - cron: "17 15 * * *"   # ~7:17am Pacific (after the morning watch sync)
+    - cron: "17 21 * * *"   # ~1:17pm Pacific
+  workflow_dispatch:
+    inputs:
+      debug_shape:
+        description: "Print field NAMES returned by each endpoint (no values)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: garmin-pull
+  cancel-in-progress: false
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install encryption library
+        run: pip install --quiet cryptography
+
+      - name: Pull and encrypt
+        env:
+          GARMIN_PERSONAL_API_KEY: ${{ secrets.GARMIN_PERSONAL_API_KEY }}
+          DASH_PASSPHRASE: ${{ secrets.DASH_PASSPHRASE }}
+          DEBUG_SHAPE: ${{ inputs.debug_shape && '1' || '0' }}
+          OUT_FILE: ${{ runner.temp }}/out/garmin.enc.json
+        run: |
+          mkdir -p "${{ runner.temp }}/out"
+          python scripts/garmin_pull.py
+
+      - name: Publish to garmin-data branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd "${{ runner.temp }}/out"
+          git init -q -b garmin-data
+          git config user.name "garmin-bot"
+          git config user.email "garmin-bot@users.noreply.github.com"
+          git add garmin.enc.json
+          git commit -q -m "Garmin data $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" garmin-data
+          echo "Published."
